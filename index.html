@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crealanda</title>
-    <!-- Het Great Vibes lettertype inladen van Google Fonts -->
-    <link href="https://googleapis.com" rel="stylesheet">
     <style>
-        /* Jouw gekozen achtergrondkleur */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
@@ -20,7 +17,7 @@
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
-            padding: 15px; 
+            padding: 10px 15px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -28,17 +25,28 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            height: 60px;
         }
 
-        /* Logo links in Great Vibes lettertype */
-        .logo {
-            font-family: 'Great Vibes', cursive;
-            font-size: 36px;
-            margin: 0;
-            padding-left: 10px;
+        .banner-spacer {
+            width: 26px; 
         }
 
-        /* De 3 bolletjes rechtsboven (Menu knop) */
+        /* Jouw logo met de originele lange naam precies in het midden */
+        .logo-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .logo-container img {
+            max-height: 55px; 
+            width: auto;
+            object-fit: contain;
+        }
+
+        /* De 3 bolletjes rechtsboven */
         .menu-btn {
             display: flex;
             flex-direction: column;
@@ -58,7 +66,7 @@
             display: none;
             background-color: #9EB3D8;
             position: absolute;
-            top: 65px;
+            top: 75px;
             right: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -83,7 +91,6 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        /* Welkomstbalk op Home */
         .welcome-box {
             background: rgba(255, 255, 255, 0.05);
             padding: 20px;
@@ -109,7 +116,7 @@
         .btn-cart { background-color: #9EB3D8; color: #FCF5EE; }
         .btn:active { opacity: 0.8; }
 
-        /* Winkelmand pagina layout */
+        /* Winkelmand layout */
         .cart-section { background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px; border: 2px dashed #9EB3D8; }
         .cart-section h2 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
         ul { list-style: none; padding: 0; margin: 0; }
@@ -129,10 +136,15 @@
 </head>
 <body>
 
-<!-- De blauwe banner bovenaan -->
+<!-- De blauwe banner bovenaan met jouw logo -->
 <div class="top-banner">
-    <div class="logo">Crea Landa</div>
-    <!-- De 3 bolletjes knop -->
+    <div class="banner-spacer"></div> 
+    
+    <div class="logo-container">
+        <!-- Deze link zoekt nu exact naar de naam van jouw bestand -->
+        <img src="Naamloos - 03 oktober 2026 om 18.42.59 .png" alt="Crea Landa Logo">
+    </div>
+    
     <div class="menu-btn" onclick="toggleMenu()">
         <div class="dot"></div>
         <div class="dot"></div>
@@ -191,9 +203,6 @@
 </div>
 
 <script>
-    // ==========================================
-    //  HIER KUN JE DE PRODUCTEN EN VERZENDKOSTEN AANPASSEN
-    // ==========================================
     const VERZENDKOSTEN = 4.25; 
 
     const PRODUCTEN = [
@@ -203,12 +212,8 @@
         { id: 4, name: "Handbeschilderde Wenskaart", price: 3.50, weight: "15 gram", image: "product4.jpg" }
     ];
 
-    // ==========================================
-    //  DE AUTOMATISCHE CODE VOOR HET SYSTEEM
-    // ==========================================
     let cart = [];
 
-    // Producten op de homepagina zetten
     const container = document.getElementById('products-container');
     PRODUCTEN.forEach(p => {
         container.innerHTML += `
@@ -222,5 +227,10 @@
         `;
     });
 
-    // Menu openen en sluiten
     function toggleMenu() {
+        const menu = document.getElementById('navMenu');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function switchPage(pageId) {
+        
