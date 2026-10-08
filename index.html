@@ -122,16 +122,19 @@
             box-sizing: border-box;
             width: 100%;
         }
+        
+        /* HIER WORDT HET LETTERTYPE NU COMPLEET TOEGEPAST */
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 22px; 
+            font-weight: 500;
+            font-size: 26px; /* Iets groter omdat dit lettertype wat smaller is */
             color: #FCF5EE;
-            line-height: 1.4;
-            letter-spacing: 0.5px;
+            line-height: 1.3;
+            letter-spacing: 0.8px;
         }
 
-        /* ================= WINKELMAND STYLING ================= */
+        /* Winkelmand layout */
         .cart-section { 
             background: rgba(0, 0, 0, 0.15); 
             padding: 20px; 
@@ -164,7 +167,7 @@
 
         /* Het invulformulier */
         .order-section { 
-            background-color: #9EB3D8; /* Vak in de kleur van de banner */
+            background-color: #9EB3D8; 
             padding: 20px; 
             border-radius: 12px; 
             margin-top: 25px; 
@@ -184,7 +187,6 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 15px; }
         
-        /* De invoervakken (Zelfde kleur als de banner #9EB3D8, tekst #FCF5EE) */
         .form-group input, .form-group textarea { 
             width: 100%; 
             padding: 12px; 
@@ -195,13 +197,11 @@
             box-sizing: border-box; 
             font-size: 16px;
         }
-        /* Zorgt dat de tijdelijke weergavetekst (placeholder) een beetje transparant wit is */
         .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(252, 245, 238, 0.6); }
         .form-group textarea { height: 100px; resize: none; }
 
-        /* Grote verzendknop */
         .btn-submit {
-            background-color: #724058; /* Mooie contrastkleur voor de knop */
+            background-color: #724058; 
             color: #FCF5EE;
             border: 2px solid #FCF5EE;
             padding: 14px 15px;
@@ -254,7 +254,7 @@
         <div class="cart-section">
             <h2>Jouw Winkelmandje</h2>
             <ul id="cart-items">
-                <li>Je winkelmandje is nog leeg. Ga op de Homepagina producten toevoegen!</li>
+                <li>Je winkelmandje is nog leeg. Ga terug naar Home om producten toe te voegen!</li>
             </ul>
             <div class="cost-row"><span>Subtotaal:</span><span>€ <span id="cart-subtotal">0.00</span></span></div>
             <div class="cost-row"><span>Verzendkosten:</span><span>€ <span id="cart-shipping">0.00</span></span></div>
@@ -262,7 +262,7 @@
             <button class="btn-clear" onclick="clearCart()">🗑️ Mandje leegmaken</button>
         </div>
 
-        <!-- Het Invulformulier (Wordt pas actief als er een product in zit) -->
+        <!-- Het Invulformulier -->
         <div id="orderSection" class="order-section" style="display: none;">
             <h3>Bestelling Afronden</h3>
             <form onsubmit="sendOrder(event)">
@@ -276,4 +276,8 @@
                 </div>
                 <div class="form-group">
                     <label for="buyerPostal">Postcode:</label>
+                    <input type="text" id="buyerPostal" placeholder="Bijv. 1234 AB" required>
+                </div>
+                <div class="form-group">
+                    <label for="buyerCity">Woonplaats:</label>
                     
