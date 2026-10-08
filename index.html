@@ -3,225 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crealanda</title>
-    <!-- Het Great Vibes lettertype inladen van Google Fonts -->
-    <link href="https://googleapis.com" rel="stylesheet">
+    <title>Crea Landa</title>
+    <!-- FontAwesome toevoegen voor het winkelmandje-icoon -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
     <style>
-        /* Jouw gekozen achtergrondkleur */
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #834863; 
-            color: #FCF5EE; 
+        /* Basisstijlen in de kleuren van Crea Landa */
+        :root {
+            --bg-purple: #704461;    /* De paarse achtergrondkleur van de site */
+            --navbar-blue: #9cb1d9;  /* De lichtblauwe kleur van de bovenbalk */
+            --text-white: #ffffff;
         }
-        
-        /* De blauwe banner bovenaan */
-        .top-banner { 
-            background-color: #9EB3D8; 
-            color: #FCF5EE; 
-            padding: 15px; 
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-purple);
+            color: var(--text-white);
+        }
+
+        /* Navigatiebalk */
+        .navbar {
+            background-color: var(--navbar-blue);
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: sticky;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .brand-title {
+            font-family: 'Georgia', cursive, serif;
+            font-size: 24px;
+            color: var(--text-white);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Schattig winkelmandje knop */
+        .cart-btn {
+            background: none;
+            border: none;
+            color: var(--bg-purple); /* Het mandje krijgt de paarse kleur */
+            font-size: 22px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .cart-btn:hover {
+            transform: scale(1.1); /* Subtiel animatie-effect bij hover */
+        }
+
+        /* Drie puntjes menu */
+        .menu-dots {
+            color: var(--text-white);
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        /* Winkelmandje Overlay / Modaal Venster */
+        .cart-modal {
+            display: none; /* Standaard verborgen */
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Logo links in Great Vibes lettertype */
-        .logo {
-            font-family: 'Great Vibes', cursive;
-            font-size: 36px;
-            margin: 0;
-            padding-left: 10px;
+        .modal-content {
+            background-color: var(--bg-purple);
+            border: 3px solid var(--navbar-blue);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            text-align: center;
         }
 
-        /* De 3 bolletjes rechtsboven (Menu knop) */
-        .menu-btn {
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: var(--navbar-blue);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--navbar-blue);
+            padding-bottom: 10px;
+        }
+
+        .empty-msg {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #e0d0cc;
+        }
+
+        /* Aanmeldformulier in het mandje */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .form-group {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            cursor: pointer;
-            padding: 10px;
-        }
-        .menu-btn .dot {
-            width: 6px;
-            height: 6px;
-            background-color: #FCF5EE;
-            border-radius: 50%;
         }
 
-        /* Het uitschuifbare keuzemenu */
-        .nav-menu {
-            display: none;
-            background-color: #9EB3D8;
-            position: absolute;
-            top: 65px;
-            right: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 10px 0;
-            min-width: 160px;
-            z-index: 99;
+        .form-group label {
+            font-size: 14px;
+            color: var(--navbar-blue);
         }
-        .nav-menu a {
-            display: block;
-            color: #FCF5EE;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-weight: bold;
+
+        .form-group input {
+            padding: 10px;
+            border: 2px solid var(--navbar-blue);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
             font-size: 16px;
         }
-        .nav-menu a:active {
-            background-color: rgba(252, 245, 238, 0.2);
+
+        .form-group input::placeholder {
+            color: #ccc;
         }
 
-        /* Inhoud van de pagina's */
-        .container { padding: 15px; }
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* Welkomstbalk op Home */
-        .welcome-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
+        .submit-btn {
+            background-color: var(--navbar-blue);
+            color: var(--bg-purple);
+            border: none;
+            padding: 12px;
             border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
         }
-        .welcome-box p { margin: 0; font-size: 16px; line-height: 1.5; }
 
-        .section-title { text-align: center; font-size: 22px; margin: 25px 0 15px 0; font-weight: bold; }
-        
-        /* Producten */
-        .product-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
-        .product-card { background: #FCF5EE; color: #333; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .product-card img { max-width: 100%; height: 180px; object-fit: cover; border-radius: 6px; background: #eee; margin-bottom: 10px; }
-        .product-card h3 { margin: 10px 0 5px 0; color: #834863; font-size: 20px; }
-        .weight-tag { font-size: 14px; color: #666; margin-bottom: 15px; display: block; }
-        .price-tag { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; }
-        
-        /* Knoppen */
-        .btn { background-color: #834863; color: #FCF5EE; border: none; padding: 12px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
-        .btn-cart { background-color: #9EB3D8; color: #FCF5EE; }
-        .btn:active { opacity: 0.8; }
-
-        /* Winkelmand pagina layout */
-        .cart-section { background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px; border: 2px dashed #9EB3D8; }
-        .cart-section h2 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
-        ul { list-style: none; padding: 0; margin: 0; }
-        li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .cost-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px; font-weight: bold; border-top: 2px solid #9EB3D8; padding-top: 10px; }
-        .btn-clear { background-color: transparent; color: #FCF5EE; border: 1px solid #FCF5EE; padding: 6px 12px; border-radius: 4px; width: auto; font-size: 13px; margin-top: 15px; }
-
-        /* Formulier */
-        .order-section { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-top: 25px; }
-        .form-banner { background-color: #9EB3D8; color: #FCF5EE; padding: 12px; border-radius: 8px 8px 0 0; font-weight: bold; font-size: 18px; text-align: center; margin: -20px -20px 20px -20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; background-color: #9EB3D8; color: #FCF5EE; border: 1px solid rgba(255,255,255,0.4); border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        .form-group textarea { height: 120px; resize: none; }
+        .submit-btn:hover {
+            background-color: #b0c4de;
+        }
     </style>
 </head>
 <body>
 
-<!-- De blauwe banner bovenaan -->
-<div class="top-banner">
-    <div class="logo">Crea Landa</div>
-    <!-- De 3 bolletjes knop -->
-    <div class="menu-btn" onclick="toggleMenu()">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-    </div>
-</div>
-
-<!-- Het uitschuifbare keuzemenu -->
-<div id="navMenu" class="nav-menu">
-    <a href="#" onclick="switchPage('home')">🏠 Home</a>
-    <a href="#" onclick="switchPage('winkelmand')">🛒 Winkelmand (<span id="menu-cart-count">0</span>)</a>
-</div>
-
-<div class="container">
-
-    <!-- ================= HOMEPAGE PAGINA ================= -->
-    <div id="homePage" class="page active">
-        <div class="welcome-box">
-            <p>Welkom op mijn hobby website! Hier vind je al mijn handgemaakte creaties, met liefde en zorg ontworpen. Kijk gerust rond en voeg je favoriete items toe aan het winkelmandje via het menu rechtsboven.</p>
+    <!-- Navigatiebalk -->
+    <header class="navbar">
+        <div class="brand-title">Crea Landa</div>
+        <div class="nav-actions">
+            <!-- Schattig winkelmandje links naast de 3 puntjes -->
+            <button class="cart-btn" id="openCart" title="Winkelmandje">
+                <i class="fas fa-shopping-basket"></i> <!-- Schattig mandje-icoon -->
+            </button>
+            <!-- De 3 puntjes -->
+            <div class="menu-dots">
+                <i class="fas fa-ellipsis-v"></i>
+            </div>
         </div>
-        <div class="section-title">Onze Producten</div>
-        <div id="products-container" class="product-grid"></div>
-    </div>
+    </header>
 
-    <!-- ================= WINKELMAND PAGINA ================= -->
-    <div id="winkelmandPage" class="page">
-        <div class="cart-section">
-            <h2>Jouw Winkelmandje</h2>
-            <ul id="cart-items">
-                <li>Je winkelmandje is nog leeg.</li>
-            </ul>
-            <div class="cost-row"><span>Subtotaal:</span><span>€ <span id="cart-subtotal">0.00</span></span></div>
-            <div class="cost-row"><span>Verzendkosten:</span><span>€ <span id="cart-shipping">0.00</span></span></div>
-            <div class="total-row"><span>Totaal incl. verzendkosten:</span><span>€ <span id="cart-total">0.00</span></span></div>
-            <button class="btn btn-clear" onclick="clearCart()">🗑️ Mandje leegmaken</button>
-            <button class="btn btn-cart" style="margin-top: 20px;" onclick="showOrderForm()">Plaats Bestelling</button>
-        </div>
+    <!-- Het Winkelmandje Scherm (Pop-up) -->
+    <div class="cart-modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeCart">&times;</span>
+            <div class="modal-title">🛍️ Mijn Winkelmandje</div>
+            
+            <!-- Status van het mandje -->
+            <p class="empty-msg" id="cartStatus">Je winkelmandje is momenteel nog leeg.</p>
 
-        <!-- Het Invulformulier -->
-        <div id="orderSection" class="order-section" style="display: none;">
-            <div class="form-banner">Bestelling Afronden</div>
-            <form onsubmit="sendOrder(event)">
+            <!-- Aanmeldformulier -->
+            <form class="login-form" id="checkoutForm">
                 <div class="form-group">
-                    <label>Jouw Naam:</label>
-                    <input type="text" id="buyerName" placeholder="Typ hier je volledige naam..." required>
+                    <label for="name">Naam:</label>
+                    <input type="text" id="name" placeholder="Vul je naam in" required>
                 </div>
                 <div class="form-group">
-                    <label>Inhoud Bestelling:</label>
-                    <textarea id="orderContent" readonly></textarea>
+                    <label for="email">E-mailadres:</label>
+                    <input type="email" id="email" placeholder="Vul je e-mailadres in" required>
                 </div>
-                <button type="submit" class="btn btn-cart" style="border: 2px solid #FCF5EE;">Verstuur Bestelling via E-mail</button>
+                <button type="submit" class="submit-btn">Aanmelden & Verder</button>
             </form>
         </div>
     </div>
 
-</div>
+    <script>
+        // JavaScript om de pop-up te openen en te sluiten
+        const modal = document.getElementById('cartModal');
+        const openBtn = document.getElementById('openCart');
+        const closeBtn = document.getElementById('closeCart');
+        const form = document.getElementById('checkoutForm');
+        const statusText = document.getElementById('cartStatus');
 
-<script>
-    // ==========================================
-    //  HIER KUN JE DE PRODUCTEN EN VERZENDKOSTEN AANPASSEN
-    // ==========================================
-    const VERZENDKOSTEN = 4.25; 
+        // Openen bij klik op het mandje
+        openBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
 
-    const PRODUCTEN = [
-        { id: 1, name: "Handgemaakte Armband Romantiek", price: 12.50, weight: "45 gram", image: "product1.jpg" },
-        { id: 2, name: "Sleutelhanger Glitter Goud", price: 7.95, weight: "20 gram", image: "product2.jpg" },
-        { id: 3, name: "Luxe Geurkaars in Glas", price: 14.99, weight: "250 gram", image: "product3.jpg" },
-        { id: 4, name: "Handbeschilderde Wenskaart", price: 3.50, weight: "15 gram", image: "product4.jpg" }
-    ];
+        // Sluiten bij klik op het kruisje
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
 
-    // ==========================================
-    //  DE AUTOMATISCHE CODE VOOR HET SYSTEEM
-    // ==========================================
-    let cart = [];
+        // Sluiten als je buiten het venster klikt
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
 
-    // Producten op de homepagina zetten
-    const container = document.getElementById('products-container');
-    PRODUCTEN.forEach(p => {
-        container.innerHTML += `
-            <div class="product-card">
-                <img src="${p.image}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                <span class="weight-tag">Gewicht: ${p.weight}</span>
-                <div class="price-tag">€ ${p.price.toFixed(2).replace('.', ',')}</div>
-                <button class="btn" onclick="addToCart('${p.name}', ${p.price}, '${p.weight}')">In winkelmand</button>
-            </div>
-        `;
-    });
-
-    // Menu openen en sluiten
-    function toggleMenu() {
-        
+        // Formulier afhandeling (simulatie voor vullen met producten later)
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            
+            // Verander de tekst zodra er is ingelogd/aangemeld
+            statusText.innerText = `Welkom terug, ${name}! Je mandje wordt nu geladen met producten...`;
+            form.style.display = 'none'; // Verberg het formulier na succesvol invullen
+        });
+    </script>
+</body>
+</html>
