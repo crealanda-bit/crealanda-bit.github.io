@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crealanda</title>
+    <title>Crea Landa</title>
+    <!-- De Canva lettertypen inladen via Google Fonts -->
+    <link href="https://googleapis.com" rel="stylesheet">
     <style>
+        /* Basisinstellingen en jouw nieuwe achtergrondkleur */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: #834863; 
+            background-color: #724058; 
             color: #FCF5EE; 
         }
         
-        /* De blauwe banner bovenaan */
+        /* De banner bovenaan die blijft staan bij het scrollen */
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
@@ -26,33 +29,39 @@
             top: 0;
             z-index: 100;
             height: 60px;
+            box-sizing: border-box;
         }
 
-        .banner-spacer {
-            width: 26px; 
+        /* Crea Landa aan de linkerkant in Great Vibes lettertype */
+        .logo-text {
+            font-family: 'Great Vibes', cursive;
+            font-size: 28px;
+            color: #FCF5EE;
+            white-space: nowrap;
         }
 
-        /* Jouw logo met de originele lange naam precies in het midden */
-        .logo-container {
+        /* Jouw ronde logo precies in het midden van de banner */
+        .logo-image-container {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
         }
-        .logo-container img {
-            max-height: 55px; 
+        .logo-image-container img {
+            max-height: 45px; 
             width: auto;
             object-fit: contain;
+            border-radius: 50%; /* Zorgt dat het logo mooi rond blijft */
         }
 
-        /* De 3 bolletjes rechtsboven */
+        /* De 3 bolletjes aan de rechterkant */
         .menu-btn {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
             cursor: pointer;
-            padding: 10px;
+            padding: 5px;
         }
         .menu-btn .dot {
             width: 6px;
@@ -61,12 +70,12 @@
             border-radius: 50%;
         }
 
-        /* Het uitschuifbare keuzemenu */
+        /* Het uitschuifbare keuzemenu (kleur van de tekst is FCF5EE) */
         .nav-menu {
             display: none;
             background-color: #9EB3D8;
             position: absolute;
-            top: 75px;
+            top: 65px;
             right: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -87,62 +96,60 @@
         }
 
         /* Inhoud van de pagina's */
-        .container { padding: 15px; }
-        .page { display: none; }
-        .page.active { display: block; }
-
-        .welcome-box {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
+        .container { 
+            padding: 20px 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .welcome-box p { margin: 0; font-size: 16px; line-height: 1.5; }
-
-        .section-title { text-align: center; font-size: 22px; margin: 25px 0 15px 0; font-weight: bold; }
         
-        /* Producten */
-        .product-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 30px; }
-        .product-card { background: #FCF5EE; color: #333; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .product-card img { max-width: 100%; height: 180px; object-fit: cover; border-radius: 6px; background: #eee; margin-bottom: 10px; }
-        .product-card h3 { margin: 10px 0 5px 0; color: #834863; font-size: 20px; }
-        .weight-tag { font-size: 14px; color: #666; margin-bottom: 15px; display: block; }
-        .price-tag { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 15px; }
-        
-        /* Knoppen */
-        .btn { background-color: #834863; color: #FCF5EE; border: none; padding: 12px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; }
-        .btn-cart { background-color: #9EB3D8; color: #FCF5EE; }
-        .btn:active { opacity: 0.8; }
+        .page { 
+            display: none; 
+            width: 100%;
+            max-width: 600px;
+        }
+        .page.active { 
+            display: block; 
+        }
 
-        /* Winkelmand layout */
-        .cart-section { background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px; border: 2px dashed #9EB3D8; }
+        /* Jouw welkomstvak: groeit mee met tekst, licht afgeronde hoeken, kleur #9EB3D8 */
+        .welcome-box {
+            background-color: #9EB3D8;
+            padding: 20px;
+            border-radius: 12px; /* Subtiel afgeronde hoeken */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            text-align: center;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        
+        /* Jouw tekst in Big Shoulders Display, kleur #FCF5EE */
+        .welcome-box p { 
+            margin: 0; 
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 22px; 
+            color: #FCF5EE;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+        }
+
+        /* Ruimte voor de volgende stappen (winkelmand layout) */
+        .cart-section { background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px; border: 2px dashed #9EB3D8; margin-top: 20px; }
         .cart-section h2 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px; }
         ul { list-style: none; padding: 0; margin: 0; }
-        li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .cost-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 10px; font-size: 18px; font-weight: bold; border-top: 2px solid #9EB3D8; padding-top: 10px; }
-        .btn-clear { background-color: transparent; color: #FCF5EE; border: 1px solid #FCF5EE; padding: 6px 12px; border-radius: 4px; width: auto; font-size: 13px; margin-top: 15px; }
-
-        /* Formulier */
-        .order-section { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-top: 25px; }
-        .form-banner { background-color: #9EB3D8; color: #FCF5EE; padding: 12px; border-radius: 8px 8px 0 0; font-weight: bold; font-size: 18px; text-align: center; margin: -20px -20px 20px -20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea { width: 100%; padding: 12px; background-color: #9EB3D8; color: #FCF5EE; border: 1px solid rgba(255,255,255,0.4); border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        .form-group textarea { height: 120px; resize: none; }
+        li { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; }
+        .btn { background-color: #9EB3D8; color: #FCF5EE; border: none; padding: 12px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 16px; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-<!-- De blauwe banner bovenaan met jouw logo -->
+<!-- De vaste blauwe bovenbalk -->
 <div class="top-banner">
-    <div class="banner-spacer"></div> 
+    <div class="logo-text">Crea Landa</div>
     
-    <div class="logo-container">
-        <!-- Deze link zoekt nu exact naar de naam van jouw bestand -->
-        <img src="Naamloos - 03 oktober 2026 om 18.42.59 .png" alt="Crea Landa Logo">
+    <div class="logo-image-container">
+        <!-- Deze link zoekt exact naar jouw geüploade bestand -->
+        <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
     </div>
     
     <div class="menu-btn" onclick="toggleMenu()">
@@ -162,75 +169,54 @@
 
     <!-- ================= HOMEPAGE PAGINA ================= -->
     <div id="homePage" class="page active">
+        <!-- Het op-maat-gemaakte welkomstvak -->
         <div class="welcome-box">
-            <p>Welkom op mijn hobby website! Hier vind je al mijn handgemaakte creaties, met liefde en zorg ontworpen. Kijk gerust rond en voeg je favoriete items toe aan het winkelmandje via het menu rechtsboven.</p>
+            <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
         </div>
-        <div class="section-title">Onze Producten</div>
-        <div id="products-container" class="product-grid"></div>
+        
+        <!-- HIER KUNNEN WE STRAKS HEEL MAKKELIJK DE PRODUCTEN ONDER PLAKKEN -->
     </div>
 
-    <!-- ================= WINKELMAND PAGINA ================= -->
+    <!-- ================= WINKELMAND PAGINA (VOOR DE VOLGENDE STAP) ================= -->
     <div id="winkelmandPage" class="page">
         <div class="cart-section">
             <h2>Jouw Winkelmandje</h2>
             <ul id="cart-items">
-                <li>Je winkelmandje is nog leeg.</li>
+                <li>Je winkelmandje is nog leeg. Ga straks op de Homepagina producten toevoegen!</li>
             </ul>
-            <div class="cost-row"><span>Subtotaal:</span><span>€ <span id="cart-subtotal">0.00</span></span></div>
-            <div class="cost-row"><span>Verzendkosten:</span><span>€ <span id="cart-shipping">0.00</span></span></div>
-            <div class="total-row"><span>Totaal incl. verzendkosten:</span><span>€ <span id="cart-total">0.00</span></span></div>
-            <button class="btn btn-clear" onclick="clearCart()">🗑️ Mandje leegmaken</button>
-            <button class="btn btn-cart" style="margin-top: 20px;" onclick="showOrderForm()">Plaats Bestelling</button>
-        </div>
-
-        <!-- Het Invulformulier -->
-        <div id="orderSection" class="order-section" style="display: none;">
-            <div class="form-banner">Bestelling Afronden</div>
-            <form onsubmit="sendOrder(event)">
-                <div class="form-group">
-                    <label>Jouw Naam:</label>
-                    <input type="text" id="buyerName" placeholder="Typ hier je volledige naam..." required>
-                </div>
-                <div class="form-group">
-                    <label>Inhoud Bestelling:</label>
-                    <textarea id="orderContent" readonly></textarea>
-                </div>
-                <button type="submit" class="btn btn-cart" style="border: 2px solid #FCF5EE;">Verstuur Bestelling via E-mail</button>
-            </form>
+            <button class="btn" onclick="switchPage('home')">Terug naar Home</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    const VERZENDKOSTEN = 4.25; 
-
-    const PRODUCTEN = [
-        { id: 1, name: "Handgemaakte Armband Romantiek", price: 12.50, weight: "45 gram", image: "product1.jpg" },
-        { id: 2, name: "Sleutelhanger Glitter Goud", price: 7.95, weight: "20 gram", image: "product2.jpg" },
-        { id: 3, name: "Luxe Geurkaars in Glas", price: 14.99, weight: "250 gram", image: "product3.jpg" },
-        { id: 4, name: "Handbeschilderde Wenskaart", price: 3.50, weight: "15 gram", image: "product4.jpg" }
-    ];
-
+    // =================================================================
+    //  UITLEG VOOR DE VOLGENDE STAP:
+    //  Ik help je er straks stap voor stap mee, maar hieronder regelt 
+    //  de code nu alvast heel overzichtelijk de knoppen en pagina's.
+    // =================================================================
+    
     let cart = [];
 
-    const container = document.getElementById('products-container');
-    PRODUCTEN.forEach(p => {
-        container.innerHTML += `
-            <div class="product-card">
-                <img src="${p.image}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                <span class="weight-tag">Gewicht: ${p.weight}</span>
-                <div class="price-tag">€ ${p.price.toFixed(2).replace('.', ',')}</div>
-                <button class="btn" onclick="addToCart('${p.name}', ${p.price}, '${p.weight}')">In winkelmand</button>
-            </div>
-        `;
-    });
-
+    // Menu openen en sluiten bij het klikken op de 3 bolletjes
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     }
 
+    // Wisselen tussen de pagina's via het menu
     function switchPage(pageId) {
-        
+        document.getElementById('homePage').classList.remove('active');
+        document.getElementById('winkelmandPage').classList.remove('active');
+        document.getElementById('navMenu').style.display = 'none'; // Sluit menu direct
+
+        if(pageId === 'home') {
+            document.getElementById('homePage').classList.add('active');
+        } else if(pageId === 'winkelmand') {
+            document.getElementById('winkelmandPage').classList.add('active');
+        }
+    }
+</script>
+</body>
+</html>
