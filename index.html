@@ -14,18 +14,27 @@
             color: #FCF5EE; 
         }
         
-        /* De banner bovenaan */
+        /* De grote banner bovenaan (Homepagina stijl) */
         header { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
-            padding: 15px; 
+            padding: 25px 15px; 
             border-radius: 8px; 
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        header h1 { margin: 0; font-size: 24px; }
-        .cart-status { margin-top: 5px; font-size: 14px; font-weight: bold; }
+        header h1 { margin: 0; font-size: 28px; letter-spacing: 1px; }
+        header p { margin: 10px 0 0 0; font-size: 15px; opacity: 0.9; line-height: 1.4; }
+        .cart-status { margin-top: 15px; font-size: 14px; font-weight: bold; background: rgba(0,0,0,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px; }
+
+        /* Sectietitels */
+        .section-title {
+            text-align: center;
+            font-size: 22px;
+            margin: 30px 0 15px 0;
+            color: #FCF5EE;
+        }
 
         /* Producten overzicht */
         .product-grid { 
@@ -113,7 +122,6 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        /* Zorgt dat de tekst in de invoervakken goed leesbaar is */
         .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(252, 245, 238, 0.7); }
         .form-group textarea { height: 120px; resize: none; }
     </style>
@@ -122,8 +130,12 @@
 
 <header>
     <h1>Crealanda</h1>
+    <!-- Hier kun je de welkomsttekst van je homepagina makkelijk aanpassen -->
+    <p>Welkom op mijn hobby website! Hier vind je al mijn handgemaakte creaties, met liefde en zorg ontworpen. Kijk gerust rond en voeg je favoriete items toe aan het winkelmandje.</p>
     <div class="cart-status">🛒 Winkelmand: <span id="cart-count">0</span> product(en)</div>
 </header>
+
+<div class="section-title">Onze Producten</div>
 
 <!-- Hier staan je producten op een rij -->
 <div id="products-container" class="product-grid"></div>
@@ -224,19 +236,4 @@
             document.getElementById('cart-total').innerText = total.toFixed(2).replace('.', ',');
             
             document.getElementById('orderContent').value = 
-                `Hallo Crealanda,\n\nIk wil graag de volgende producten bestellen:\n${textContent}\nSubtotaal: € ${subtotal.toFixed(2).replace('.', ',')}\nVerzendkosten: € ${VERZENDKOSTEN.toFixed(2).replace('.', ',')}\nTotaalbedrag: € ${total.toFixed(2).replace('.', ',')}`;
-        }
-    }
-
-    function showOrderForm() {
-        if(cart.length === 0) {
-            alert('Voeg eerst producten toe aan je winkelmandje voordat je bestelt!');
-            return;
-        }
-        document.getElementById('orderSection').style.display = 'block';
-        document.getElementById('orderSection').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function sendOrder(e) {
-        e.preventDefault();
-        const name = document.getElementById('buyerName').value;
+                
