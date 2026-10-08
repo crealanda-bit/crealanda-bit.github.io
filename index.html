@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
-    <!-- De Canva lettertypen inladen via Google Fonts -->
+    <!-- De Canva lettertypen en de icoontjes inladen via Google Fonts / FontAwesome -->
     <link href="https://googleapis.com" rel="stylesheet">
+    <link rel="stylesheet" href="https://cloudflare.com">
+    
     <style>
-        /* Basisinstellingen en achtergrondkleur */
+        /* Basisinstellingen en achtergrondkleur voor de Homepagina */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
             background-color: #724058; 
             color: #FCF5EE; 
+            transition: background-color 0.3s ease;
         }
         
         /* De banner bovenaan die blijft staan bij het scrollen */
@@ -70,29 +73,29 @@
             border-radius: 50%;
         }
 
-        /* Het uitschuifbare keuzemenu */
+        /* Het handige uitschuifmenu: klein vak, kleur #B32C43, afgeronde hoeken */
         .nav-menu {
             display: none;
-            background-color: #9EB3D8;
+            background-color: #B32C43;
             position: absolute;
             top: 65px;
             right: 15px;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 10px 0;
-            min-width: 160px;
+            padding: 10px;
+            min-width: 60px;
+            text-align: center;
             z-index: 99;
         }
         .nav-menu a {
             display: block;
             color: #FCF5EE;
-            padding: 12px 20px;
+            padding: 12px 10px;
             text-decoration: none;
-            font-weight: bold;
-            font-size: 16px;
+            font-size: 24px; /* Formaat van de icoontjes */
         }
         .nav-menu a:active {
-            background-color: rgba(252, 245, 238, 0.2);
+            opacity: 0.7;
         }
 
         /* Inhoud van de pagina's */
@@ -101,6 +104,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            box-sizing: border-box;
         }
         
         .page { 
@@ -112,7 +116,7 @@
             display: block; 
         }
 
-        /* Welkomstvak op Home */
+        /* Welkomstvak op Home: meegroeiend, kleur #9EB3D8, licht afgerond */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px;
@@ -122,97 +126,114 @@
             box-sizing: border-box;
             width: 100%;
         }
-        
-        /* HIER WORDT HET LETTERTYPE NU COMPLEET TOEGEPAST */
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', sans-serif;
             font-weight: 500;
-            font-size: 26px; /* Iets groter omdat dit lettertype wat smaller is */
+            font-size: 26px; 
             color: #FCF5EE;
             line-height: 1.3;
             letter-spacing: 0.8px;
         }
 
-        /* Winkelmand layout */
+        /* ================= WINKELMAND STYLING ================= */
+        /* Hoofdvak winkelmand: kleur #9EB3D8, afgeronde hoeken */
         .cart-section { 
-            background: rgba(0, 0, 0, 0.15); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border: 2px dashed #9EB3D8; 
-            box-sizing: border-box;
-            width: 100%;
-        }
-        .cart-section h2 { 
-            margin-top: 0; 
-            border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 10px;
-            font-size: 22px;
-        }
-        ul { list-style: none; padding: 0; margin: 0; }
-        li { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; font-size: 16px; }
-        .cost-row { display: flex; justify-content: space-between; margin-top: 12px; font-size: 15px; opacity: 0.9; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 19px; font-weight: bold; border-top: 2px solid #9EB3D8; padding-top: 12px; color: #FCF5EE; }
-        
-        .btn-clear { 
-            background-color: transparent; 
-            color: #FCF5EE; 
-            border: 1px solid #FCF5EE; 
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-size: 13px; 
-            margin-top: 15px;
-        }
-
-        /* Het invulformulier */
-        .order-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
             border-radius: 12px; 
-            margin-top: 25px; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             box-sizing: border-box;
             width: 100%;
-            color: #FCF5EE;
         }
-        .order-section h3 { 
-            margin-top: 0; 
-            margin-bottom: 20px; 
-            text-align: center; 
-            font-size: 22px;
+        
+        .cart-section h2 {
+            margin-top: 0;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 28px;
+            text-align: center;
             border-bottom: 1px solid rgba(252, 245, 238, 0.3);
             padding-bottom: 10px;
         }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 15px; }
-        
-        .form-group input, .form-group textarea { 
-            width: 100%; 
-            padding: 12px; 
-            background-color: #9EB3D8; 
-            color: #FCF5EE; 
-            border: 1px solid #FCF5EE; 
-            border-radius: 6px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-        }
-        .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(252, 245, 238, 0.6); }
-        .form-group textarea { height: 100px; resize: none; }
 
-        .btn-submit {
-            background-color: #724058; 
+        /* Productvakken onder elkaar: kleur #B32C43, afgeronde hoeken */
+        .cart-item-card {
+            background-color: #B32C43;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Foto links in het productvak */
+        .cart-item-card img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #eee;
+        }
+        
+        /* Tekst rechts in het productvak (Big Shoulders Display, kleur #FCF5EE) */
+        .cart-item-details {
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 22px;
             color: #FCF5EE;
-            border: 2px solid #FCF5EE;
-            padding: 14px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        /* Verzendkosten vak onder de producten: Big Shoulders Display, kleur #FCF5EE */
+        .shipping-section {
+            margin-top: 20px;
+            padding: 15px;
+            border-top: 1px solid rgba(252, 245, 238, 0.3);
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 22px;
+            color: #FCF5EE;
+        }
+        .shipping-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 8px; opacity: 0.9; }
+        .total-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 26px; font-weight: bold; border-top: 2px solid #FCF5EE; padding-top: 10px; }
+
+        /* Knoppen en Formulieren */
+        .order-form-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid rgba(252, 245, 238, 0.3);
+        }
+        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', sans-serif; font-size: 18px; }
+        .form-group label { display: block; margin-bottom: 4px; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; background-color: #9EB3D8; color: #FCF5EE; border: 1px solid #FCF5EE; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        .form-group textarea { height: 80px; resize: none; }
+
+        /* Bestelling plaatsen knop: kleur #B32C43, Big Shoulders Display, rechts uitgelijnd */
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .btn-submit {
+            background-color: #B32C43; 
+            color: #FCF5EE;
+            border: none;
+            padding: 12px 25px;
             border-radius: 8px;
             cursor: pointer;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 22px;
             font-weight: bold;
-            width: 100%;
-            font-size: 16px;
-            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-submit:active { opacity: 0.8; }
+        .btn-clear { background: transparent; color: #FCF5EE; border: 1px solid #FCF5EE; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Big Shoulders Display', sans-serif; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -232,10 +253,10 @@
     </div>
 </div>
 
-<!-- Het uitschuifbare keuzemenu -->
+<!-- Het handige uitschuifmenu met alleen icoontjes onder elkaar -->
 <div id="navMenu" class="nav-menu">
-    <a href="#" onclick="switchPage('home')">🏠 Home</a>
-    <a href="#" onclick="switchPage('winkelmand')">🛒 Winkelmand (<span id="menu-cart-count">0</span>)</a>
+    <a href="#" onclick="switchPage('home')" title="Home"><i class="fa-solid fa-house"></i></a>
+    <a href="#" onclick="switchPage('winkelmand')" title="Winkelmand"><i class="fa-solid fa-basket-shopping"></i></a>
 </div>
 
 <div class="container">
@@ -246,38 +267,13 @@
             <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
         </div>
         
-        <!-- HIER KUNNEN WE STRAKS JOUW PRODUCTEN ONDER PLAKKEN -->
+        <!-- HIER KUN JE STRAKS MAKKELIJK JOUW PRODUCTEN ONDER PLAKKEN -->
+        <div style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', sans-serif; font-size:24px; opacity:0.7;">
+            (Klik op het menu rechtsboven en kies de winkelmand om de testproducten te bekijken!)
+        </div>
     </div>
 
     <!-- ================= WINKELMAND PAGINA ================= -->
     <div id="winkelmandPage" class="page">
         <div class="cart-section">
-            <h2>Jouw Winkelmandje</h2>
-            <ul id="cart-items">
-                <li>Je winkelmandje is nog leeg. Ga terug naar Home om producten toe te voegen!</li>
-            </ul>
-            <div class="cost-row"><span>Subtotaal:</span><span>€ <span id="cart-subtotal">0.00</span></span></div>
-            <div class="cost-row"><span>Verzendkosten:</span><span>€ <span id="cart-shipping">0.00</span></span></div>
-            <div class="total-row"><span>Totaal incl. verzendkosten:</span><span>€ <span id="cart-total">0.00</span></span></div>
-            <button class="btn-clear" onclick="clearCart()">🗑️ Mandje leegmaken</button>
-        </div>
-
-        <!-- Het Invulformulier -->
-        <div id="orderSection" class="order-section" style="display: none;">
-            <h3>Bestelling Afronden</h3>
-            <form onsubmit="sendOrder(event)">
-                <div class="form-group">
-                    <label for="buyerName">Volledige Naam:</label>
-                    <input type="text" id="buyerName" placeholder="Voor- en achternaam" required>
-                </div>
-                <div class="form-group">
-                    <label for="buyerAddress">Straatnaam en Huisnummer:</label>
-                    <input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 12" required>
-                </div>
-                <div class="form-group">
-                    <label for="buyerPostal">Postcode:</label>
-                    <input type="text" id="buyerPostal" placeholder="Bijv. 1234 AB" required>
-                </div>
-                <div class="form-group">
-                    <label for="buyerCity">Woonplaats:</label>
-                    
+            <h2>Jouw Bestelling</h2>
