@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -90,7 +89,6 @@ button, input { font: inherit; }
   background: var(--cream);
 }
 
-/* Menu: uitgelijnd met de rechterrand en bovenkant van het hoofdvak */
 .menu-panel {
   position: fixed;
   z-index: 2000;
@@ -327,6 +325,25 @@ main {
   font-size: 18px;
 }
 
+/* Galerij */
+#galerij { margin: 24px 0 0; }
+#galerij h2 { text-align: center; color: var(--cream); font-size: 1.8rem; letter-spacing: 1px; margin: 0 0 16px; font-weight: normal; }
+#clGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.cl-card { margin: 0; background: var(--blue); border-radius: 16px; overflow: hidden; position: relative;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  opacity: 0; transform: translateY(40px) scale(.9);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.2,.9,.3,1.2); }
+.cl-card.show { opacity: 1; transform: none; }
+.cl-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+.cl-card figcaption { padding: 8px 12px 10px; color: var(--cream); font-size: 1.1rem; }
+.cl-card small { display: block; opacity: .85; }
+.cl-heart { position: absolute; top: 8px; right: 8px; border: 0; border-radius: 22px; padding: 6px 12px;
+  background: rgba(0,0,0,.5); color: #fff; font-size: 1.1rem; cursor: pointer; transition: transform .15s; }
+.cl-heart.on { color: #ff5a7a; }
+.cl-heart.pop { animation: clPop .35s ease; }
+
+@keyframes clPop { 0% { transform: scale(1); } 40% { transform: scale(1.4); } 100% { transform: scale(1); } }
+
 @keyframes swingOut {
   from { opacity: 0; transform: rotateX(-75deg); }
   to { opacity: 1; transform: rotateX(0); }
@@ -369,6 +386,7 @@ main {
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
   }
+  .cl-card { transition: none; opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -420,62 +438,10 @@ main {
     <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
   </section>
 
-<section id="galerij" style="margin:24px 16px;">
-  <style>
-    #galerij h2 { text-align:center; color:#fff6ee; font-size:1.8rem; letter-spacing:1px; margin:0 0 16px; }
-    #clGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
-    .cl-card { margin:0; background:#9db3d9; border-radius:16px; overflow:hidden; position:relative;
-      box-shadow:0 6px 18px rgba(0,0,0,.25);
-      opacity:0; transform:translateY(40px) scale(.9);
-      transition:opacity .6s ease, transform .6s cubic-bezier(.2,.9,.3,1.2); }
-    .cl-card.show { opacity:1; transform:none; }
-    .cl-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
-    .cl-card figcaption { padding:8px 12px 10px; color:#fff6ee; font-size:1.1rem; }
-    .cl-card small { display:block; opacity:.85; }
-    .cl-heart { position:absolute; top:8px; right:8px; border:0; border-radius:22px; padding:6px 12px;
-      background:rgba(0,0,0,.5); color:#fff; font-size:1.1rem; cursor:pointer; transition:transform .15s; }
-    .cl-heart.on { color:#ff5a7a; }
-    .cl-heart.pop { animation:clPop .35s ease; }
-    @keyframes clPop { 0%{transform:scale(1)} 40%{transform:scale(1.4)} 100%{transform:scale(1)} }
-    @media (prefers-reduced-motion: reduce) { .cl-card { transition:none; opacity:1; transform:none; } }
-  </style>
-
-  <h2>Galerij</h2>
-  <div id="clGrid"></div>
-</section>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script>
-(function () {
-  const sb = supabase.createClient(
-    'https://nyeedsxrlnkbxzoritwg.supabase.co',
-    'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7'
-  );
-  const grid = document.getElementById('clGrid');
-
-  function visitorId() {
-    try {
-      let v = localStorage.getItem('cl_visitor');
-      if (!v) { v = crypto.randomUUID(); localStorage.setItem('cl_visitor', v); }
-      return v;
-    } catch (e) { return crypto.randomUUID(); }
-  }
-  const vid = visitorId();
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((e) => {
-      if (e.isIntersecting) {
-        e.target.classList.add('show');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.15 });
-
-  async function load() {
-    const [p, c, m] = await Promise.all([
-      sb.from('photos').select('*').order('created_at', { ascending: false }),
-      sb.rpc('get_like_counts'),
-      sb.rpc('get_my_lik
+  <div id="galerij">
+    <h2>Galerij</h2>
+    <div id="clGrid"></div>
+  </div>
 
   <section class="page" id="cartPage">
     <div class="cart-panel">
@@ -532,6 +498,7 @@ main {
   </section>
 </main>
 
+<!-- Winkelmandje en menu -->
 <script>
 (function () {
   "use strict";
@@ -541,6 +508,7 @@ main {
   const menuButton = $("menuToggle");
   const menuPanel = $("menuPanel");
   const welcome = $("welcome");
+  const galerij = $("galerij");
   const cartPage = $("cartPage");
   const cartItems = $("cartItems");
   const emptyCart = $("emptyCart");
@@ -641,15 +609,9 @@ main {
     renderCart();
   }
 
-  /*
-    Menu gebruikt alleen de knop en het nav-element.
-    De klik wordt niet afhankelijk gemaakt van andere paginacode.
-  */
   function openMenu() {
     menuPanel.hidden = false;
     menuPanel.classList.remove("opening");
-
-    // Herstart de openingsanimatie zonder de klikfunctie te blokkeren.
     void menuPanel.offsetWidth;
     menuPanel.classList.add("opening");
 
@@ -681,6 +643,7 @@ main {
     const cartSelected = page === "cart";
 
     welcome.hidden = cartSelected;
+    galerij.hidden = cartSelected;
     cartPage.classList.toggle("active", cartSelected);
     closeMenu();
 
@@ -694,10 +657,8 @@ main {
     window.scrollTo({ top: 0, behavior: "auto" });
   }
 
-  // Gebruik een directe eventlistener voor de menuknop.
   menuButton.addEventListener("click", toggleMenu);
 
-  // Klik buiten het menu sluit het menu.
   document.addEventListener("click", function (event) {
     if (!menuPanel.hidden &&
         !menuPanel.contains(event.target) &&
@@ -706,7 +667,6 @@ main {
     }
   });
 
-  // Tikken op Home of Winkelmandje navigeert en sluit het menu.
   document.querySelectorAll("[data-page]").forEach(function (link) {
     link.addEventListener("click", function (event) {
       event.preventDefault();
@@ -728,25 +688,22 @@ main {
     showPage(location.hash === "#winkelmandje" ? "cart" : "home", false);
   });
 
-  /*
-    Bestellen:
-    De mailservice moet vooraf worden geactiveerd.
-    Een echte automatische ontvangstbevestiging is afhankelijk van die service.
-  */
+  // Bestelling versturen
   $("orderForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const status = $("orderStatus");
     const button = $("submitOrder");
+    const formElement = event.currentTarget;
 
     if (cart.length === 0) {
       status.textContent = "Je winkelmandje is nog leeg.";
       return;
     }
 
-    if (!event.currentTarget.reportValidity()) return;
+    if (!formElement.reportValidity()) return;
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const customerEmail = String(form.get("email") || "").trim();
 
     const products = cart.map(item =>
@@ -790,35 +747,53 @@ main {
         })
       });
 
-      const result = await response.json();
+      if (!response.ok) throw new Error("Versturen mislukt");
 
-      if (!response.ok ||
-          result.success === false ||
-          result.success === "false") {
-        throw new Error("Verzenden niet bevestigd");
-      }
-
-      status.textContent =
-        "Je bestelling is verzonden. Controleer je e-mail voor de ontvangstbevestiging.";
-
+      status.textContent = "Bedankt! Je bestelling is verstuurd. Je ontvangt een bevestiging per e-mail.";
       cart = [];
       saveCart();
       renderCart();
-      event.currentTarget.reset();
-      $("postnl").checked = true;
-      renderCart();
+      formElement.reset();
     } catch (error) {
-      status.textContent =
-        "Verzenden is niet gelukt. Controleer of de e-mailservice is geactiveerd en probeer opnieuw.";
+      status.textContent = "Er ging iets mis bij het versturen. Probeer het later nog eens.";
     } finally {
       button.disabled = false;
     }
   });
 
-  // Startpagina bepalen.
-  showPage(location.hash === "#winkelmandje" ? "cart" : "home", false);
   renderCart();
+  showPage(location.hash === "#winkelmandje" ? "cart" : "home", false);
 })();
 </script>
-</body>
-</html>
+
+<!-- Galerij met hartjes (Supabase) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  if (typeof supabase === "undefined") return;
+
+  const sb = supabase.createClient(
+    'https://nyeedsxrlnkbxzoritwg.supabase.co',
+    'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7'
+  );
+  const grid = document.getElementById('clGrid');
+
+  function visitorId() {
+    try {
+      let v = localStorage.getItem('cl_visitor');
+      if (!v) { v = crypto.randomUUID(); localStorage.setItem('cl_visitor', v); }
+      return v;
+    } catch (e) { return crypto.randomUUID(); }
+  }
+  const vid = visitorId();
+
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('show');
+        observer.unobserve(e.target);
+      }
+    });
+  }, {
