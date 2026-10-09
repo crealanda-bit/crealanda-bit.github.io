@@ -5,20 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- Canva Lettertypen inladen -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
     
     <style>
-        /* =================================================================
-           BASIS EN ACHTERGROND
-           ================================================================= */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: #724058; /* Wordt automatisch aangepast door de instellingen onderaan */
+            background-color: #724058; 
             color: #FCF5EE; 
         }
 
@@ -39,9 +35,6 @@
             display: block; 
         }
 
-        /* =================================================================
-           BANNER BOVENAAN
-           ================================================================= */
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
@@ -75,9 +68,6 @@
             color: #FCF5EE;
         }
 
-        /* =================================================================
-           3 BOLLETJES EN HET INSCHUIFMENU
-           ================================================================= */
         #menu-toggle {
             display: none;
         }
@@ -129,9 +119,6 @@
             display: block !important;
         }
 
-        /* =================================================================
-           WELKOMSTVAK (HOME)
-           ================================================================= */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
@@ -154,9 +141,6 @@
             transform: scaleX(0.92);
         }
 
-        /* =================================================================
-           WINKELMAND EN GEGEVENS (MIJN BESTELLING)
-           ================================================================= */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -224,7 +208,6 @@
 </head>
 <body>
 
-    <!-- DE BANNER STRUCTUUR -->
     <div class="top-banner">
         <div class="left-brand">
             <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
@@ -240,7 +223,6 @@
 
     <input type="checkbox" id="menu-toggle">
 
-    <!-- INHOUD VAN JOUW MENU -->
     <div class="nav-menu">
         <button class="menu-link-btn" onclick="gotoPage('home')">🏠 Home</button>
         <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒 Winkelmand</button>
@@ -248,10 +230,8 @@
 
     <div class="container">
 
-        <!-- HOMEPAGE PAGINA -->
         <div id="homePage" class="page active">
             <div class="welcome-box">
-                <!-- De tekst hieronder laadt automatisch de tekst in uit de instellingen onderaan -->
                 <p id="welcome-text-placeholder"></p>
             </div>
             <p style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', 'Arial Narrow', sans-serif; font-size:20px; opacity:0.6;">
@@ -259,7 +239,6 @@
             </p>
         </div>
 
-        <!-- WINKELMAND PAGINA -->
         <div id="winkelmandPage" class="page">
             <div class="cart-section">
                 <div class="cart-title-text">Mijn Bestelling</div>
@@ -273,3 +252,28 @@
                 <div class="order-form-box">
                     <form onsubmit="sendOrder(event)">
                         <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
+                        <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 1" required></div>
+                        <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" id="buyerCity" placeholder="Bijv. 1234 AB Dorp" required></div>
+                        <div class="form-group"><label>Telefoonnummer:</label><input type="text" id="buyerPhone" placeholder="Voor overleg via Tikkie"></div>
+                        <div class="btn-container"><button type="submit" class="btn-submit">Bestelling plaatsen</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+<script>
+    /* ==========================================================================================
+       JOLANDA DASHBOARD - HIER KUN JE ALLES MAKKELIJK EN RECHTSPSTREEKS AANPASSEN
+       ========================================================================================== */
+    
+    // JOUW EMAILADRES:
+    const INSTELD_EMAIL = "crealanda@gmail.com";
+
+    // JOUW KLEUREN:
+    const KLEUR_HOME_ACHTERGROND       = "#724058"; 
+    const KLEUR_WINKELMAND_ACHTERGROND = "#6F4257";
+    const KLEUR_BANNER_EN_VAKKEN       = "#9EB3D8";
+    const KLEUR_MENU_EN_KNOPPEN        = "#B32C43";
+    const KLEUR_TEKST_LICHT            = "#FCF5EE";
+
+    // JOUW VERZENDKOSTEN:
