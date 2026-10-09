@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- LETTERTYPEN INLADEN VAN GOOGLE -->
+    <!-- GOOGLE FONTS: GREAT VIBES EN HET NIEUWE BEBAS NEUE INLADEN -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://googleapis.com/css2?family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
     
     <style>
         /* BASE: BASISINSTELLINGEN EN STANDAARD ACHTERGROND */
@@ -26,6 +26,7 @@
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
+            position: relative;
         }
         .page { 
             display: none; 
@@ -67,7 +68,7 @@
             color: #FCF5EE;
         }
 
-        /* ANIMATIES: HIER STAAN JOUW BEWEGINGEN GEDEFINEERD */
+        /* ANIMATIES: JOUW OP-MAAT-GEMAAKTE BEWEGINGEN */
         @keyframes plopOpen {
             0% { transform: scale(0.7); opacity: 0; }
             80% { transform: scale(1.03); } 
@@ -75,21 +76,18 @@
         }
 
         @keyframes glijdNaarBeneden {
-            0% { transform: translateY(-20px); opacity: 0; }
+            0% { transform: translateY(-15px); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
         }
 
-        /* MENU: DE DRIE BOLLETJES EN HET RECHTBANG MENU UTILS CHUIVEN */
+        /* MENU: DRIE BOLLETJES EN DE LOSSE ICOONTJES ZONDER ACHTERGRONDBANNER */
         #menu-toggle {
             display: none;
         }
-        
-        /* WEG MET DE BLAUWE RAND: Dit haalt die lelijke selectierand op je Pixel weg! */
         .menu-btn, .menu-link-btn, input, button {
             -webkit-tap-highlight-color: transparent !important;
             outline: none !important;
         }
-        
         .menu-btn {
             display: flex;
             flex-direction: column;
@@ -108,38 +106,41 @@
             border-radius: 50%;
         }
         
-        /* Compact menuvakje, perfect passend voor alleen twee icoontjes */
+        /* De nav-menu banner achtergrond is volledig verwijderd. Transparant gemaakt! */
         .nav-menu {
             display: none;
-            background-color: #B32C43;
+            background-color: transparent !important; 
             position: absolute;
             top: 65px;
-            right: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 5px;
-            min-width: 55px; /* Lekker smal vakje geworden */
+            right: 15px; /* Lijnt nu perfect uit met de rechterkant van je welkomstvak */
+            padding: 0;
+            min-width: 44px;
             z-index: 99;
+            box-shadow: none !important;
         }
         
-        /* De icoontjes als strakke, paarse ronde knopjes onder elkaar */
+        /* Losse ronde paarse knopjes die onder elkaar zweven, zonder banner erachter */
         .menu-link-btn {
             display: block;
-            background-color: #724058;
+            background-color: #B32C43; /* Jouw paars-rode menukleur */
             color: #FCF5EE;
-            padding: 10px 0;
-            margin: 5px 0;
-            border-radius: 50%; /* Maakt er een mooi rond knopje van */
+            padding: 0;
+            margin: 0 0 10px 0;
+            border-radius: 50%; 
             width: 44px;
             height: 44px;
-            line-height: 24px;
+            line-height: 44px;
             text-decoration: none;
-            font-size: 22px; /* Mooi formaat voor het huisje en winkelmandje */
+            font-size: 22px; 
             border: 1px solid #FCF5EE;
             text-align: center;
             cursor: pointer;
             box-sizing: border-box;
             transition: transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .menu-link-btn:last-child {
+            margin-bottom: 0;
         }
         .menu-link-btn:active {
             transform: scale(0.90); 
@@ -147,10 +148,10 @@
         
         #menu-toggle:checked ~ .nav-menu {
             display: block !important;
-            animation: glijdNaarBeneden 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: glijdNaarBeneden 0.25s ease-out forwards;
         }
 
-        /* WELKOMSTVAK: HET LICHTBLAUWE TEXTVAK OP DE HOMEPAGE */
+        /* WELKOMSTVAK: HET DESIGN IS NU GEKOPPELD AAN BEBAS NEUE */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
@@ -163,17 +164,15 @@
         }
         .welcome-box p { 
             margin: 0; 
-            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
-            font-size: 25px !important; 
-            font-weight: 600 !important;
-            line-height: 1.35;
-            letter-spacing: 0.3px;
+            font-family: 'Bebas Neue', Arial, sans-serif !important; /* Direct gekoppeld aan de werkende Bebas Neue look */
+            font-size: 24px !important; 
+            letter-spacing: 1px;
+            line-height: 1.3;
             color: #FCF5EE !important;
             display: inline-block;
-            transform: scaleX(0.92);
         }
 
-        /* WINKELMAND: MIJN BESTELLING INCLUSIEF DE RODE INVOERVAKKEN */
+        /* WINKELMAND: JOUW INSTELLINGEN VOOR DE BESTELPAGINA */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -195,9 +194,10 @@
         .shipping-section {
             margin-top: 15px;
             padding: 10px 5px;
-            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
-            font-size: 24px !important;
+            font-family: 'Bebas Neue', Arial, sans-serif !important;
+            font-size: 22px !important;
             color: #FCF5EE !important;
+            letter-spacing: 0.8px;
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
         .shipping-section::after {
@@ -210,13 +210,14 @@
         .total-row { 
             display: flex; 
             justify-content: space-between; 
-            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
-            font-size: 28px !important; 
+            font-family: 'Bebas Neue', Arial, sans-serif !important;
+            font-size: 26px !important; 
             font-weight: bold !important; 
             color: #FCF5EE !important; 
+            letter-spacing: 0.8px;
         }
         .order-form-box { margin-top: 15px; }
-        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 20px; color: #FCF5EE !important; }
+        .form-group { margin-bottom: 12px; font-family: 'Bebas Neue', Arial, sans-serif !important; font-size: 20px; color: #FCF5EE !important; letter-spacing: 0.5px; }
         .form-group label { display: block; margin-bottom: 6px; text-align: left; }
         .form-group input { 
             width: 100%; 
@@ -235,7 +236,7 @@
         }
         .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
         .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
-        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; transition: transform 0.2s ease; }
+        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Bebas Neue', Arial, sans-serif !important; font-size: 22px; font-weight: bold; letter-spacing: 0.8px; transition: transform 0.2s ease; }
         .btn-submit:active { transform: scale(0.95); }
     </style>
 </head>
@@ -257,7 +258,7 @@
 
     <input type="checkbox" id="menu-toggle">
 
-    <!-- JOUW COSTRUCTIE MET PURE EN ALKHEEN ICOONTJES ONDER ELKAAR -->
+    <!-- JOUW COSTRUCTIE MET PURE EN ALLEEN ICOONTJES ONDER ELKAAR (BANNERVAK WEG!) -->
     <div class="nav-menu">
         <button class="menu-link-btn" onclick="gotoPage('home')">🏠</button>
         <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒</button>
@@ -270,10 +271,11 @@
             <div class="welcome-box">
                 <p id="welcome-text-placeholder"></p>
             </div>
-            <p style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', 'Arial Narrow', sans-serif; font-size:20px; opacity:0.6;">
+            <p style="text-align:center; margin-top: 40px; font-family:'Bebas Neue', Arial, sans-serif; font-size:20px; opacity:0.6; letter-spacing: 0.5px;">
                 (Gebruik het menu rechtsboven om de winkelmand te bekijken)
             </p>
         </div>
 
         <!-- WINKELMAND PAGINA -->
         <div id="winkelmandPage" class="page">
+            <div class="cart-section">
