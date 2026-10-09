@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
@@ -275,3 +275,41 @@
     <div id="winkelmandPage" class="page">
         <!-- Het grote winkelmandvak in de kleur #9EB3D8 -->
         <div class="cart-section">
+
+op (#B32C43)
+container.innerHTML = '';
+cart.forEach(item => {
+subtotal += item.price;
+textContent += - ${item.name} (${item.weight}) -> € ${item.price.toFixed(2).replace('.', ',')}\n;
+container.innerHTML += <div class="cart-item-card"> <img src="${item.image}" alt="${item.name}"> <div class="cart-item-details"> <span style="font-weight: bold;">${item.name}</span> <span>Kosten: € ${item.price.toFixed(2).replace('.', ',')}</span> <span style="opacity:0.8; font-size: 18px;">Gewicht: ${item.weight}</span> </div> </div>;
+});
+// Bouw het verzendkostenlijstje op
+shippingContainer.innerHTML = '';
+let standaardVerzending = VERZENDOPTIES[0].price; // PostNL als standaard rekenbasis
+VERZENDOPTIES.forEach(opt => {
+shippingContainer.innerHTML += <div class="shipping-row"> <span>${opt.name}:</span> <span>€ ${opt.price.toFixed(2).replace('.', ',')}</span> </div>;
+});
+let total = subtotal + standaardVerzending;
+document.getElementById('cart-total').innerText = total.toFixed(2).replace('.', ',');
+// Automatische mailtekst genereren
+document.getElementById('orderContent').value =
+BESTELDE PRODUCTEN:\n${textContent}\nVerzendwijze basistarief meegerekend.\nTotaalbedrag incl. verzendkosten: € ${total.toFixed(2).replace('.', ',')};
+}
+function clearCart() {
+cart = [];
+updateCartDisplay();
+}
+function sendOrder(e) {
+e.preventDefault();
+const name = document.getElementById('buyerName').value;
+const address = document.getElementById('buyerAddress').value;
+const city = document.getElementById('buyerCity').value;
+const phone = document.getElementById('buyerPhone').value || "Niet opgegeven";
+let orderDetails = document.getElementById('orderContent').value;
+const mailBody = Hallo Crea Landa,\n\nIk wil graag een bestelling plaatsen!\n\nKLANTGEGEVENS:\nNaam: ${name}\nAdres: ${address}\nPostcode & Woonplaats: ${city}\nTelefoonnummer: ${phone}\n\n${orderDetails};
+const subject = encodeURIComponent(Nieuwe bestelling van ${name});
+const content = encodeURIComponent(mailBody);
+window.location.href = mailto:${MIJN_EMAIL}?subject=${subject}&body=${content};
+}
+// Eerste weergave inladen
+updateCartDisplay();
