@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- DE KORTE EN STRAKKE CANVA LETTERTYPEN DIRECT VAN GOOGLE -->
+    <!-- GOOGLE FONTS: GREAT VIBES EN HET SMALLE BEBAS NEUE DIRECT GEKOPPELD -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
     
     <style>
         /* =================================================================
-           BASE: BASISINSTELLINGEN EN ACHTERGROND OP DE HOMEPAGE
+           BASE: STANDAARD INSTELLINGEN
            ================================================================= */
         body { 
             font-family: Arial, sans-serif; 
@@ -21,7 +21,7 @@
             background-color: #724058; 
             color: #FCF5EE; 
             transition: background-color 0.4s ease;
-            perspective: 1000px; /* Nodig voor het 3D deurtjes-effect (Swing Out) */
+            perspective: 1000px; /* Vereist voor het 3D Swing Out effect */
         }
         .container { 
             padding: 20px 15px; 
@@ -40,7 +40,7 @@
         }
 
         /* =================================================================
-           BANNER: DE BOVENBALK DIE ALTIJP EN OVERAL BLIJFT STAAN
+           BANNER: VASTE BOVENBALK (KLEUR #9EB3D8)
            ================================================================= */
         .top-banner { 
             background-color: #9EB3D8; 
@@ -61,14 +61,12 @@
             align-items: center;
             gap: 12px;
         }
-        /* Jouw ronde logo, niet te klein maar net passend */
         .left-brand img {
             max-height: 44px; 
             width: auto;
             border-radius: 50%;
             object-fit: contain;
         }
-        /* Crea Landa in Great Vibes lettertype */
         .logo-text {
             font-family: 'Great Vibes', cursive;
             font-size: 30px;
@@ -76,22 +74,19 @@
         }
 
         /* =================================================================
-           ANIMATIES: JOUW OP-MAAT-GEMAAKTE BEWEGINGEN VIA CSS
+           ANIMATIES: JOUW DRY ANMATION STYLES
            ================================================================= */
-        /* De plopOpen animatie voor het welkomstvak en winkelmand */
         @keyframes plopOpen {
             0% { transform: scale(0.7); opacity: 0; }
             80% { transform: scale(1.03); } 
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* De 3D Swing Out deurtjes-animatie */
         @keyframes swingOutMenu {
             0% { transform: rotateX(-90deg); opacity: 0; transform-origin: top; }
             100% { transform: rotateX(0deg); opacity: 1; transform-origin: top; }
         }
 
-        /* De Pulse ademhaling voor de bolletjes en de verzendknop */
         @keyframes pulseKnop {
             0% { transform: scale(1); }
             50% { transform: scale(1.15); filter: brightness(1.1); }
@@ -99,12 +94,11 @@
         }
 
         /* =================================================================
-           MENU: DE DRIE BOLLETJES MET RECHTE ZWEVENDE BUTTONS
+           MENU: 3 BOLLETJES (PULSE) EN LOSSE ZWEVENDE BUTTONS (SWING OUT)
            ================================================================= */
         #menu-toggle {
             display: none;
         }
-        /* Haalt overal de lelijke blauwe selectierand op je Pixel weg */
         .menu-btn, .menu-link-btn, input, button {
             -webkit-tap-highlight-color: transparent !important;
             outline: none !important;
@@ -123,52 +117,50 @@
             border-radius: 50%;
         }
         
-        /* Het menuvakje (Zonder achtergrondbanner, knoppen zweven handig) */
+        /* Het uitschuifbare menu (Kleur #B32C43, loopt gelijk met welkomstvak) */
         .nav-menu {
             display: none;
-            background-color: transparent !important; 
+            background-color: #B32C43 !important; 
             position: absolute;
-            top: 60px; /* Loopt nu exact gelijk met de onderkant van de banner/welkomstvak */
+            top: 60px; 
             right: 15px; 
-            padding: 0;
-            min-width: 44px;
+            padding: 6px;
+            min-width: 50px;
             z-index: 99;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-sizing: border-box;
         }
         .menu-link-btn {
             display: block;
-            background-color: #B32C43; /* Gekleurd in #B32C43 */
-            color: #FCF5EE; /* Icoontjes in 1 kleur #FCF5EE */
-            padding: 0;
-            margin: 5px 0 0 0;
-            border-radius: 12px; /* Gematigd afgeronde hoeken */
-            width: 44px;
-            height: 44px;
-            line-height: 44px;
+            background-color: transparent;
+            color: #FCF5EE !important;
+            padding: 8px 0;
             text-decoration: none;
-            font-size: 22px; 
-            border: 1px solid #FCF5EE;
+            font-size: 24px; 
             text-align: center;
             cursor: pointer;
+            border: none;
+            width: 100%;
             box-sizing: border-box;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
         }
 
-        /* Geactiveerde animaties via de onzichtbare toggle */
+        /* Geactiveerde menu-animaties */
         #menu-toggle:checked ~ .top-banner .menu-btn {
             animation: pulseKnop 0.4s ease-out; /* De Pulse op de 3 bolletjes */
         }
-        #menu-toggle:checked ~ .nav-menu {
+        #menu-toggle:checked ~ .container .nav-menu {
             display: block !important;
             animation: swingOutMenu 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Swing Out */
         }
 
         /* =================================================================
-           WELKOMSTVAK: HET LICHTBLAUWE VAK MET PLOPOPEN ANIMATIE
+           WELKOMSTVAK: KLEUR #9EB3D8 (PLOP-OPEN ANIMATIE)
            ================================================================= */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
-            border-radius: 12px; /* Afgeronde hoeken, niet te rond */
+            border-radius: 12px; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             text-align: center;
             box-sizing: border-box;
@@ -177,7 +169,7 @@
         }
         .welcome-box p { 
             margin: 0; 
-            font-family: 'Bebas Neue', Arial, sans-serif !important; /* Dwingend Bebas Neue */
+            font-family: 'Bebas Neue', Arial, sans-serif !important; 
             font-size: 24px !important; 
             letter-spacing: 0.8px;
             line-height: 1.35;
@@ -185,18 +177,24 @@
         }
 
         /* =================================================================
-           WINKELMAND: MIJN BESTELLING IN JOUW CANVAS-KLEUREN
+           WINKELMAND: KLEUR #9EB3D8 MET RANDEFFECT IN #6F4257
            ================================================================= */
+        .cart-wrapper {
+            background-color: #6F4257; /* De kleine randkleur rondom */
+            padding: 4px; 
+            border-radius: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
         .cart-section { 
-            background-color: #9EB3D8; /* Vak over de achtergrond heen */
+            background-color: #9EB3D8; 
             padding: 20px; 
-            border-radius: 12px; /* Afgeronde hoeken, niet te rond */
+            border-radius: 12px; /* Gematigd afgerond */
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             box-sizing: border-box;
             width: 100%;
             animation: plopOpen 0.4s ease-out forwards;
         }
-        /* Titel: Mijn Bestelling in het midden, Great Vibes, kleur #FCF5EE */
         .cart-title-text {
             font-family: 'Great Vibes', cursive !important;
             font-size: 42px !important;
@@ -205,7 +203,6 @@
             padding: 5px 0 15px 0;
             color: #FCF5EE !important;
         }
-        /* Verzendtarieven en Totaalbedrag in Bebas Neue, kleur #FCF5EE */
         .shipping-section {
             font-family: 'Bebas Neue', Arial, sans-serif !important;
             font-size: 24px !important;
@@ -214,7 +211,6 @@
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
         
-        /* De stippellijn onder de verzendopties, kleur #FCF5EE */
         .shipping-section::after {
             content: "";
             display: block;
@@ -230,7 +226,7 @@
         }
 
         /* =================================================================
-           FORMULIER: STRUKTUUR VAN DE GEGEVENS-VAKKEN ONDER ELKAAR
+           FORMULIER: LOSSE RODE VAKKEN (#B32C43) EN LICHTE INVOERVAKKEN (#FCF5EE)
            ================================================================= */
         .order-form-box { 
             margin-top: 25px; 
@@ -242,7 +238,6 @@
             width: 100%;
             gap: 10px;
         }
-        /* Korte linker vakken voor de teksten, kleur #B32C43, Bebas Neue */
         .form-label-box {
             background-color: #B32C43;
             color: #FCF5EE !important;
@@ -250,16 +245,39 @@
             font-size: 20px;
             letter-spacing: 0.5px;
             padding: 12px;
-            border-radius: 8px; /* Net afgeronde hoeken maar niet te */
+            border-radius: 8px; 
             min-width: 110px;
             text-align: center;
             box-sizing: border-box;
             border: 1px solid #FCF5EE;
         }
-        /* Rechter vakken waar ze in kunnen typen, kleur #B32C43, tekstkleur #FCF5EE */
         .form-input-box {
             flex-grow: 1;
         }
         .form-input-box input {
             width: 100%;
             padding: 12px;
+            background-color: #FCF5EE !important; /* Invoerveld kleur #FCF5EE */
+            color: #B32C43 !important; /* Typ-tekst in contrasterend rood */
+            border: 1px solid #FCF5EE !important;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .form-input-box input::placeholder { color: rgba(179, 44, 67, 0.5) !important; }
+
+        /* Bestelling plaatsen knop rechtsonder met De Pulse animatie */
+        .btn-container { 
+            display: flex; 
+            justify-content: flex-end; 
+            width: 100%; 
+            margin-top: 20px; 
+        }
+        .btn-submit { 
+            background-color: #B32C43; 
+            color: #FCF5EE; 
+            border: 1px solid #FCF5EE; 
+            padding: 12px 25px; 
+            border-radius: 8px; 
+            cursor: pointer; 
