@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- We laden hier de lettertypen op de meest dwingende manier in direct vanaf Google -->
+    <!-- De Canva lettertypen direct inladen vanaf Google Fonts -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cloudflare.com">
     
     <style>
         body { 
@@ -54,7 +53,12 @@
             color: #FCF5EE;
         }
 
-        /* De 3 bolletjes */
+        /* 100% VEILIGE MENU-METHODE: Een onzichtbaar selectievakje regelt de knop! */
+        #menu-toggle {
+            display: none;
+        }
+
+        /* De 3 bolletjes knop */
         .menu-btn {
             display: flex;
             flex-direction: column;
@@ -91,6 +95,11 @@
             text-decoration: none;
         }
 
+        /* Als het onzichtbare vakje is aangevinkt, floept het menu open zónder code-motor! */
+        #menu-toggle:checked ~ .nav-menu {
+            display: block !important;
+        }
+
         .container { 
             padding: 20px 15px; 
             display: flex;
@@ -104,9 +113,12 @@
             width: 100%;
             max-width: 600px;
         }
-        .page.active { 
-            display: block; 
-        }
+        
+        /* Regelt welke pagina actief getoond wordt via de url hashtag (#home of #winkelmand) */
+        #homePage, #winkelmandPage { display: none; }
+        
+        body:not(:has(:target)) #homePage, :target#homePage { display: block; }
+        :target#winkelmandPage { display: block; }
 
         /* Welkomstvak: compact en netjes */
         .welcome-box {
@@ -119,17 +131,15 @@
             width: 100%;
         }
         
-        /* DE NIEUWE TRUC: We dwingen de letters smal, hoog en strak te zijn zoals in Canva! */
+        /* Jouw dwingende strakke letters uit Canva (Big Shoulders Display) */
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
             font-size: 25px !important; 
             font-weight: 600 !important;
-            text-transform: none;
             line-height: 1.35;
             letter-spacing: 0.3px;
             color: #FCF5EE !important;
-            /* Maakt de letters smaller en hoger als extra dwingende laag */
             display: inline-block;
             transform: scaleX(0.92);
         }
@@ -203,33 +213,40 @@
         .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
 
         .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
-        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; }
+        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
 
+<!-- De vaste bovenbalk -->
 <div class="top-banner">
     <div class="left-brand">
         <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
         <div class="logo-text">Crea Landa</div>
     </div>
     
-    <div class="menu-btn" onclick="toggleMenu()">
+    <!-- De 3 bolletjes knop stuurt nu direct het onzichtbare vakje aan -->
+    <label for="menu-toggle" class="menu-btn">
         <div class="dot"></div>
         <div class="dot"></div>
         <div class="dot"></div>
-    </div>
+    </label>
 </div>
 
-<div id="navMenu" class="nav-menu">
-    <a href="#" onclick="switchPage('home')">🏠</a>
-    <a href="#" onclick="switchPage('winkelmand')">🛒</a>
+<!-- Het onzichtbare vakje dat de status bewaart -->
+<input type="checkbox" id="menu-toggle">
+
+<!-- Het uitschuifmenu -->
+<div class="nav-menu">
+    <!-- Sluit het menu automatisch zodra je klikt -->
+    <a href="#home" onclick="document.getElementById('menu-toggle').checked = false;">🏠</a>
+    <a href="#winkelmand" onclick="document.getElementById('menu-toggle').checked = false; document.body.style.backgroundColor = '#6F4257';">🛒</a>
 </div>
 
 <div class="container">
 
     <!-- HOME PAGINA -->
-    <div id="homePage" class="page active">
+    <div id="homePage">
         <div class="welcome-box">
             <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
         </div>
@@ -239,7 +256,7 @@
     </div>
 
     <!-- WINKELMAND PAGINA -->
-    <div id="winkelmandPage" class="page">
+    <div id="winkelmandPage">
         <div class="cart-section">
             <div class="cart-title-text">Mijn Bestelling</div>
             
@@ -250,21 +267,7 @@
             </div>
 
             <div class="order-form-box">
-                <form onsubmit="sendOrder(event)">
-                    <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
-                    <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 1" required></div>
-                    <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" id="buyerCity" placeholder="Bijv. 1234 AB Dorp" required></div>
-                    <div class="form-group"><label>Telefoonnummer:</label><input type="text" id="buyerPhone" placeholder="Voor overleg via Tikkie"></div>
-                    <div class="btn-container"><button type="submit" class="btn-submit">Bestelling plaatsen</button></div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    const MIJN_EMAIL = "crealanda@gmail.com";
-
-    function toggleMenu() {
-        var menu = document.getElementById('navMenu');
+                <form action="mailto:crealanda@gmail.com" method="GET" enctype="text/plain">
+                    <!-- Verborgen velden om het onderwerp automatisch mee te sturen via pure HTML -->
+                    <input type="hidden" name="subject" value="Nieuwe bestelling van Crea Landa">
+                    
