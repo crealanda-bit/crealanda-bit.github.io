@@ -13,7 +13,8 @@
     
     <style>
         body { 
-            font-family: Arial, sans-serif; 
+            font-family:'Big Shoulders 
+Display' 
             margin: 0; 
             padding: 0; 
             background-color: #724058; 
@@ -122,7 +123,7 @@
         /* Extra dwingende styling voor Big Shoulders Display */
         .welcome-box p { 
             margin: 0; 
-            font-family: 'Big Shoulders Display', sans-serif !important;
+            font-family: 'Big Shoulders Display'
             font-size: 24px !important; 
             color: #FCF5EE !important;
             line-height: 1.3;
@@ -224,13 +225,13 @@
 <script>
     // Schone, herstelde navigatiefuncties zonder fouten
     function toggleMenu() {
-        var menu = document.getElementById('navMenu');
-        if (menu.style.display === 'block') {
-            menu.style.display = 'none';
-        } else {
-            menu.style.display = 'block';
-        }
+    var menu = document.getElementById('navMenu');
+    if (window.getComputedStyle(menu).display === 'none') {
+        menu.style.setProperty('display', 'block', 'important');
+    } else {
+        menu.style.setProperty('display', 'none', 'important');
     }
+}
 
     function switchPage(pageId) {
         document.getElementById('homePage').style.display = 'none';
