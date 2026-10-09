@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- De Canva lettertypen inladen via Google Fonts (als reserve) -->
+    <!-- De Canva lettertypen inladen via Google Fonts -->
     <link href="https://googleapis.com" rel="stylesheet">
     
     <style>
@@ -75,15 +75,15 @@
             right: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 10px;
-            min-width: 60px;
+            padding: 8px;
+            min-width: 50px;
             text-align: center;
             z-index: 99;
         }
         .nav-menu a {
             display: block;
             color: #FCF5EE;
-            padding: 12px 0;
+            padding: 10px 0;
             font-size: 26px; 
             text-decoration: none;
         }
@@ -116,10 +116,10 @@
             width: 100%;
         }
         
-        /* Dwingend smal/hoog lettertype (Imitatie van Big Shoulders Display voor Android) */
+        /* Dwingend smal/hoog lettertype (Big Shoulders Display) */
         .welcome-box p { 
             margin: 0; 
-            font-family: 'Big Shoulders Display', 'Arial Narrow', 'Nimbus Sans L', sans-serif-condensed, sans-serif !important;
+            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
             font-stretch: condensed !important;
             font-weight: bold !important;
             font-size: 24px !important; 
@@ -128,7 +128,7 @@
             letter-spacing: 0.5px;
         }
 
-             /* ================= JOUW NIEUWE WINKELMAND STYLING ================= */
+        /* ================= JOUW NIEUWE WINKELMAND STYLING ================= */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -136,7 +136,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             box-sizing: border-box;
             width: 100%;
-            color: #FCF5EE !important; /* Dwingt alle algemene teksten naar jouw lichte kleur */
+            color: #FCF5EE !important;
         }
         
         /* Titel bovenaan in Great Vibes lettertype */
@@ -159,11 +159,11 @@
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
         
-        /* Jouw gewenste stippellijn boven het totaalbedrag */
+        /* Stippellijn boven het totaalbedrag */
         .shipping-section::after {
             content: "";
             display: block;
-            border-top: 3px dashed #FCF5EE; /* Niet te dunne stippellijn */
+            border-top: 3px dashed #FCF5EE; 
             margin: 15px 0;
             width: 100%;
         }
@@ -183,7 +183,7 @@
         .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 20px; color: #FCF5EE !important; }
         .form-group label { display: block; margin-bottom: 6px; text-align: left; }
         
-        /* De invoervakken zelf rood gemaakt */
+        /* De invoervakken zelf rood gemaakt met lichte rand */
         .form-group input { 
             width: 100%; 
             padding: 12px; 
@@ -194,9 +194,33 @@
             box-sizing: border-box; 
             font-size: 16px; 
         }
-        /* Zorgt dat de placeholder-tekst in de rode vakken ook netjes leesbaar is */
         .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
 
+        .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
+        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="top-banner">
+    <div class="left-brand">
+        <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
+        <div class="logo-text">Crea Landa</div>
+    </div>
+    
+    <div class="menu-btn" onclick="toggleMenu()">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+    </div>
+</div>
+
+<div id="navMenu" class="nav-menu">
+    <a href="#" onclick="switchPage('home')">🏠</a>
+    <a href="#" onclick="switchPage('winkelmand')">🛒</a>
+</div>
+
+<div class="container">
 
     <!-- HOME PAGINA -->
     <div id="homePage" class="page active">
@@ -211,7 +235,8 @@
     <!-- WINKELMAND PAGINA -->
     <div id="winkelmandPage" class="page">
         <div class="cart-section">
-            <div class="cart-title-text">Jouw Bestelling</div>
+            <!-- Titel veranderd naar Mijn Bestelling -->
+            <div class="cart-title-text">Mijn Bestelling</div>
             
             <div class="shipping-section">
                 <div class="shipping-row"><span>PostNL Brievenbuspakje:</span><span>€ 4,25</span></div>
@@ -220,11 +245,11 @@
             </div>
 
             <div class="order-form-box">
-                <form onsubmit="event.preventDefault(); alert('Test succesvol!');">
-                    <div class="form-group"><label>Volledige Naam:</label><input type="text" placeholder="Voor- en achternaam" required></div>
-                    <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" placeholder="Bijv. Dorpsstraat 1" required></div>
-                    <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" placeholder="Bijv. 1234 AB Dorp" required></div>
-                    <div class="form-group"><label>Telefoonnummer:</label><input type="text" placeholder="Voor overleg via Tikkie"></div>
+                <form onsubmit="sendOrder(event)">
+                    <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
+                    <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 1" required></div>
+                    <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" id="buyerCity" placeholder="Bijv. 1234 AB Dorp" required></div>
+                    <div class="form-group"><label>Telefoonnummer:</label><input type="text" id="buyerPhone" placeholder="Voor overleg via Tikkie"></div>
                     <div class="btn-container"><button type="submit" class="btn-submit">Bestelling plaatsen</button></div>
                 </form>
             </div>
@@ -234,7 +259,8 @@
 </div>
 
 <script>
-    // Menu openen en sluiten
+    const MIJN_EMAIL = "crealanda@gmail.com";
+
     function toggleMenu() {
         var menu = document.getElementById('navMenu');
         if (menu.style.display === 'block') {
@@ -244,20 +270,6 @@
         }
     }
 
-    // Wisselen tussen de pagina's
     function switchPage(pageId) {
         document.getElementById('homePage').style.display = 'none';
         document.getElementById('winkelmandPage').style.display = 'none';
-        document.getElementById('navMenu').style.display = 'none';
-
-        if(pageId === 'home') {
-            document.body.style.backgroundColor = "#724058"; 
-            document.getElementById('homePage').style.display = 'block';
-        } else if(pageId === 'winkelmand') {
-            document.body.style.backgroundColor = "#6F4257"; 
-            document.getElementById('winkelmandPage').style.display = 'block';
-        }
-    }
-</script>
-</body>
-</html>
