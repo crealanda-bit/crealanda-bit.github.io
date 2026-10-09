@@ -420,12 +420,62 @@ main {
     <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
   </section>
 
-<div style="text-align:center; margin:24px 16px;">
-  <a href="galerij-index.html"
-     style="display:inline-block; padding:14px 28px; background:#b32a44; color:#fff6ee; border-radius:14px; text-decoration:none; font-size:1.4rem; font-family:inherit; letter-spacing:1px;">
-    BEKIJK DE GALERIJ
-  </a>
-</div>
+<section id="galerij" style="margin:24px 16px;">
+  <style>
+    #galerij h2 { text-align:center; color:#fff6ee; font-size:1.8rem; letter-spacing:1px; margin:0 0 16px; }
+    #clGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
+    .cl-card { margin:0; background:#9db3d9; border-radius:16px; overflow:hidden; position:relative;
+      box-shadow:0 6px 18px rgba(0,0,0,.25);
+      opacity:0; transform:translateY(40px) scale(.9);
+      transition:opacity .6s ease, transform .6s cubic-bezier(.2,.9,.3,1.2); }
+    .cl-card.show { opacity:1; transform:none; }
+    .cl-card img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+    .cl-card figcaption { padding:8px 12px 10px; color:#fff6ee; font-size:1.1rem; }
+    .cl-card small { display:block; opacity:.85; }
+    .cl-heart { position:absolute; top:8px; right:8px; border:0; border-radius:22px; padding:6px 12px;
+      background:rgba(0,0,0,.5); color:#fff; font-size:1.1rem; cursor:pointer; transition:transform .15s; }
+    .cl-heart.on { color:#ff5a7a; }
+    .cl-heart.pop { animation:clPop .35s ease; }
+    @keyframes clPop { 0%{transform:scale(1)} 40%{transform:scale(1.4)} 100%{transform:scale(1)} }
+    @media (prefers-reduced-motion: reduce) { .cl-card { transition:none; opacity:1; transform:none; } }
+  </style>
+
+  <h2>Galerij</h2>
+  <div id="clGrid"></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function () {
+  const sb = supabase.createClient(
+    'https://nyeedsxrlnkbxzoritwg.supabase.co',
+    'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7'
+  );
+  const grid = document.getElementById('clGrid');
+
+  function visitorId() {
+    try {
+      let v = localStorage.getItem('cl_visitor');
+      if (!v) { v = crypto.randomUUID(); localStorage.setItem('cl_visitor', v); }
+      return v;
+    } catch (e) { return crypto.randomUUID(); }
+  }
+  const vid = visitorId();
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('show');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  async function load() {
+    const [p, c, m] = await Promise.all([
+      sb.from('photos').select('*').order('created_at', { ascending: false }),
+      sb.rpc('get_like_counts'),
+      sb.rpc('get_my_lik
 
   <section class="page" id="cartPage">
     <div class="cart-panel">
