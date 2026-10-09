@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
-    <!-- De Canva lettertypen en de icoontjes inladen via Google Fonts / FontAwesome -->
+    <!-- De Canva lettertypen en icoontjes inladen via Google Fonts / FontAwesome -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="https://cloudflare.com">
     
@@ -35,27 +35,27 @@
             box-sizing: border-box;
         }
 
-        /* Crea Landa aan de linkerkant in Great Vibes lettertype */
-        .logo-text {
-            font-family: 'Great Vibes', cursive;
-            font-size: 28px;
-            color: #FCF5EE;
-            white-space: nowrap;
+        /* Container voor logo en naam aan de linkerkant */
+        .left-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        /* Ronde logo in het midden van de banner */
-        .logo-image-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-        }
-        .logo-image-container img {
-            max-height: 45px; 
+        /* Jouw ronde logo, passend in de banner naast de naam */
+        .left-brand img {
+            max-height: 42px; 
             width: auto;
             object-fit: contain;
             border-radius: 50%;
+        }
+
+        /* Crea Landa in Great Vibes lettertype */
+        .logo-text {
+            font-family: 'Great Vibes', cursive;
+            font-size: 30px;
+            color: #FCF5EE;
+            white-space: nowrap;
         }
 
         /* De 3 bolletjes aan de rechterkant */
@@ -73,7 +73,7 @@
             border-radius: 50%;
         }
 
-        /* Het handige uitschuifmenu: klein vak, kleur #B32C43, afgeronde hoeken */
+        /* Het uitschuifbare keuzemenu: klein vak, kleur #B32C43, afgeronde hoeken */
         .nav-menu {
             display: none;
             background-color: #B32C43;
@@ -82,17 +82,17 @@
             right: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 10px;
-            min-width: 60px;
+            padding: 8px;
+            min-width: 50px;
             text-align: center;
             z-index: 99;
         }
         .nav-menu a {
             display: block;
             color: #FCF5EE;
-            padding: 12px 10px;
+            padding: 10px 0;
             text-decoration: none;
-            font-size: 24px; /* Formaat van de icoontjes */
+            font-size: 26px; /* Formaat van de icoontjes */
         }
         .nav-menu a:active {
             opacity: 0.7;
@@ -116,7 +116,7 @@
             display: block; 
         }
 
-        /* Welkomstvak op Home: meegroeiend, kleur #9EB3D8, licht afgerond */
+        /* Welkomstvak op Home: kleur #9EB3D8, licht afgerond, meegroeiend */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px;
@@ -126,6 +126,8 @@
             box-sizing: border-box;
             width: 100%;
         }
+        
+        /* Jouw welkomsttekst in Big Shoulders Display, kleur #FCF5EE */
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', sans-serif;
@@ -146,15 +148,6 @@
             box-sizing: border-box;
             width: 100%;
         }
-        
-        .cart-section h2 {
-            margin-top: 0;
-            font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 28px;
-            text-align: center;
-            border-bottom: 1px solid rgba(252, 245, 238, 0.3);
-            padding-bottom: 10px;
-        }
 
         /* Productvakken onder elkaar: kleur #B32C43, afgeronde hoeken */
         .cart-item-card {
@@ -166,6 +159,8 @@
             align-items: center;
             gap: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            width: 100%;
         }
         
         /* Foto links in het productvak */
@@ -180,36 +175,37 @@
         /* Tekst rechts in het productvak (Big Shoulders Display, kleur #FCF5EE) */
         .cart-item-details {
             font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 22px;
+            font-size: 24px;
             color: #FCF5EE;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
+            text-align: left;
         }
 
         /* Verzendkosten vak onder de producten: Big Shoulders Display, kleur #FCF5EE */
         .shipping-section {
             margin-top: 20px;
             padding: 15px;
+            background-color: transparent;
             border-top: 1px solid rgba(252, 245, 238, 0.3);
             font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 22px;
+            font-size: 24px;
             color: #FCF5EE;
         }
-        .shipping-title { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 8px; opacity: 0.9; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 26px; font-weight: bold; border-top: 2px solid #FCF5EE; padding-top: 10px; }
+        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .total-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 28px; font-weight: bold; border-top: 2px solid #FCF5EE; padding-top: 10px; }
 
-        /* Knoppen en Formulieren */
+        /* Formulier en Invoervakken */
         .order-form-box {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 15px;
             margin-top: 20px;
-            border: 1px solid rgba(252, 245, 238, 0.3);
+            border: 1px solid rgba(252, 245, 238, 0.2);
         }
-        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', sans-serif; font-size: 18px; }
-        .form-group label { display: block; margin-bottom: 4px; }
+        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', sans-serif; font-size: 20px; color: #FCF5EE; }
+        .form-group label { display: block; margin-bottom: 4px; text-align: left; }
         .form-group input, .form-group textarea { width: 100%; padding: 10px; background-color: #9EB3D8; color: #FCF5EE; border: 1px solid #FCF5EE; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
         .form-group textarea { height: 80px; resize: none; }
 
@@ -228,24 +224,25 @@
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         .btn-submit:active { opacity: 0.8; }
-        .btn-clear { background: transparent; color: #FCF5EE; border: 1px solid #FCF5EE; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Big Shoulders Display', sans-serif; font-size: 16px; margin-top: 10px; }
+        .btn-clear { background: transparent; color: #FCF5EE; border: 1px solid #FCF5EE; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-family: 'Big Shoulders Display', sans-serif; font-size: 16px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <!-- De vaste blauwe bovenbalk -->
 <div class="top-banner">
-    <div class="logo-text">Crea Landa</div>
-    
-    <div class="logo-image-container">
+    <div class="left-brand">
+        <!-- Jouw ronde logo links naast de naam -->
         <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
+        <div class="logo-text">Crea Landa</div>
     </div>
     
+    <!-- De 3 bolletjes knop rechts -->
     <div class="menu-btn" onclick="toggleMenu()">
         <div class="dot"></div>
         <div class="dot"></div>
@@ -253,7 +250,7 @@
     </div>
 </div>
 
-<!-- Het handige uitschuifmenu met alleen icoontjes onder elkaar -->
+<!-- Het handige uitschuifmenu met alleen het huisje en winkelmandje onder elkaar -->
 <div id="navMenu" class="nav-menu">
     <a href="#" onclick="switchPage('home')" title="Home"><i class="fa-solid fa-house"></i></a>
     <a href="#" onclick="switchPage('winkelmand')" title="Winkelmand"><i class="fa-solid fa-basket-shopping"></i></a>
@@ -263,17 +260,18 @@
 
     <!-- ================= HOMEPAGE PAGINA ================= -->
     <div id="homePage" class="page active">
+        <!-- Jouw op-maat-gemaakte welkomstvak -->
         <div class="welcome-box">
-            <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
+            <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je what leuks ziet kun je een bestelling plaatsen!</p>
         </div>
         
-        <!-- HIER KUN JE STRAKS MAKKELIJK JOUW PRODUCTEN ONDER PLAKKEN -->
-        <div style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', sans-serif; font-size:24px; opacity:0.7;">
-            (Klik op het menu rechtsboven en kies de winkelmand om de testproducten te bekijken!)
+        <!-- HIER KUNNEN WE STRAKS JOUW PRODUCTEN ONDER PLAKKEN -->
+        <div style="text-align:center; margin-top: 50px; font-family:'Big Shoulders Display', sans-serif; font-size:24px; opacity:0.6;">
+            (Klik op de 3 bolletjes rechtsboven en kies het winkelmandje om de opbouw te bekijken!)
         </div>
     </div>
 
     <!-- ================= WINKELMAND PAGINA ================= -->
     <div id="winkelmandPage" class="page">
+        <!-- Het grote winkelmandvak in de kleur #9EB3D8 -->
         <div class="cart-section">
-            <h2>Jouw Bestelling</h2>
