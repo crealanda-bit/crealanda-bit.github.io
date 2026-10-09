@@ -128,7 +128,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ================= JOUW NIEUWE WINKELMAND STYLING ================= */
+        /* ================= JOUW WINKELMAND STYLING ================= */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -235,7 +235,6 @@
     <!-- WINKELMAND PAGINA -->
     <div id="winkelmandPage" class="page">
         <div class="cart-section">
-            <!-- Titel veranderd naar Mijn Bestelling -->
             <div class="cart-title-text">Mijn Bestelling</div>
             
             <div class="shipping-section">
@@ -273,3 +272,5 @@
     function switchPage(pageId) {
         document.getElementById('homePage').style.display = 'none';
         document.getElementById('winkelmandPage').style.display = 'none';
+        document.getElementById('navMenu').style.display = 'none'; // TYPEFOUT HIER RECHTGEZET!
+
