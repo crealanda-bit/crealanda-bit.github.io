@@ -18,7 +18,7 @@
             padding: 0; 
             background-color: #724058; 
             color: #FCF5EE; 
-            transition: background-color 0.4s ease; /* Zorgt dat de achtergrondkleur heel zachtjes verandert */
+            transition: background-color 0.4s ease; 
         }
         .container { 
             padding: 20px 15px; 
@@ -67,10 +67,10 @@
             color: #FCF5EE;
         }
 
-        /* ANIMATIES: HIER STAAN JOUW NIEUWE BEWEGINGEN GEDEFINEERD */
+        /* ANIMATIES: HIER STAAN JOUW BEWEGINGEN GEDEFINEERD */
         @keyframes plopOpen {
             0% { transform: scale(0.7); opacity: 0; }
-            80% { transform: scale(1.03); } /* Subtiel bounce effectje */
+            80% { transform: scale(1.03); } 
             100% { transform: scale(1); opacity: 1; }
         }
 
@@ -79,10 +79,17 @@
             100% { transform: translateY(0); opacity: 1; }
         }
 
-        /* MENU: DE DRIE BOLLETJES EN HET PAARSE INSCHUIFMENU */
+        /* MENU: DE DRIE BOLLETJES EN HET RECHTBANG MENU UTILS CHUIVEN */
         #menu-toggle {
             display: none;
         }
+        
+        /* WEG MET DE BLAUWE RAND: Dit haalt die lelijke selectierand op je Pixel weg! */
+        .menu-btn, .menu-link-btn, input, button {
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
+        }
+        
         .menu-btn {
             display: flex;
             flex-direction: column;
@@ -92,7 +99,7 @@
             transition: transform 0.2s ease;
         }
         .menu-btn:active {
-            transform: scale(0.85); /* Krimpt een beetje als je erop drukt */
+            transform: scale(0.85); 
         }
         .menu-btn .dot {
             width: 6px;
@@ -100,6 +107,8 @@
             background-color: #FCF5EE;
             border-radius: 50%;
         }
+        
+        /* Compact menuvakje, perfect passend voor alleen twee icoontjes */
         .nav-menu {
             display: none;
             background-color: #B32C43;
@@ -108,31 +117,34 @@
             right: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 10px;
-            min-width: 140px;
+            padding: 5px;
+            min-width: 55px; /* Lekker smal vakje geworden */
             z-index: 99;
         }
+        
+        /* De icoontjes als strakke, paarse ronde knopjes onder elkaar */
         .menu-link-btn {
             display: block;
             background-color: #724058;
             color: #FCF5EE;
-            padding: 10px;
+            padding: 10px 0;
             margin: 5px 0;
-            border-radius: 6px;
+            border-radius: 50%; /* Maakt er een mooi rond knopje van */
+            width: 44px;
+            height: 44px;
+            line-height: 24px;
             text-decoration: none;
-            font-family: 'Big Shoulders Display', sans-serif;
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 22px; /* Mooi formaat voor het huisje en winkelmandje */
             border: 1px solid #FCF5EE;
             text-align: center;
             cursor: pointer;
+            box-sizing: border-box;
             transition: transform 0.2s ease;
         }
         .menu-link-btn:active {
-            transform: scale(0.95); /* Knoppen reageren elastisch op indrukken */
+            transform: scale(0.90); 
         }
         
-        /* Zorgt dat het menu geanimeerd naar beneden glijdt als je klikt */
         #menu-toggle:checked ~ .nav-menu {
             display: block !important;
             animation: glijdNaarBeneden 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -147,7 +159,6 @@
             text-align: center;
             box-sizing: border-box;
             width: 100%;
-            /* Plopt direct soepel open bij het laden van de pagina */
             animation: plopOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
         .welcome-box p { 
@@ -171,7 +182,6 @@
             box-sizing: border-box;
             width: 100%;
             color: #FCF5EE !important;
-            /* Plopt ook prachtig open als je naar de pagina switcht */
             animation: plopOpen 0.4s ease-out forwards;
         }
         .cart-title-text {
@@ -220,7 +230,7 @@
             transition: border-color 0.2s ease;
         }
         .form-group input:focus {
-            border-color: #724058 !important; /* Licht op als je erin typt */
+            border-color: #724058 !important; 
             outline: none;
         }
         .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
@@ -231,6 +241,7 @@
 </head>
 <body>
 
+    <!-- DE BANNER STRUCTUUR -->
     <div class="top-banner">
         <div class="left-brand">
             <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
@@ -246,13 +257,15 @@
 
     <input type="checkbox" id="menu-toggle">
 
+    <!-- JOUW COSTRUCTIE MET PURE EN ALKHEEN ICOONTJES ONDER ELKAAR -->
     <div class="nav-menu">
-        <button class="menu-link-btn" onclick="gotoPage('home')">🏠 Home</button>
-        <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒 Winkelmand</button>
+        <button class="menu-link-btn" onclick="gotoPage('home')">🏠</button>
+        <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒</button>
     </div>
 
     <div class="container">
 
+        <!-- HOMEPAGE PAGINA -->
         <div id="homePage" class="page active">
             <div class="welcome-box">
                 <p id="welcome-text-placeholder"></p>
@@ -262,9 +275,5 @@
             </p>
         </div>
 
+        <!-- WINKELMAND PAGINA -->
         <div id="winkelmandPage" class="page">
-            <div class="cart-section">
-                <div class="cart-title-text">Mijn Bestelling</div>
-                
-                <div class="shipping-section">
-                    <div class="shipping-row"><span>PostNL Brievenbuspakje:</span><span>€ <span id="txt-postnl">0,00</span></span></div>
