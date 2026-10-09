@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- GOOGLE FONTS: GREAT VIBES EN HET NIEUWE BEBAS NEUE INLADEN -->
+    <!-- DE KORTE EN STRANGE CANVA LETTERTYPEN DIRECT VAN GOOGLE -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
     
     <style>
-        /* BASE: BASISINSTELLINGEN EN STANDAARD ACHTERGROND */
+        /* =================================================================
+           BASE: BASISINSTELLINGEN EN ACHTERGROND OP DE HOMEPAGE
+           ================================================================= */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
             background-color: #724058; 
             color: #FCF5EE; 
-            transition: background-color 0.4s ease; 
+            transition: background-color 0.4s ease;
+            perspective: 1000px; /* Nodig voor het 3D deurtjes-effect (Swing Out) */
         }
         .container { 
             padding: 20px 15px; 
@@ -26,7 +29,6 @@
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
-            position: relative;
         }
         .page { 
             display: none; 
@@ -37,7 +39,9 @@
             display: block; 
         }
 
-        /* BANNER: DE BLAUWE BOVENBALK DIE VAST BLIJFT STAAN */
+        /* =================================================================
+           BANNER: DE BOVENBALK DIE ALTIJD EN OVERAL BLIJFT STAAN
+           ================================================================= */
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
@@ -57,33 +61,50 @@
             align-items: center;
             gap: 12px;
         }
+        /* Jouw ronde logo, niet te klein maar net passend */
         .left-brand img {
-            max-height: 42px; 
+            max-height: 44px; 
             width: auto;
             border-radius: 50%;
+            object-fit: contain;
         }
+        /* Crea Landa in Great Vibes lettertype */
         .logo-text {
             font-family: 'Great Vibes', cursive;
             font-size: 30px;
             color: #FCF5EE;
         }
 
-        /* ANIMATIES: JOUW OP-MAAT-GEMAAKTE BEWEGINGEN */
+        /* =================================================================
+           ANIMATIES: JOUW OP-MAAT-GEMAAKTE BEWEGINGEN VIA CSS
+           ================================================================= */
+        /* De plopOpen animatie voor het welkomstvak en winkelmand */
         @keyframes plopOpen {
             0% { transform: scale(0.7); opacity: 0; }
             80% { transform: scale(1.03); } 
             100% { transform: scale(1); opacity: 1; }
         }
 
-        @keyframes glijdNaarBeneden {
-            0% { transform: translateY(-15px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
+        /* De 3D Swing Out deurtjes-animatie */
+        @keyframes swingOutMenu {
+            0% { transform: rotateX(-90deg); opacity: 0; transform-origin: top; }
+            100% { transform: rotateX(0deg); opacity: 1; transform-origin: top; }
         }
 
-        /* MENU: DRIE BOLLETJES EN DE LOSSE ICOONTJES ZONDER ACHTERGRONDBANNER */
+        /* De Pulse ademhaling voor de bolletjes en de verzendknop */
+        @keyframes pulseKnop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); filter: brightness(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* =================================================================
+           MENU: DE DRIE BOLLETJES MET RECHTE ZWEVENDE BUTTONS
+           ================================================================= */
         #menu-toggle {
             display: none;
         }
+        /* Haalt overal de lelijke blauwe selectierand op je Pixel weg */
         .menu-btn, .menu-link-btn, input, button {
             -webkit-tap-highlight-color: transparent !important;
             outline: none !important;
@@ -94,10 +115,6 @@
             gap: 4px;
             cursor: pointer;
             padding: 10px;
-            transition: transform 0.2s ease;
-        }
-        .menu-btn:active {
-            transform: scale(0.85); 
         }
         .menu-btn .dot {
             width: 6px;
@@ -106,27 +123,24 @@
             border-radius: 50%;
         }
         
-        /* De nav-menu banner achtergrond is volledig verwijderd. Transparant gemaakt! */
+        /* Het menuvakje (Zonder achtergrondbanner, knoppen zweven handig) */
         .nav-menu {
             display: none;
             background-color: transparent !important; 
             position: absolute;
-            top: 65px;
-            right: 15px; /* Lijnt nu perfect uit met de rechterkant van je welkomstvak */
+            top: 60px; /* Loopt nu exact gelijk met de onderkant van de banner/welkomstvak */
+            right: 15px; 
             padding: 0;
             min-width: 44px;
             z-index: 99;
-            box-shadow: none !important;
         }
-        
-        /* Losse ronde paarse knopjes die onder elkaar zweven, zonder banner erachter */
         .menu-link-btn {
             display: block;
-            background-color: #B32C43; /* Jouw paars-rode menukleur */
-            color: #FCF5EE;
+            background-color: #B32C43; /* Gekleurd in #B32C43 */
+            color: #FCF5EE; /* Icoontjes in 1 kleur #FCF5EE */
             padding: 0;
-            margin: 0 0 10px 0;
-            border-radius: 50%; 
+            margin: 5px 0 0 0;
+            border-radius: 12px; /* Gematigd afgeronde hoeken */
             width: 44px;
             height: 44px;
             line-height: 44px;
@@ -136,70 +150,71 @@
             text-align: center;
             cursor: pointer;
             box-sizing: border-box;
-            transition: transform 0.2s ease;
             box-shadow: 0 4px 6px rgba(0,0,0,0.15);
         }
-        .menu-link-btn:last-child {
-            margin-bottom: 0;
+
+        /* Geactiveerde animaties via de onzichtbare toggle */
+        #menu-toggle:checked ~ .top-banner .menu-btn {
+            animation: pulseKnop 0.4s ease-out; /* De Pulse op de 3 bolletjes */
         }
-        .menu-link-btn:active {
-            transform: scale(0.90); 
-        }
-        
         #menu-toggle:checked ~ .nav-menu {
             display: block !important;
-            animation: glijdNaarBeneden 0.25s ease-out forwards;
+            animation: swingOutMenu 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Swing Out */
         }
 
-        /* WELKOMSTVAK: HET DESIGN IS NU GEKOPPELD AAN BEBAS NEUE */
+        /* =================================================================
+           WELKOMSTVAK: HET LICHTBLAUWE VAK MET PLOPOPEN ANIMATIE
+           ================================================================= */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
-            border-radius: 12px;
+            border-radius: 12px; /* Afgeronde hoeken, niet te rond */
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             text-align: center;
             box-sizing: border-box;
             width: 100%;
-            animation: plopOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: plopOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* plopOpen */
         }
         .welcome-box p { 
             margin: 0; 
-            font-family: 'Bebas Neue', Arial, sans-serif !important; /* Direct gekoppeld aan de werkende Bebas Neue look */
+            font-family: 'Bebas Neue', Arial, sans-serif !important; /* Dwingend Bebas Neue */
             font-size: 24px !important; 
-            letter-spacing: 1px;
-            line-height: 1.3;
+            letter-spacing: 0.8px;
+            line-height: 1.35;
             color: #FCF5EE !important;
-            display: inline-block;
         }
 
-        /* WINKELMAND: JOUW INSTELLINGEN VOOR DE BESTELPAGINA */
+        /* =================================================================
+           WINKELMAND: MIJN BESTELLING IN JOUW CANVAS-KLEUREN
+           ================================================================= */
         .cart-section { 
-            background-color: #9EB3D8; 
+            background-color: #9EB3D8; /* Vak over de achtergrond heen */
             padding: 20px; 
-            border-radius: 12px; 
+            border-radius: 12px; /* Afgeronde hoeken, niet te rond */
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             box-sizing: border-box;
             width: 100%;
-            color: #FCF5EE !important;
             animation: plopOpen 0.4s ease-out forwards;
         }
+        /* Titel: Mijn Bestelling in het midden, Great Vibes, kleur #FCF5EE */
         .cart-title-text {
             font-family: 'Great Vibes', cursive !important;
             font-size: 42px !important;
             font-weight: normal !important;
             text-align: center;
-            padding: 5px;
+            padding: 5px 0 15px 0;
             color: #FCF5EE !important;
         }
+        /* Verzendtarieven en Totaalbedrag in Bebas Neue, kleur #FCF5EE */
         .shipping-section {
-            margin-top: 15px;
-            padding: 10px 5px;
             font-family: 'Bebas Neue', Arial, sans-serif !important;
-            font-size: 22px !important;
+            font-size: 24px !important;
             color: #FCF5EE !important;
             letter-spacing: 0.8px;
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        
+        /* De stippellijn onder de verzendopties, kleur #FCF5EE */
         .shipping-section::after {
             content: "";
             display: block;
@@ -210,72 +225,41 @@
         .total-row { 
             display: flex; 
             justify-content: space-between; 
-            font-family: 'Bebas Neue', Arial, sans-serif !important;
-            font-size: 26px !important; 
+            font-size: 28px !important; 
             font-weight: bold !important; 
-            color: #FCF5EE !important; 
-            letter-spacing: 0.8px;
         }
-        .order-form-box { margin-top: 15px; }
-        .form-group { margin-bottom: 12px; font-family: 'Bebas Neue', Arial, sans-serif !important; font-size: 20px; color: #FCF5EE !important; letter-spacing: 0.5px; }
-        .form-group label { display: block; margin-bottom: 6px; text-align: left; }
-        .form-group input { 
-            width: 100%; 
-            padding: 12px; 
-            background-color: #B32C43; 
-            color: #FCF5EE !important; 
-            border: 1px solid #FCF5EE !important; 
-            border-radius: 6px; 
-            box-sizing: border-box; 
-            font-size: 16px; 
-            transition: border-color 0.2s ease;
+
+        /* =================================================================
+           FORMULIER: STRUKTUUR VAN DE GEGEVENS-VAKKEN ONDER ELKAAR
+           ================================================================= */
+        .order-form-box { 
+            margin-top: 25px; 
         }
-        .form-group input:focus {
-            border-color: #724058 !important; 
-            outline: none;
+        .form-row-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+            width: 100%;
+            gap: 10px;
         }
-        .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
-        .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
-        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Bebas Neue', Arial, sans-serif !important; font-size: 22px; font-weight: bold; letter-spacing: 0.8px; transition: transform 0.2s ease; }
-        .btn-submit:active { transform: scale(0.95); }
-    </style>
-</head>
-<body>
-
-    <!-- DE BANNER STRUCTUUR -->
-    <div class="top-banner">
-        <div class="left-brand">
-            <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
-            <div class="logo-text">Crea Landa</div>
-        </div>
-        
-        <label for="menu-toggle" class="menu-btn">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </label>
-    </div>
-
-    <input type="checkbox" id="menu-toggle">
-
-    <!-- JOUW COSTRUCTIE MET PURE EN ALLEEN ICOONTJES ONDER ELKAAR (BANNERVAK WEG!) -->
-    <div class="nav-menu">
-        <button class="menu-link-btn" onclick="gotoPage('home')">🏠</button>
-        <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒</button>
-    </div>
-
-    <div class="container">
-
-        <!-- HOMEPAGE PAGINA -->
-        <div id="homePage" class="page active">
-            <div class="welcome-box">
-                <p id="welcome-text-placeholder"></p>
-            </div>
-            <p style="text-align:center; margin-top: 40px; font-family:'Bebas Neue', Arial, sans-serif; font-size:20px; opacity:0.6; letter-spacing: 0.5px;">
-                (Gebruik het menu rechtsboven om de winkelmand te bekijken)
-            </p>
-        </div>
-
-        <!-- WINKELMAND PAGINA -->
-        <div id="winkelmandPage" class="page">
-            <div class="cart-section">
+        /* Korte linker vakken voor de teksten, kleur #B32C43, Bebas Neue */
+        .form-label-box {
+            background-color: #B32C43;
+            color: #FCF5EE !important;
+            font-family: 'Bebas Neue', Arial, sans-serif !important;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+            padding: 12px;
+            border-radius: 8px; /* Net afgeronde hoeken maar niet te */
+            min-width: 110px;
+            text-align: center;
+            box-sizing: border-box;
+            border: 1px solid #FCF5EE;
+        }
+        /* Rechter vakken waar ze in kunnen typen, kleur #B32C43, tekstkleur #FCF5EE */
+        .form-input-box {
+            flex-grow: 1;
+        }
+        .form-input-box input {
+            width: 100%;
+            padding: 12px;
