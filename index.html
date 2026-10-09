@@ -29,6 +29,7 @@
 
     button, input { font: inherit; }
 
+    /* Vaste banner */
     .header {
       position: fixed;
       z-index: 1000;
@@ -68,7 +69,8 @@
       white-space: nowrap;
     }
 
-    .menu-wrap { position: relative; }
+    /* Menu-knop */
+    .menu-wrap { position: static; }
 
     .menu-toggle {
       width: 48px;
@@ -94,15 +96,18 @@
       background: var(--cream);
     }
 
-    .menu-toggle:active {
-      transform: scale(.92);
-    }
+    .menu-toggle:active { transform: scale(.92); }
 
+    /*
+      Het menu ligt over de inhoud.
+      De rechterkant volgt de rechterkant van het hoofdvak.
+    */
     .menu-panel {
-      position: absolute;
-      top: 0;
-      right: 56px;
-      width: 190px;
+      position: fixed;
+      z-index: 1100;
+      top: 112px;
+      right: max(14px, calc((100vw - 1080px) / 2 + 14px));
+      width: 78px;
       padding: 8px;
       border-radius: 9px;
       background: var(--red);
@@ -116,17 +121,17 @@
     .menu-link {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
       width: 100%;
-      padding: 12px;
+      min-height: 60px;
+      padding: 10px 4px;
       border: 0;
       border-radius: 6px;
       background: transparent;
       color: var(--cream);
       text-decoration: none;
-      text-align: left;
-      font-size: 21px;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .menu-link:hover,
@@ -135,21 +140,24 @@
     }
 
     .menu-link svg {
-      width: 23px;
-      height: 23px;
+      display: block;
+      width: 28px;
+      height: 28px;
       fill: none;
-      stroke: currentColor;
+      stroke: var(--cream);
       stroke-width: 1.8;
-      flex-shrink: 0;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     main {
       width: 100%;
       max-width: 1080px;
       margin: 0 auto;
-      padding: 104px 14px 30px;
+      padding: 112px 14px 30px;
     }
 
+    /* Welkomstvak */
     .welcome {
       width: fit-content;
       max-width: 100%;
@@ -165,15 +173,16 @@
 
     .welcome p { margin: 0; }
 
-    /* De homepage toont uitsluitend het welkomstvak. */
+    /* Pagina's */
     .page { display: none; }
     .page.active { display: block; }
 
+    /* Winkelmandje: blauw vlak, crème teksten */
     .cart-panel {
       padding: clamp(18px, 4vw, 32px);
       border-radius: 10px;
-      background: var(--cream);
-      color: var(--plum);
+      background: var(--blue);
+      color: var(--cream);
     }
 
     .cart-panel h1 {
@@ -182,6 +191,7 @@
       font-family: "Great Vibes", cursive;
       font-size: 48px;
       font-weight: normal;
+      color: var(--cream);
     }
 
     .cart-layout {
@@ -190,7 +200,10 @@
       gap: 24px;
     }
 
-    .order-lines { font-size: 22px; }
+    .order-lines {
+      font-size: 22px;
+      color: var(--cream);
+    }
 
     .cart-items {
       list-style: none;
@@ -204,7 +217,7 @@
       align-items: center;
       gap: 10px;
       padding: 10px 0;
-      border-bottom: 1px solid #ddcbd1;
+      border-bottom: 1px solid #FCF5EE70;
     }
 
     .qty-controls {
@@ -227,10 +240,14 @@
       align-items: center;
       gap: 10px;
       margin: 12px 0;
+      color: var(--cream);
     }
 
     .shipping-option input {
       accent-color: var(--red);
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
 
     .shipping-option label {
@@ -238,12 +255,13 @@
       justify-content: space-between;
       gap: 12px;
       width: 100%;
+      color: var(--cream);
       cursor: pointer;
     }
 
     .dotted-line {
       border: 0;
-      border-top: 2px dotted var(--plum);
+      border-top: 2px dotted var(--cream);
       margin: 20px 0 14px;
     }
 
@@ -252,8 +270,10 @@
       justify-content: space-between;
       gap: 12px;
       font-size: 25px;
+      color: var(--cream);
     }
 
+    /* Labels en invoervelden */
     .form-fields {
       display: grid;
       grid-template-columns: 1fr 1.2fr;
@@ -275,9 +295,20 @@
       padding: 11px;
       border: 1px solid var(--red);
       border-radius: 7px;
-      background: var(--cream);
-      color: var(--plum);
+      background: var(--blue);
+      color: var(--cream);
       font-size: 17px;
+      caret-color: var(--cream);
+    }
+
+    .form-fields input::placeholder {
+      color: var(--cream);
+      opacity: .8;
+    }
+
+    .form-fields input:focus {
+      outline: 2px solid var(--cream);
+      outline-offset: 2px;
     }
 
     .submit-row {
@@ -301,11 +332,9 @@
       animation: pulse .85s infinite;
     }
 
-    .notice {
+    .status-message {
       margin-top: 16px;
-      padding: 12px;
-      border-radius: 8px;
-      background: #e7dce0;
+      color: var(--cream);
       font-size: 18px;
     }
 
@@ -336,7 +365,7 @@
         height: 48px;
       }
 
-      main { padding-top: 104px; }
+      main { padding-top: 112px; }
 
       .welcome { padding: 18px; }
 
@@ -380,35 +409,31 @@
       >
         <span></span><span></span><span></span>
       </button>
-
-      <nav class="menu-panel" id="menuPanel" hidden>
-        <a class="menu-link" href="#home" data-page="home">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m3 10 9-7 9 7"/>
-            <path d="M5 9v12h14V9M9 21v-7h6v7"/>
-          </svg>
-          Home
-        </a>
-
-        <a class="menu-link" href="#winkelmandje" data-page="cart">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M3 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 7H6"/>
-            <circle cx="10" cy="20" r="1.2"/>
-            <circle cx="18" cy="20" r="1.2"/>
-          </svg>
-          Winkelmandje <span id="cartCount">(0)</span>
-        </a>
-      </nav>
     </div>
+
+    <nav class="menu-panel" id="menuPanel" hidden aria-label="Hoofdnavigatie">
+      <a class="menu-link" href="#home" data-page="home" aria-label="Home" title="Home">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m3 10 9-7 9 7"/>
+          <path d="M5 9v12h14V9M9 21v-7h6v7"/>
+        </svg>
+      </a>
+
+      <a class="menu-link" href="#winkelmandje" data-page="cart" aria-label="Winkelmandje" title="Winkelmandje">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 7H6"/>
+          <circle cx="10" cy="20" r="1.2"/>
+          <circle cx="18" cy="20" r="1.2"/>
+        </svg>
+      </a>
+    </nav>
   </header>
 
   <main>
-    <!-- Welkomstvak blijft op de homepage staan. -->
     <section class="welcome" id="welcome">
       <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
     </section>
 
-    <!-- Geen extra titel, uitlegblok of voorbeeldproducten op de homepage. -->
     <section class="page" id="cartPage">
       <div class="cart-panel">
         <h1>Mijn Bestelling</h1>
@@ -420,12 +445,16 @@
 
             <div class="shipping-option">
               <input type="radio" id="postnl" name="shipping" value="4.25" checked>
-              <label for="postnl"><span>PostNL:</span><span>€ 4,25</span></label>
+              <label for="postnl">
+                <span>PostNL:</span><span>€ 4,25</span>
+              </label>
             </div>
 
             <div class="shipping-option">
               <input type="radio" id="dhl" name="shipping" value="5.95">
-              <label for="dhl"><span>DHL:</span><span>€ 5,95</span></label>
+              <label for="dhl">
+                <span>DHL:</span><span>€ 5,95</span>
+              </label>
             </div>
 
             <hr class="dotted-line">
@@ -433,10 +462,6 @@
             <div class="total-row">
               <span>Totaalbedrag:</span>
               <span id="totalAmount">€ 4,25</span>
-            </div>
-
-            <div class="notice">
-              Betaling gaat niet via deze website. Na het invullen opent je e-mailprogramma met je bestelling. Je moet de e-mail zelf verzenden.
             </div>
           </div>
 
@@ -456,8 +481,12 @@
             </div>
 
             <div class="submit-row">
-              <button class="primary-btn pulse" type="submit">Bestelling plaatsen</button>
+              <button class="primary-btn pulse" id="submitOrder" type="submit">
+                Bestelling plaatsen
+              </button>
             </div>
+
+            <p class="status-message" id="orderStatus" role="status" aria-live="polite"></p>
           </form>
         </div>
       </div>
@@ -468,7 +497,7 @@
     "use strict";
 
     /*
-      Voeg je producten hier toe zodra je ze wilt tonen.
+      Voeg producten hier toe wanneer je productpagina klaar is.
       Voorbeeld:
       { id: "zeep", name: "Handgemaakte zeep", price: 4.50 }
     */
@@ -542,8 +571,7 @@
         list.append(li);
       });
 
-      $("#cartCount").textContent =
-        `(${cart.reduce((sum, item) => sum + item.qty, 0)})`;
+      $("#cartCount")?.remove();
 
       $("#totalAmount").textContent = money(subtotal() + shippingCost());
     }
@@ -557,22 +585,6 @@
 
       saveCart();
       renderCart();
-    }
-
-    function showPage(page) {
-      const isCart = page === "cart";
-
-      $("#welcome").hidden = isCart;
-      $("#cartPage").classList.toggle("active", isCart);
-
-      closeMenu();
-
-      const hash = isCart ? "#winkelmandje" : "#home";
-      if (location.hash !== hash) {
-        history.pushState({ page }, "", hash);
-      }
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function closeMenu() {
@@ -593,16 +605,31 @@
       );
     }
 
-    // Expliciete klikafhandeling voor de drie bolletjes.
+    function showPage(page, updateHistory = true) {
+      const isCart = page === "cart";
+
+      $("#welcome").hidden = isCart;
+      $("#cartPage").classList.toggle("active", isCart);
+
+      closeMenu();
+
+      const hash = isCart ? "#winkelmandje" : "#home";
+      if (updateHistory && location.hash !== hash) {
+        history.pushState({ page }, "", hash);
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
     $("#menuToggle").addEventListener("click", event => {
       event.preventDefault();
       event.stopPropagation();
       toggleMenu();
     });
 
-    // Sluit het menu wanneer je buiten het menu klikt.
     document.addEventListener("click", event => {
-      if (!event.target.closest(".menu-wrap")) {
+      if (!event.target.closest("#menuPanel") &&
+          !event.target.closest("#menuToggle")) {
         closeMenu();
       }
     });
@@ -623,66 +650,105 @@
       input.addEventListener("change", renderCart);
     });
 
-    $("#orderForm").addEventListener("submit", event => {
+    window.addEventListener("popstate", () => {
+      showPage(location.hash === "#winkelmandje" ? "cart" : "home", false);
+    });
+
+    /*
+      E-mailbevestiging:
+      Deze code gebruikt FormSubmit. Activeer eerst het e-mailadres via de
+      bevestigingsmail van FormSubmit. Zonder die activatie werkt verzenden
+      niet. De service stuurt de bestelling naar Crea Landa en stuurt de klant
+      een automatische ontvangstbevestiging.
+    */
+    $("#orderForm").addEventListener("submit", async event => {
       event.preventDefault();
 
       if (cart.length === 0) {
-        alert("Je winkelmandje is nog leeg.");
+        $("#orderStatus").textContent = "Je winkelmandje is nog leeg.";
         return;
       }
 
       const form = new FormData(event.currentTarget);
+      const customerEmail = String(form.get("email") || "").trim();
+
+      if (!customerEmail) {
+        $("#orderStatus").textContent = "Vul je e-mailadres in.";
+        return;
+      }
 
       const lines = cart.map(item =>
-        `- ${item.name}; aantal: ${item.qty}; prijs: ${money(item.price * item.qty)}`
-      );
+        `${item.name} | Aantal: ${item.qty} | Subtotaal: ${money(item.price * item.qty)}`
+      ).join("\n");
 
-      const shipping = $("#dhl").checked
+      const shippingName = $("#dhl").checked
         ? "DHL (€ 5,95)"
         : "PostNL (€ 4,25)";
 
-      const body = [
-        "Hallo Crea Landa,",
+      const orderDetails = [
+        "Nieuwe bestelling via Crea Landa",
         "",
-        "Mijn bestelling:",
-        ...lines,
+        "Producten:",
+        lines,
         "",
-        `Verzendmethode: ${shipping}`,
-        `Producten: ${money(subtotal())}`,
+        `Verzendmethode: ${shippingName}`,
+        `Productbedrag: ${money(subtotal())}`,
         `Verzendkosten: ${money(shippingCost())}`,
         `Totaalbedrag: ${money(subtotal() + shippingCost())}`,
         "",
         `Naam: ${form.get("naam")}`,
         `Adres: ${form.get("adres")}`,
         `Telefoonnummer: ${form.get("telefoonnummer")}`,
-        `E-mailadres: ${form.get("email")}`
+        `E-mailadres klant: ${customerEmail}`
       ].join("\n");
 
-      const url = "mailto:crealanda@gmail.com"
-        + "?subject=" + encodeURIComponent("Bestelling via Crea Landa")
-        + "&body=" + encodeURIComponent(body);
+      const button = $("#submitOrder");
+      const status = $("#orderStatus");
 
-      window.location.href = url;
-    });
+      button.disabled = true;
+      status.textContent = "Je bestelling wordt verstuurd…";
 
-    // Houd de pagina correct bij browser-terug en browser-vooruit.
-    window.addEventListener("popstate", () => {
-      const isCart = location.hash === "#winkelmandje";
-      $("#welcome").hidden = isCart;
-      $("#cartPage").classList.toggle("active", isCart);
-      closeMenu();
-    });
+      try {
+        const response = await fetch("https://formsubmit.co/ajax/crealanda@gmail.com", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            _subject: "Nieuwe bestelling via Crea Landa",
+            _template: "table",
+            _replyto: customerEmail,
+            _autoresponse:
+              "Bedankt voor je bestelling bij Crea Landa!\n\n" +
+              "We hebben je bestelling ontvangen. Dit is een ontvangstbevestiging, " +
+              "nog geen definitieve orderbevestiging.\n\n" +
+              "Jolanda bekijkt je bestelling en neemt contact met je op via e-mail " +
+              "om de bestelling, verzendkosten en verdere betaalafspraken te bespreken.\n\n" +
+              "Je hoeft nu nog niets te betalen.\n\n" +
+              "Lieve groet,\nJolanda - Crea Landa",
+            Klantnaam: String(form.get("naam")),
+            Klantadres: String(form.get("adres")),
+            Telefoonnummer: String(form.get("telefoonnummer")),
+            Emailklant: customerEmail,
+            Verzendmethode: shippingName,
+            Producten: lines,
+            Productbedrag: money(subtotal()),
+            Verzendkosten: money(shippingCost()),
+            Totaalbedrag: money(subtotal() + shippingCost()),
+            Bestelling: orderDetails
+          })
+        });
 
-    // Begin altijd op Home, tenzij de winkelmandpagina is aangevraagd.
-    if (location.hash === "#winkelmandje") {
-      $("#welcome").hidden = true;
-      $("#cartPage").classList.add("active");
-    } else {
-      $("#welcome").hidden = false;
-      $("#cartPage").classList.remove("active");
-    }
+        const result = await response.json();
 
-    renderCart();
-  </script>
-</body>
-</html>
+        if (!response.ok || result.success === "false" || result.success === false) {
+          throw new Error("De e-mailservice heeft de bestelling niet bevestigd.");
+        }
+
+        status.textContent =
+          "Je bestelling is verzonden. Controleer je e-mail voor de ontvangstbevestiging.";
+
+        cart = [];
+        saveCart();
+  
