@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- De Canva lettertypen direct inladen vanaf Google Fonts -->
+    <!-- De Canva lettertypen inladen vanaf Google Fonts -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cloudflare.com">
     
     <style>
         body { 
@@ -54,7 +53,7 @@
             color: #FCF5EE;
         }
 
-        /* Menu-knop besturing via CSS */
+        /* Menu-knop besturing via een onzichtbaar vakje */
         #menu-toggle {
             display: none;
         }
@@ -91,10 +90,9 @@
         .nav-menu a {
             display: block;
             color: #FCF5EE;
-            padding: 10px 0;
-            font-size: 26px; 
+            padding: 12px 0;
+            font-size: 28px; 
             text-decoration: none;
-            cursor: pointer;
         }
 
         /* Schuif het menu open als het vakje is aangevinkt */
@@ -110,12 +108,18 @@
             box-sizing: border-box;
         }
         
+        /* Paginabesturing puur op basis van HTML hashtags (#home en #winkelmand) */
         .page { 
             display: none; 
             width: 100%;
             max-width: 600px;
         }
-        .page.active { 
+        
+        /* Standaard tonen we Home, tenzij de winkelmand is geselecteerd */
+        body:not(:has(:target)) #homePage, :target#homePage { 
+            display: block; 
+        }
+        :target#winkelmandPage { 
             display: block; 
         }
 
@@ -217,7 +221,7 @@
 </head>
 <body>
 
-<!-- De vaste bovenbalk -->
+<!-- De vaste blauwe bovenbalk -->
 <div class="top-banner">
     <div class="left-brand">
         <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
@@ -235,16 +239,16 @@
 <!-- Het onzichtbare vakje dat de status bewaart -->
 <input type="checkbox" id="menu-toggle">
 
-<!-- Het uitschuifmenu -->
-<div id="navMenu" class="nav-menu">
-    <a onclick="switchPage('home')">🏠</a>
-    <a onclick="switchPage('winkelmand')">🛒</a>
+<!-- Het uitschuifmenu met 100% onbreekbare pure tekst-emoji's -->
+<div class="nav-menu">
+    <a href="#home" onclick="document.getElementById('menu-toggle').checked = false;">🏠</a>
+    <a href="#winkelmand" onclick="document.getElementById('menu-toggle').checked = false;">🛒</a>
 </div>
 
 <div class="container">
 
     <!-- HOME PAGINA -->
-    <div id="homePage" class="page active">
+    <div id="homePage" class="page">
         <div class="welcome-box">
             <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
         </div>
@@ -265,8 +269,6 @@
             </div>
 
             <div class="order-form-box">
-                <form onsubmit="sendOrder(event)">
-                    <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
-                    <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 1" required></div>
-                    <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" id="buyerCity" placeholder="Bijv. 1234 AB Dorp" required></div>
-                    <div class="form-group"><label>Telefoonnummer:</label><input type="text" id="buyerPhone" placeholder="Voor overleg via Tikkie"></div>
+                <form action="mailto:crealanda@gmail.com" method="GET" enctype="text/plain">
+                    <input type="hidden" name="subject" value="Nieuwe bestelling van Crea Landa">
+                    <div class="form-group"><label>Volledige Naam:</label><input type="text" name="Naam" placeholder="Voor- en achternaam" required></div>
