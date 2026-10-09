@@ -128,7 +128,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ================= WINKELMAND PAGINA ================= */
+             /* ================= JOUW NIEUWE WINKELMAND STYLING ================= */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -136,64 +136,67 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             box-sizing: border-box;
             width: 100%;
+            color: #FCF5EE !important; /* Dwingt alle algemene teksten naar jouw lichte kleur */
         }
         
+        /* Titel bovenaan in Great Vibes lettertype */
         .cart-title-text {
-            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
-            font-size: 26px;
-            font-weight: bold;
+            font-family: 'Great Vibes', cursive !important;
+            font-size: 38px !important;
+            font-weight: normal !important;
             text-align: center;
-            padding: 10px;
+            padding: 5px;
+            color: #FCF5EE !important;
         }
 
+        /* Verzendsectie in Big Shoulders Display */
         .shipping-section {
-            margin-top: 20px;
-            padding: 15px;
-            border-top: 1px solid rgba(252, 245, 238, 0.3);
+            margin-top: 15px;
+            padding: 10px 5px;
             font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
-            font-size: 22px;
-            color: #FCF5EE;
+            font-size: 24px !important;
+            color: #FCF5EE !important;
         }
-        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .total-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 26px; font-weight: bold; border-top: 2px solid #FCF5EE; padding-top: 10px; }
-
-        .order-form-box {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid rgba(252, 245, 238, 0.2);
+        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        
+        /* Jouw gewenste stippellijn boven het totaalbedrag */
+        .shipping-section::after {
+            content: "";
+            display: block;
+            border-top: 3px dashed #FCF5EE; /* Niet te dunne stippellijn */
+            margin: 15px 0;
+            width: 100%;
         }
-        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 18px; color: #FCF5EE; }
-        .form-group label { display: block; margin-bottom: 4px; text-align: left; }
-        .form-group input { width: 100%; padding: 10px; background-color: #9EB3D8; color: #FCF5EE; border: 1px solid #FCF5EE; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
 
-        .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
-        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; }
-    </style>
-</head>
-<body>
+        /* Totaalbedrag in Big Shoulders Display */
+        .total-row { 
+            display: flex; 
+            justify-content: space-between; 
+            font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
+            font-size: 28px !important; 
+            font-weight: bold !important; 
+            color: #FCF5EE !important; 
+        }
 
-<div class="top-banner">
-    <div class="left-brand">
-        <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
-        <div class="logo-text">Crea Landa</div>
-    </div>
-    
-    <div class="menu-btn" onclick="toggleMenu()">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-    </div>
-</div>
+        /* De handige invulvakken in jouw nieuwe rode kleur #B32C43 */
+        .order-form-box { margin-top: 15px; }
+        .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 20px; color: #FCF5EE !important; }
+        .form-group label { display: block; margin-bottom: 6px; text-align: left; }
+        
+        /* De invoervakken zelf rood gemaakt */
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            background-color: #B32C43 !important; 
+            color: #FCF5EE !important; 
+            border: 1px solid #FCF5EE !important; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px; 
+        }
+        /* Zorgt dat de placeholder-tekst in de rode vakken ook netjes leesbaar is */
+        .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
 
-<!-- Het handige uitschuifmenu met de 100% werkende emoji-icoontjes -->
-<div id="navMenu" class="nav-menu">
-    <a href="#" onclick="switchPage('home')">🏠</a>
-    <a href="#" onclick="switchPage('winkelmand')">🛒</a>
-</div>
-
-<div class="container">
 
     <!-- HOME PAGINA -->
     <div id="homePage" class="page active">
