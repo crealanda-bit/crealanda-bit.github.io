@@ -5,19 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
+    <!-- LETTERTYPEN INLADEN VAN GOOGLE -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
     
     <style>
+        /* BASE: BASISINSTELLINGEN EN STANDAARD ACHTERGROND */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
             background-color: #724058; 
             color: #FCF5EE; 
+            transition: background-color 0.4s ease; /* Zorgt dat de achtergrondkleur heel zachtjes verandert */
         }
-
         .container { 
             padding: 20px 15px; 
             display: flex;
@@ -25,7 +27,6 @@
             align-items: center;
             box-sizing: border-box;
         }
-        
         .page { 
             display: none; 
             width: 100%;
@@ -35,6 +36,7 @@
             display: block; 
         }
 
+        /* BANNER: DE BLAUWE BOVENBALK DIE VAST BLIJFT STAAN */
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
@@ -49,35 +51,48 @@
             height: 60px;
             box-sizing: border-box;
         }
-
         .left-brand {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-
         .left-brand img {
             max-height: 42px; 
             width: auto;
             border-radius: 50%;
         }
-
         .logo-text {
             font-family: 'Great Vibes', cursive;
             font-size: 30px;
             color: #FCF5EE;
         }
 
+        /* ANIMATIES: HIER STAAN JOUW NIEUWE BEWEGINGEN GEDEFINEERD */
+        @keyframes plopOpen {
+            0% { transform: scale(0.7); opacity: 0; }
+            80% { transform: scale(1.03); } /* Subtiel bounce effectje */
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes glijdNaarBeneden {
+            0% { transform: translateY(-20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* MENU: DE DRIE BOLLETJES EN HET PAARSE INSCHUIFMENU */
         #menu-toggle {
             display: none;
         }
-
         .menu-btn {
             display: flex;
             flex-direction: column;
             gap: 4px;
             cursor: pointer;
             padding: 10px;
+            transition: transform 0.2s ease;
+        }
+        .menu-btn:active {
+            transform: scale(0.85); /* Krimpt een beetje als je erop drukt */
         }
         .menu-btn .dot {
             width: 6px;
@@ -85,7 +100,6 @@
             background-color: #FCF5EE;
             border-radius: 50%;
         }
-
         .nav-menu {
             display: none;
             background-color: #B32C43;
@@ -98,7 +112,6 @@
             min-width: 140px;
             z-index: 99;
         }
-        
         .menu-link-btn {
             display: block;
             background-color: #724058;
@@ -113,12 +126,19 @@
             border: 1px solid #FCF5EE;
             text-align: center;
             cursor: pointer;
+            transition: transform 0.2s ease;
         }
-
+        .menu-link-btn:active {
+            transform: scale(0.95); /* Knoppen reageren elastisch op indrukken */
+        }
+        
+        /* Zorgt dat het menu geanimeerd naar beneden glijdt als je klikt */
         #menu-toggle:checked ~ .nav-menu {
             display: block !important;
+            animation: glijdNaarBeneden 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
+        /* WELKOMSTVAK: HET LICHTBLAUWE TEXTVAK OP DE HOMEPAGE */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
@@ -127,8 +147,9 @@
             text-align: center;
             box-sizing: border-box;
             width: 100%;
+            /* Plopt direct soepel open bij het laden van de pagina */
+            animation: plopOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
@@ -141,6 +162,7 @@
             transform: scaleX(0.92);
         }
 
+        /* WINKELMAND: MIJN BESTELLING INCLUSIEF DE RODE INVOERVAKKEN */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -149,8 +171,9 @@
             box-sizing: border-box;
             width: 100%;
             color: #FCF5EE !important;
+            /* Plopt ook prachtig open als je naar de pagina switcht */
+            animation: plopOpen 0.4s ease-out forwards;
         }
-        
         .cart-title-text {
             font-family: 'Great Vibes', cursive !important;
             font-size: 42px !important;
@@ -159,7 +182,6 @@
             padding: 5px;
             color: #FCF5EE !important;
         }
-
         .shipping-section {
             margin-top: 15px;
             padding: 10px 5px;
@@ -168,7 +190,6 @@
             color: #FCF5EE !important;
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        
         .shipping-section::after {
             content: "";
             display: block;
@@ -176,7 +197,6 @@
             margin: 15px 0;
             width: 100%;
         }
-
         .total-row { 
             display: flex; 
             justify-content: space-between; 
@@ -185,11 +205,9 @@
             font-weight: bold !important; 
             color: #FCF5EE !important; 
         }
-
         .order-form-box { margin-top: 15px; }
         .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 20px; color: #FCF5EE !important; }
         .form-group label { display: block; margin-bottom: 6px; text-align: left; }
-        
         .form-group input { 
             width: 100%; 
             padding: 12px; 
@@ -199,11 +217,16 @@
             border-radius: 6px; 
             box-sizing: border-box; 
             font-size: 16px; 
+            transition: border-color 0.2s ease;
+        }
+        .form-group input:focus {
+            border-color: #724058 !important; /* Licht op als je erin typt */
+            outline: none;
         }
         .form-group input::placeholder { color: rgba(252, 245, 238, 0.6) !important; }
-
         .btn-container { display: flex; justify-content: flex-end; width: 100%; margin-top: 20px; }
-        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; }
+        .btn-submit { background-color: #B32C43; color: #FCF5EE; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 22px; font-weight: bold; transition: transform 0.2s ease; }
+        .btn-submit:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -245,35 +268,3 @@
                 
                 <div class="shipping-section">
                     <div class="shipping-row"><span>PostNL Brievenbuspakje:</span><span>€ <span id="txt-postnl">0,00</span></span></div>
-                    <div class="shipping-row"><span>DHL Pakje naar huis:</span><span>€ <span id="txt-dhl">0,00</span></span></div>
-                    <div class="total-row"><span>Totaalbedrag:</span><span>€ 0,00</span></div>
-                </div>
-
-                <div class="order-form-box">
-                    <form onsubmit="sendOrder(event)">
-                        <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
-                        <div class="form-group"><label>Adres (Straat + Huisnummer):</label><input type="text" id="buyerAddress" placeholder="Bijv. Dorpsstraat 1" required></div>
-                        <div class="form-group"><label>Postcode & Woonplaats:</label><input type="text" id="buyerCity" placeholder="Bijv. 1234 AB Dorp" required></div>
-                        <div class="form-group"><label>Telefoonnummer:</label><input type="text" id="buyerPhone" placeholder="Voor overleg via Tikkie"></div>
-                        <div class="btn-container"><button type="submit" class="btn-submit">Bestelling plaatsen</button></div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-<script>
-    /* ==========================================================================================
-       JOLANDA DASHBOARD - HIER KUN JE ALLES MAKKELIJK EN RECHTSPSTREEKS AANPASSEN
-       ========================================================================================== */
-    
-    // JOUW EMAILADRES:
-    const INSTELD_EMAIL = "crealanda@gmail.com";
-
-    // JOUW KLEUREN:
-    const KLEUR_HOME_ACHTERGROND       = "#724058"; 
-    const KLEUR_WINKELMAND_ACHTERGROND = "#6F4257";
-    const KLEUR_BANNER_EN_VAKKEN       = "#9EB3D8";
-    const KLEUR_MENU_EN_KNOPPEN        = "#B32C43";
-    const KLEUR_TEKST_LICHT            = "#FCF5EE";
-
-    // JOUW VERZENDKOSTEN:
