@@ -5,21 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crea Landa</title>
     
-    <!-- De Canva lettertypen inladen vanaf Google Fonts -->
+    <!-- Canva Lettertypen inladen -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Great+Vibes&family=Big+Shoulders+Display:wght@600;800&display=swap" rel="stylesheet">
     
     <style>
+        /* =================================================================
+           BASIS EN ACHTERGROND
+           ================================================================= */
         body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 0; 
-            background-color: #724058; 
+            background-color: #724058; /* Wordt automatisch aangepast door de instellingen onderaan */
             color: #FCF5EE; 
         }
+
+        .container { 
+            padding: 20px 15px; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
         
-        /* Bovenbalk die vast blijft staan */
+        .page { 
+            display: none; 
+            width: 100%;
+            max-width: 600px;
+        }
+        .page.active { 
+            display: block; 
+        }
+
+        /* =================================================================
+           BANNER BOVENAAN
+           ================================================================= */
         .top-banner { 
             background-color: #9EB3D8; 
             color: #FCF5EE; 
@@ -53,12 +75,13 @@
             color: #FCF5EE;
         }
 
-        /* Menu-knop besturing via een onzichtbaar vakje */
+        /* =================================================================
+           3 BOLLETJES EN HET INSCHUIFMENU
+           ================================================================= */
         #menu-toggle {
             display: none;
         }
 
-        /* De 3 bolletjes knop */
         .menu-btn {
             display: flex;
             flex-direction: column;
@@ -73,7 +96,6 @@
             border-radius: 50%;
         }
 
-        /* Uitschuifmenu: kleur #B32C43, afgeronde hoeken */
         .nav-menu {
             display: none;
             background-color: #B32C43;
@@ -82,48 +104,34 @@
             right: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            padding: 8px;
-            min-width: 50px;
-            text-align: center;
+            padding: 10px;
+            min-width: 140px;
             z-index: 99;
         }
-        .nav-menu a {
+        
+        .menu-link-btn {
             display: block;
+            background-color: #724058;
             color: #FCF5EE;
-            padding: 12px 0;
-            font-size: 28px; 
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 6px;
             text-decoration: none;
+            font-family: 'Big Shoulders Display', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid #FCF5EE;
+            text-align: center;
+            cursor: pointer;
         }
 
-        /* Schuif het menu open als het vakje is aangevinkt */
         #menu-toggle:checked ~ .nav-menu {
             display: block !important;
         }
 
-        .container { 
-            padding: 20px 15px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        
-        /* Paginabesturing puur op basis van HTML hashtags (#home en #winkelmand) */
-        .page { 
-            display: none; 
-            width: 100%;
-            max-width: 600px;
-        }
-        
-        /* Standaard tonen we Home, tenzij de winkelmand is geselecteerd */
-        body:not(:has(:target)) #homePage, :target#homePage { 
-            display: block; 
-        }
-        :target#winkelmandPage { 
-            display: block; 
-        }
-
-        /* Welkomstvak: compact en netjes */
+        /* =================================================================
+           WELKOMSTVAK (HOME)
+           ================================================================= */
         .welcome-box {
             background-color: #9EB3D8;
             padding: 20px 15px; 
@@ -134,7 +142,6 @@
             width: 100%;
         }
         
-        /* Jouw strakke letters uit Canva (Big Shoulders Display) */
         .welcome-box p { 
             margin: 0; 
             font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important;
@@ -147,7 +154,9 @@
             transform: scaleX(0.92);
         }
 
-        /* ================= WINKELMAND STYLING ================= */
+        /* =================================================================
+           WINKELMAND EN GEGEVENS (MIJN BESTELLING)
+           ================================================================= */
         .cart-section { 
             background-color: #9EB3D8; 
             padding: 20px; 
@@ -158,7 +167,6 @@
             color: #FCF5EE !important;
         }
         
-        /* Titel bovenaan in Great Vibes lettertype */
         .cart-title-text {
             font-family: 'Great Vibes', cursive !important;
             font-size: 42px !important;
@@ -168,7 +176,6 @@
             color: #FCF5EE !important;
         }
 
-        /* Verzendsectie in Big Shoulders Display */
         .shipping-section {
             margin-top: 15px;
             padding: 10px 5px;
@@ -178,7 +185,6 @@
         }
         .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
         
-        /* Stippellijn boven het totaalbedrag */
         .shipping-section::after {
             content: "";
             display: block;
@@ -187,7 +193,6 @@
             width: 100%;
         }
 
-        /* Totaalbedrag in Big Shoulders Display */
         .total-row { 
             display: flex; 
             justify-content: space-between; 
@@ -197,16 +202,14 @@
             color: #FCF5EE !important; 
         }
 
-        /* De handige invulvakken in jouw nieuwe rode kleur #B32C43 */
         .order-form-box { margin-top: 15px; }
         .form-group { margin-bottom: 12px; font-family: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif !important; font-size: 20px; color: #FCF5EE !important; }
         .form-group label { display: block; margin-bottom: 6px; text-align: left; }
         
-        /* De invoervakken zelf rood gemaakt met lichte rand */
         .form-group input { 
             width: 100%; 
             padding: 12px; 
-            background-color: #B32C43 !important; 
+            background-color: #B32C43; 
             color: #FCF5EE !important; 
             border: 1px solid #FCF5EE !important; 
             border-radius: 6px; 
@@ -221,54 +224,52 @@
 </head>
 <body>
 
-<!-- De vaste blauwe bovenbalk -->
-<div class="top-banner">
-    <div class="left-brand">
-        <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
-        <div class="logo-text">Crea Landa</div>
-    </div>
-    
-    <!-- De 3 bolletjes knop -->
-    <label for="menu-toggle" class="menu-btn">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-    </label>
-</div>
-
-<!-- Het onzichtbare vakje dat de status bewaart -->
-<input type="checkbox" id="menu-toggle">
-
-<!-- Het uitschuifmenu met 100% onbreekbare pure tekst-emoji's -->
-<div class="nav-menu">
-    <a href="#home" onclick="document.getElementById('menu-toggle').checked = false;">🏠</a>
-    <a href="#winkelmand" onclick="document.getElementById('menu-toggle').checked = false;">🛒</a>
-</div>
-
-<div class="container">
-
-    <!-- HOME PAGINA -->
-    <div id="homePage" class="page">
-        <div class="welcome-box">
-            <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
+    <!-- DE BANNER STRUCTUUR -->
+    <div class="top-banner">
+        <div class="left-brand">
+            <img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Logo">
+            <div class="logo-text">Crea Landa</div>
         </div>
-        <p style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', 'Arial Narrow', sans-serif; font-size:20px; opacity:0.6;">
-            (Gebruik het menu rechtsboven om de winkelmand te bekijken)
-        </p>
+        
+        <label for="menu-toggle" class="menu-btn">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </label>
     </div>
 
-    <!-- WINKELMAND PAGINA -->
-    <div id="winkelmandPage" class="page">
-        <div class="cart-section">
-            <div class="cart-title-text">Mijn Bestelling</div>
-            
-            <div class="shipping-section">
-                <div class="shipping-row"><span>PostNL Brievenbuspakje:</span><span>€ 4,25</span></div>
-                <div class="shipping-row"><span>DHL Pakje naar huis:</span><span>€ 5,95</span></div>
-                <div class="total-row"><span>Totaalbedrag:</span><span>€ 0,00</span></div>
-            </div>
+    <input type="checkbox" id="menu-toggle">
 
-            <div class="order-form-box">
-                <form action="mailto:crealanda@gmail.com" method="GET" enctype="text/plain">
-                    <input type="hidden" name="subject" value="Nieuwe bestelling van Crea Landa">
-                    <div class="form-group"><label>Volledige Naam:</label><input type="text" name="Naam" placeholder="Voor- en achternaam" required></div>
+    <!-- INHOUD VAN JOUW MENU -->
+    <div class="nav-menu">
+        <button class="menu-link-btn" onclick="gotoPage('home')">🏠 Home</button>
+        <button class="menu-link-btn" onclick="gotoPage('winkelmand')">🛒 Winkelmand</button>
+    </div>
+
+    <div class="container">
+
+        <!-- HOMEPAGE PAGINA -->
+        <div id="homePage" class="page active">
+            <div class="welcome-box">
+                <!-- De tekst hieronder laadt automatisch de tekst in uit de instellingen onderaan -->
+                <p id="welcome-text-placeholder"></p>
+            </div>
+            <p style="text-align:center; margin-top: 40px; font-family:'Big Shoulders Display', 'Arial Narrow', sans-serif; font-size:20px; opacity:0.6;">
+                (Gebruik het menu rechtsboven om de winkelmand te bekijken)
+            </p>
+        </div>
+
+        <!-- WINKELMAND PAGINA -->
+        <div id="winkelmandPage" class="page">
+            <div class="cart-section">
+                <div class="cart-title-text">Mijn Bestelling</div>
+                
+                <div class="shipping-section">
+                    <div class="shipping-row"><span>PostNL Brievenbuspakje:</span><span>€ <span id="txt-postnl">0,00</span></span></div>
+                    <div class="shipping-row"><span>DHL Pakje naar huis:</span><span>€ <span id="txt-dhl">0,00</span></span></div>
+                    <div class="total-row"><span>Totaalbedrag:</span><span>€ 0,00</span></div>
+                </div>
+
+                <div class="order-form-box">
+                    <form onsubmit="sendOrder(event)">
+                        <div class="form-group"><label>Volledige Naam:</label><input type="text" id="buyerName" placeholder="Voor- en achternaam" required></div>
