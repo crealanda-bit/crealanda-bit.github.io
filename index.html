@@ -1,283 +1,772 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea Landa</title>
-    
-    <!-- GOOGLE FONTS: GREAT VIBES EN HET SMALLE BEBAS NEUE DIRECT GEKOPPELD -->
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Great+Vibes&family=Bebas+Neue&display=swap" rel="stylesheet">
-    
-    <style>
-        /* =================================================================
-           BASE: STANDAARD INSTELLINGEN
-           ================================================================= */
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 0; 
-            background-color: #724058; 
-            color: #FCF5EE; 
-            transition: background-color 0.4s ease;
-            perspective: 1000px; /* Vereist voor het 3D Swing Out effect */
-        }
-        .container { 
-            padding: 20px 15px; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .page { 
-            display: none; 
-            width: 100%;
-            max-width: 600px;
-        }
-        .page.active { 
-            display: block; 
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#9EB3D8">
+  <title>Crea Landa | Handgemaakt met liefde</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap" rel="stylesheet">
 
-        /* =================================================================
-           BANNER: VASTE BOVENBALK (KLEUR #9EB3D8)
-           ================================================================= */
-        .top-banner { 
-            background-color: #9EB3D8; 
-            color: #FCF5EE; 
-            padding: 10px 15px; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            height: 60px;
-            box-sizing: border-box;
-        }
-        .left-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .left-brand img {
-            max-height: 44px; 
-            width: auto;
-            border-radius: 50%;
-            object-fit: contain;
-        }
-        .logo-text {
-            font-family: 'Great Vibes', cursive;
-            font-size: 30px;
-            color: #FCF5EE;
-        }
+  <style>
+    :root {
+      --banner: #9EB3D8;
+      --cream: #FCF5EE;
+      --berry: #B32C43;
+      --plum: #6F4257;
+      --radius: 10px;
+      --shadow: 0 8px 24px rgba(40, 20, 30, .14);
+    }
 
-        /* =================================================================
-           ANIMATIES: JOUW DRY ANMATION STYLES
-           ================================================================= */
-        @keyframes plopOpen {
-            0% { transform: scale(0.7); opacity: 0; }
-            80% { transform: scale(1.03); } 
-            100% { transform: scale(1); opacity: 1; }
-        }
+    * { box-sizing: border-box; }
 
-        @keyframes swingOutMenu {
-            0% { transform: rotateX(-90deg); opacity: 0; transform-origin: top; }
-            100% { transform: rotateX(0deg); opacity: 1; transform-origin: top; }
-        }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 100px;
+    }
 
-        @keyframes pulseKnop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); filter: brightness(1.1); }
-            100% { transform: scale(1); }
-        }
+    body {
+      margin: 0;
+      background: var(--plum);
+      color: var(--cream);
+      font-family: "Bebas Neue", sans-serif;
+      letter-spacing: .35px;
+    }
 
-        /* =================================================================
-           MENU: 3 BOLLETJES (PULSE) EN LOSSE ZWEVENDE BUTTONS (SWING OUT)
-           ================================================================= */
-        #menu-toggle {
-            display: none;
-        }
-        .menu-btn, .menu-link-btn, input, button {
-            -webkit-tap-highlight-color: transparent !important;
-            outline: none !important;
-        }
-        .menu-btn {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            cursor: pointer;
-            padding: 10px;
-        }
-        .menu-btn .dot {
-            width: 6px;
-            height: 6px;
-            background-color: #FCF5EE;
-            border-radius: 50%;
-        }
-        
-        /* Het uitschuifbare menu (Kleur #B32C43, loopt gelijk met welkomstvak) */
-        .nav-menu {
-            display: none;
-            background-color: #B32C43 !important; 
-            position: absolute;
-            top: 60px; 
-            right: 15px; 
-            padding: 6px;
-            min-width: 50px;
-            z-index: 99;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            box-sizing: border-box;
-        }
-        .menu-link-btn {
-            display: block;
-            background-color: transparent;
-            color: #FCF5EE !important;
-            padding: 8px 0;
-            text-decoration: none;
-            font-size: 24px; 
-            text-align: center;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
 
-        /* Geactiveerde menu-animaties */
-        #menu-toggle:checked ~ .top-banner .menu-btn {
-            animation: pulseKnop 0.4s ease-out; /* De Pulse op de 3 bolletjes */
-        }
-        #menu-toggle:checked ~ .container .nav-menu {
-            display: block !important;
-            animation: swingOutMenu 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* Swing Out */
-        }
+    .site-header {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 1000;
+      min-height: 82px;
+      background: var(--banner);
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px clamp(14px, 4vw, 38px);
+      box-shadow: 0 3px 12px rgba(0,0,0,.12);
+    }
 
-        /* =================================================================
-           WELKOMSTVAK: KLEUR #9EB3D8 (PLOP-OPEN ANIMATIE)
-           ================================================================= */
-        .welcome-box {
-            background-color: #9EB3D8;
-            padding: 20px 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            text-align: center;
-            box-sizing: border-box;
-            width: 100%;
-            animation: plopOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; /* plopOpen */
-        }
-        .welcome-box p { 
-            margin: 0; 
-            font-family: 'Bebas Neue', Arial, sans-serif !important; 
-            font-size: 24px !important; 
-            letter-spacing: 0.8px;
-            line-height: 1.35;
-            color: #FCF5EE !important;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      text-decoration: none;
+    }
 
-        /* =================================================================
-           WINKELMAND: KLEUR #9EB3D8 MET RANDEFFECT IN #6F4257
-           ================================================================= */
-        .cart-wrapper {
-            background-color: #6F4257; /* De kleine randkleur rondom */
-            padding: 4px; 
-            border-radius: 16px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .cart-section { 
-            background-color: #9EB3D8; 
-            padding: 20px; 
-            border-radius: 12px; /* Gematigd afgerond */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            box-sizing: border-box;
-            width: 100%;
-            animation: plopOpen 0.4s ease-out forwards;
-        }
-        .cart-title-text {
-            font-family: 'Great Vibes', cursive !important;
-            font-size: 42px !important;
-            font-weight: normal !important;
-            text-align: center;
-            padding: 5px 0 15px 0;
-            color: #FCF5EE !important;
-        }
-        .shipping-section {
-            font-family: 'Bebas Neue', Arial, sans-serif !important;
-            font-size: 24px !important;
-            color: #FCF5EE !important;
-            letter-spacing: 0.8px;
-        }
-        .shipping-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        
-        .shipping-section::after {
-            content: "";
-            display: block;
-            border-top: 3px dashed #FCF5EE; 
-            margin: 15px 0;
-            width: 100%;
-        }
-        .total-row { 
-            display: flex; 
-            justify-content: space-between; 
-            font-size: 28px !important; 
-            font-weight: bold !important; 
-        }
+    .brand img {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex: 0 0 auto;
+      background: rgba(252,245,238,.25);
+    }
 
-        /* =================================================================
-           FORMULIER: LOSSE RODE VAKKEN (#B32C43) EN LICHTE INVOERVAKKEN (#FCF5EE)
-           ================================================================= */
-        .order-form-box { 
-            margin-top: 25px; 
-        }
-        .form-row-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 14px;
-            width: 100%;
-            gap: 10px;
-        }
-        .form-label-box {
-            background-color: #B32C43;
-            color: #FCF5EE !important;
-            font-family: 'Bebas Neue', Arial, sans-serif !important;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            padding: 12px;
-            border-radius: 8px; 
-            min-width: 110px;
-            text-align: center;
-            box-sizing: border-box;
-            border: 1px solid #FCF5EE;
-        }
-        .form-input-box {
-            flex-grow: 1;
-        }
-        .form-input-box input {
-            width: 100%;
-            padding: 12px;
-            background-color: #FCF5EE !important; /* Invoerveld kleur #FCF5EE */
-            color: #B32C43 !important; /* Typ-tekst in contrasterend rood */
-            border: 1px solid #FCF5EE !important;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .form-input-box input::placeholder { color: rgba(179, 44, 67, 0.5) !important; }
+    .brand-name {
+      color: var(--cream);
+      font: 42px/1 "Great Vibes", cursive;
+      white-space: nowrap;
+      text-shadow: 0 1px 1px rgba(0,0,0,.06);
+    }
 
-        /* Bestelling plaatsen knop rechtsonder met De Pulse animatie */
-        .btn-container { 
-            display: flex; 
-            justify-content: flex-end; 
-            width: 100%; 
-            margin-top: 20px; 
-        }
-        .btn-submit { 
-            background-color: #B32C43; 
-            color: #FCF5EE; 
-            border: 1px solid #FCF5EE; 
-            padding: 12px 25px; 
-            border-radius: 8px; 
-            cursor: pointer; 
+    .menu-wrap {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .menu-toggle {
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .menu-toggle span {
+      width: 5px;
+      height: 5px;
+      background: var(--cream);
+      border-radius: 50%;
+      display: block;
+    }
+
+    .menu-toggle:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 3px solid var(--cream);
+      outline-offset: 3px;
+    }
+
+    .menu-panel {
+      position: absolute;
+      top: 0;
+      right: 55px;
+      width: 190px;
+      background: var(--berry);
+      border-radius: var(--radius);
+      padding: 8px;
+      box-shadow: var(--shadow);
+      transform-origin: top right;
+      animation: swingOut .42s ease both;
+    }
+
+    .menu-panel[hidden] { display: none; }
+
+    .menu-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px;
+      color: var(--cream);
+      text-decoration: none;
+      border-radius: 7px;
+      font-size: 20px;
+      background: transparent;
+      border: 0;
+      text-align: left;
+    }
+
+    .menu-link:hover {
+      background: rgba(252,245,238,.14);
+    }
+
+    .menu-link svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+    }
+
+    main {
+      padding: 104px 14px 34px;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    .welcome {
+      width: fit-content;
+      max-width: 100%;
+      margin: 8px auto 26px;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      background: var(--banner);
+      color: var(--cream);
+      font-size: clamp(19px, 2.3vw, 25px);
+      line-height: 1.45;
+      box-shadow: var(--shadow);
+      animation: plopOpen .65s cubic-bezier(.2,1.5,.4,1) both;
+    }
+
+    .welcome p { margin: 0; }
+
+    .page { display: none; }
+
+    .page.active {
+      display: block;
+      animation: fadeIn .25s ease both;
+    }
+
+    .panel {
+      background: var(--cream);
+      color: var(--plum);
+      border-radius: var(--radius);
+      padding: clamp(18px, 4vw, 34px);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(252,245,238,.55);
+    }
+
+    .panel h1 {
+      margin: 0 0 24px;
+      color: var(--plum);
+      text-align: center;
+      font: 48px/1.15 "Great Vibes", cursive;
+    }
+
+    .cart-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(250px, 1fr);
+      gap: 26px;
+    }
+
+    .order-lines {
+      color: var(--plum);
+      font-size: 22px;
+    }
+
+    .shipping-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .shipping-option input {
+      accent-color: var(--berry);
+      width: 17px;
+      height: 17px;
+    }
+
+    .shipping-option label {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .cart-items {
+      list-style: none;
+      margin: 0 0 18px;
+      padding: 0;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddcbd1;
+    }
+
+    .cart-item-name { overflow-wrap: anywhere; }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .small-btn {
+      border: 0;
+      background: var(--berry);
+      color: var(--cream);
+      border-radius: 6px;
+      padding: 3px 9px;
+    }
+
+    .empty-cart {
+      opacity: .8;
+      font-size: 18px;
+      margin: 12px 0;
+    }
+
+    .dotted-line {
+      border: 0;
+      border-top: 2px dotted var(--plum);
+      margin: 20px 0 14px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 25px;
+      font-weight: normal;
+    }
+
+    .form-fields {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 10px 12px;
+      align-items: center;
+    }
+
+    .form-fields label {
+      color: var(--cream);
+      background: var(--berry);
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 20px;
+    }
+
+    .form-fields input {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--berry);
+      border-radius: 7px;
+      padding: 11px 12px;
+      color: var(--plum);
+      background: var(--cream);
+      font-size: 18px;
+    }
+
+    .form-fields input::placeholder { color: #92717e; }
+
+    .submit-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 22px;
+    }
+
+    .primary-btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 13px 22px;
+      background: var(--berry);
+      color: var(--cream);
+      font-size: 22px;
+      box-shadow: 0 4px 10px rgba(70,20,35,.16);
+    }
+
+    .pulse:hover,
+    .pulse:focus-visible {
+      animation: pulse .85s infinite;
+    }
+
+    .section-title {
+      color: var(--cream);
+      font: 42px/1.15 "Great Vibes", cursive;
+      text-align: center;
+      margin: 8px 0 18px;
+    }
+
+    .shop-note {
+      color: var(--cream);
+      background: rgba(252,245,238,.1);
+      padding: 18px;
+      border-radius: var(--radius);
+      font-size: 21px;
+      line-height: 1.45;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(210px,1fr));
+      gap: 16px;
+    }
+
+    .product-card {
+      color: var(--plum);
+      background: var(--cream);
+      padding: 18px;
+      border-radius: var(--radius);
+    }
+
+    .product-card h2 {
+      margin: 0 0 8px;
+      font-size: 25px;
+      font-weight: normal;
+    }
+
+    .product-card p {
+      font-size: 19px;
+      margin: 0 0 14px;
+    }
+
+    .product-card .primary-btn { font-size: 19px; }
+
+    .notice {
+      margin-top: 16px;
+      color: var(--plum);
+      background: #e7dce0;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 18px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px 10px 0;
+      color: var(--cream);
+      opacity: .9;
+      font-size: 17px;
+    }
+
+    @keyframes plopOpen {
+      0% { opacity: 0; transform: scale(.82); }
+      70% { opacity: 1; transform: scale(1.035); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes swingOut {
+      0% { opacity: 0; transform: rotateX(-90deg); }
+      100% { opacity: 1; transform: rotateX(0); }
+    }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.045); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 650px) {
+      .site-header {
+        min-height: 72px;
+        padding: 8px 12px;
+      }
+
+      .brand img {
+        width: 48px;
+        height: 48px;
+      }
+
+      .brand-name { font-size: 34px; }
+      main { padding-top: 88px; }
+      .welcome { padding: 15px 17px; }
+      .cart-layout { grid-template-columns: 1fr; }
+      .panel h1 { font-size: 43px; }
+
+      .form-fields {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+
+      .form-fields input { margin-bottom: 8px; }
+      .menu-panel { right: 53px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="Crea Landa - home" data-page="home">
+      <!-- Upload je logo in dezelfde map als index.html met exact deze bestandsnaam. -->
+      <img
+        src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png"
+        alt="Rond logo van Crea Landa"
+        onerror="this.style.display='none'"
+      >
+      <span class="brand-name">Crea Landa</span>
+    </a>
+
+    <div class="menu-wrap">
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        aria-label="Menu openen"
+        aria-expanded="false"
+        aria-controls="menuPanel"
+        type="button"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="menu-panel" id="menuPanel" aria-label="Hoofdmenu" hidden>
+        <a class="menu-link" href="#home" data-page="home">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m3 10 9-7 9 7"/>
+            <path d="M5 9v12h14V9M9 21v-7h6v7"/>
+          </svg>
+          Home
+        </a>
+
+        <a class="menu-link" href="#winkelmandje" data-page="cart">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 7H6"/>
+            <circle cx="10" cy="20" r="1.2"/>
+            <circle cx="18" cy="20" r="1.2"/>
+          </svg>
+          Winkelmandje <span id="cartCount">(0)</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="welcome" id="welcome">
+      <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
+    </section>
+
+    <section class="page active" id="homePage" aria-labelledby="homeTitle">
+      <h1 class="section-title" id="homeTitle">Neem gerust een kijkje</h1>
+      <div id="products" class="product-grid"></div>
+
+      <p class="shop-note" id="emptyShopNote">
+        Binnenkort vind je hier mijn handgemaakte creaties. Producten en prijzen kun je invullen in de lijst
+        <code>PRODUCTEN</code> in de code. Zodra je producten toevoegt, kunnen bezoekers ze hier in het winkelmandje zetten.
+      </p>
+    </section>
+
+    <section class="page" id="cartPage" aria-labelledby="cartTitle">
+      <div class="panel">
+        <h1 id="cartTitle">Mijn Bestelling</h1>
+
+        <div class="cart-layout">
+          <div class="order-lines">
+            <ul class="cart-items" id="cartItems"></ul>
+            <p class="empty-cart" id="emptyCart">Je winkelmandje is nog leeg.</p>
+
+            <div class="shipping-option">
+              <input type="radio" id="postnl" name="shipping" value="4.25" checked>
+              <label for="postnl">
+                <span>PostNL:</span>
+                <span>€ 4,25</span>
+              </label>
+            </div>
+
+            <div class="shipping-option">
+              <input type="radio" id="dhl" name="shipping" value="5.95">
+              <label for="dhl">
+                <span>DHL:</span>
+                <span>€ 5,95</span>
+              </label>
+            </div>
+
+            <hr class="dotted-line">
+
+            <div class="total-row">
+              <span>Totaalbedrag:</span>
+              <span id="totalAmount">€ 4,25</span>
+            </div>
+
+            <div class="notice">
+              Je betaalt niet via deze website. Na het plaatsen van je bestelling opent je e-mailprogramma met de bestelgegevens. Controleer en verstuur de e-mail om je bestelling door te geven.
+            </div>
+          </div>
+
+          <form id="orderForm">
+            <div class="form-fields">
+              <label for="customerName">Naam:</label>
+              <input id="customerName" name="naam" autocomplete="name" required placeholder="Je volledige naam">
+
+              <label for="customerAddress">Adres:</label>
+              <input id="customerAddress" name="adres" autocomplete="street-address" required placeholder="Straat, huisnummer, postcode en plaats">
+
+              <label for="customerPhone">Telefoonnummer:</label>
+              <input id="customerPhone" name="telefoonnummer" type="tel" autocomplete="tel" required placeholder="Je telefoonnummer">
+
+              <label for="customerEmail">E-mailadres:</label>
+              <input id="customerEmail" name="email" type="email" autocomplete="email" required placeholder="Je e-mailadres">
+            </div>
+
+            <div class="submit-row">
+              <button class="primary-btn pulse" type="submit">Bestelling plaatsen</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer>© <span id="year"></span> Crea Landa · Met liefde gemaakt</footer>
+  </main>
+
+  <script>
+    /*
+      VUL HIER JE EIGEN PRODUCTEN IN.
+
+      Voorbeeld:
+      {
+        id: "zeep-roos",
+        name: "Handgemaakte rozenzeep",
+        price: 4.50,
+        description: "Een handgemaakte zeep."
+      }
+
+      Gebruik unieke id's en prijzen als getal, zonder €-teken.
+    */
+    const PRODUCTEN = [
+      // { id: "voorbeeld", name: "Naam van je product", price: 5.00, description: "Korte omschrijving" },
+    ];
+
+    const CART_KEY = "creaLandaCart_v1";
+    let cart = loadCart();
+
+    const $ = (selector) => document.querySelector(selector);
+
+    const money = (value) =>
+      new Intl.NumberFormat("nl-NL", {
+        style: "currency",
+        currency: "EUR"
+      }).format(value);
+
+    function loadCart() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+        return Array.isArray(saved) ? saved : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCart() {
+      try {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      } catch {}
+    }
+
+    function cartCount() {
+      return cart.reduce((sum, item) => sum + item.qty, 0);
+    }
+
+    function subtotal() {
+      return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+    }
+
+    function shippingCost() {
+      const selected = document.querySelector('input[name="shipping"]:checked');
+      return selected ? Number(selected.value) : 4.25;
+    }
+
+    function renderProducts() {
+      const root = $("#products");
+      root.replaceChildren();
+
+      $("#emptyShopNote").hidden = PRODUCTEN.length > 0;
+
+      PRODUCTEN.forEach(product => {
+        const card = document.createElement("article");
+        card.className = "product-card";
+
+        const title = document.createElement("h2");
+        title.textContent = product.name;
+
+        const description = document.createElement("p");
+        description.textContent = product.description || "";
+
+        const price = document.createElement("p");
+        price.textContent = money(Number(product.price));
+
+        const add = document.createElement("button");
+        add.type = "button";
+        add.className = "primary-btn pulse";
+        add.textContent = "In winkelmandje";
+        add.addEventListener("click", () => addToCart(product.id));
+
+        card.append(title, description, price, add);
+        root.append(card);
+      });
+    }
+
+    function addToCart(id) {
+      const product = PRODUCTEN.find(p => p.id === id);
+
+      if (
+        !product ||
+        !Number.isFinite(Number(product.price)) ||
+        Number(product.price) < 0
+      ) {
+        return;
+      }
+
+      const existing = cart.find(item => item.id === id);
+
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: Number(product.price),
+          qty: 1
+        });
+      }
+
+      saveCart();
+      renderCart();
+      showPage("cart");
+    }
+
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+
+      item.qty += delta;
+      cart = cart.filter(i => i.qty > 0);
+
+      saveCart();
+      renderCart();
+    }
+
+    function renderCart() {
+      const root = $("#cartItems");
+      root.replaceChildren();
+
+      $("#emptyCart").hidden = cart.length > 0;
+
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.className = "cart-item";
+
+        const name = document.createElement("span");
+        name.className = "cart-item-name";
+        name.textContent = `${item.name} · ${money(item.price * item.qty)}`;
+
+        const controls = document.createElement("span");
+        controls.className = "qty-controls";
+
+        const minus = document.createElement("button");
+        minus.className = "small-btn";
+        minus.type = "button";
+        minus.textContent = "−";
+        minus.setAttribute("aria-label", `Minder ${item.name}`);
+        minus.addEventListener("click", () => changeQty(item.id, -1));
+
+        const qty = document.createElement("span");
+        qty.textContent = item.qty;
+
+        const plus = document.createElement("button");
+        plus.className = "small-btn";
+        plus.type = "button";
+        plus.textContent = "+";
+        plus.setAttribute("aria-label", `Meer ${item.name}`);
+        plus.addEventListener("click", () => changeQty(item.id, 1));
+
+        controls.append(minus, qty, plus);
+        li.append(name, controls);
+        root.append(li);
+      });
+
+      $("#cartCount").textContent = `(${cartCount()})`;
+      $("#totalAmount").textContent = money(subtotal() + shippingCost());
+    }
+
+    function showPage(page) {
+      const isCart = page === "cart";
+
+      $("#homePage").classList.toggle("active", !isCart);
+      $("#cartPage").classList.toggle("active", isCart);
+      $("#welcome").hidden = isCart;
+
+      $("#menuPanel").hidden = true;
+      $("#menuToggle").setAttribute("aria-expanded", "false");
+      $("#menuToggle").setAttribute("aria-label", "Menu openen");
+
+      history.replaceState(null, "", isCart ? "#winkelmandje" : "#home");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    $("#menuToggle").addEventListener("click", () => {
+      const opening = $("#menuPanel").hidden;
+
+      $("#menuPanel").hidden = !opening;
+      $("#menuToggle").setAttribute("aria-expanded", String(opening));
+      $("#menuToggle").setAttribute(
+        "aria-label",
+        opening ? "Menu sluiten" : "Menu openen"
+      );
+    });
+
+    document.querySelectorAll("[data-page]").forEach(link => {
+      link.addEventListener("click", event 
