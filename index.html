@@ -440,7 +440,19 @@ main {
   </a>
 </nav>
 <main>  
-  <section class="page" id="cardsPage">
+    <section class="page" id="cardsPage">
+    <style>
+      #cardsPage { margin: -24px 0 -16px; }
+      #cardsPage .cart-panel {
+        min-height: calc(100vh - 110px);
+        min-height: calc(100dvh - 110px);
+      }
+      #cardsPage .cart-panel h1 {
+        margin: 0 0 18px;
+        font-size: clamp(24px, 8vw, 40px);
+        white-space: nowrap;
+      }
+    </style>
     <div class="cart-panel">
       <h1>Handgemaakte Kaarten</h1>
       <!-- Hier komen later de kaarten -->
