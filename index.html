@@ -423,7 +423,14 @@ main {
     </svg>
   </a>
 
-  <a class="menu-link" href="#winkelmandje" data-page="cart"
+  <a class="menu-link" href="#kaarten" data-page="cards"
+     aria-label="Handgemaakte kaarten" title="Handgemaakte kaarten">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="5" y="3" width="14" height="18" rx="2"/>
+      <path transform="translate(6.96 7.46) scale(.42)" stroke-width="4.3" d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+    </svg>
+  </a>  
+<a class="menu-link" href="#winkelmandje" data-page="cart"
      aria-label="Winkelmandje" title="Winkelmandje">
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 7H6"/>
@@ -432,7 +439,12 @@ main {
     </svg>
   </a>
 </nav>
-
+  <section class="page" id="cardsPage">
+    <div class="cart-panel">
+      <h1>Handgemaakte Kaarten</h1>
+      <!-- Hier komen later de kaarten -->
+    </div>
+  </section>
 <main>
   <section class="welcome" id="welcome">
     <p>Welkom op mijn website Crea Landa, ik ben Jolanda en ik wil hier graag mijn hobby regelmatig gaan delen wat ik maak en jullie kunnen bestellingen plaatsen alleen dan zonder betalen maar door middel van een formulier. Neem gerust een kijkje en als je wat leuks ziet kun je een bestelling plaatsen!</p>
@@ -639,16 +651,22 @@ main {
     }
   }
 
-  function showPage(page, changeAddress) {
-    const cartSelected = page === "cart";
+    function showPage(page, changeAddress) {
+    if (!changeAddress && location.hash === "#kaarten") page = "cards";
 
-    welcome.hidden = cartSelected;
-    galerij.hidden = cartSelected;
+    const cartSelected = page === "cart";
+    const cardsSelected = page === "cards";
+    const homeSelected = !cartSelected && !cardsSelected;
+
+    welcome.hidden = !homeSelected;
+    galerij.hidden = !homeSelected;
     cartPage.classList.toggle("active", cartSelected);
+    const cardsPage = $("cardsPage");
+    if (cardsPage) cardsPage.classList.toggle("active", cardsSelected);
     closeMenu();
 
     if (changeAddress) {
-      const newHash = cartSelected ? "#winkelmandje" : "#home";
+      const newHash = cartSelected ? "#winkelmandje" : cardsSelected ? "#kaarten" : "#home";
       if (location.hash !== newHash) {
         history.pushState({ page: page }, "", newHash);
       }
