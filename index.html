@@ -440,7 +440,7 @@ main {
   </a>
 </nav>
 <main>  
-    <section class="page" id="cardsPage">
+      <section class="page" id="cardsPage">
     <style>
       #cardsPage { margin: -24px 0 -16px; }
       #cardsPage .cart-panel {
@@ -452,11 +452,275 @@ main {
         font-size: clamp(24px, 8vw, 40px);
         white-space: nowrap;
       }
+
+      .pr-item {
+        margin: 0 0 26px;
+        padding-bottom: 24px;
+        border-bottom: 2px dotted rgba(252, 245, 238, .45);
+      }
+      .pr-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+
+      .pr-title {
+        margin: 0 0 10px;
+        font-family: "Great Vibes", cursive;
+        font-size: 28px;
+        font-weight: 400;
+        line-height: 1.2;
+        color: #FCF5EE;
+        -webkit-text-stroke: .5px #FCF5EE;
+      }
+
+      .pr-slider {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(252, 245, 238, .5) transparent;
+        padding-bottom: 4px;
+      }
+      .pr-photo {
+        flex: 0 0 86%;
+        width: 86%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-radius: 12px;
+        scroll-snap-align: start;
+        background: rgba(255, 255, 255, .15);
+      }
+      .pr-photo.single { flex-basis: 100%; width: 100%; }
+
+      .pr-dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+      .pr-dots span {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: rgba(252, 245, 238, .45);
+        transition: background .2s, transform .2s;
+      }
+      .pr-dots span.on { background: #FCF5EE; transform: scale(1.25); }
+
+      .pr-bottom {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 10px;
+      }
+      .pr-desc {
+        margin: 0;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 18px;
+        line-height: 1.3;
+        letter-spacing: .3px;
+        color: #FCF5EE;
+        -webkit-text-stroke: .25px #FCF5EE;
+      }
+      .pr-price {
+        margin: 4px 0 0;
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: .3px;
+        color: #FCF5EE;
+        -webkit-text-stroke: .25px #FCF5EE;
+      }
+
+      .pr-buy { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+      .pr-added {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 17px;
+        color: #FCF5EE;
+        opacity: 0;
+        transition: opacity .25s;
+      }
+      .pr-added.show { opacity: 1; }
+
+      .pr-btn {
+        width: 54px;
+        height: 44px;
+        border: 0;
+        border-radius: 10px;
+        background: #B32C43;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pr-btn svg {
+        width: 26px; height: 26px;
+        fill: none;
+        stroke: #FCF5EE;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .pr-btn.pop { animation: prPop .4s cubic-bezier(.2, .9, .3, 1.4); }
+      @keyframes prPop {
+        0% { transform: scale(1); }
+        35% { transform: scale(1.25); }
+        65% { transform: scale(.92); }
+        100% { transform: scale(1); }
+      }
+
+      .pr-msg { color: #FCF5EE; font-family: "Bebas Neue", sans-serif; font-size: 18px; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .pr-btn.pop { animation: none; }
+      }
     </style>
+
     <div class="cart-panel">
       <h1>Handgemaakte Kaarten</h1>
-      <!-- Hier komen later de kaarten -->
+      <div id="kaartenLijst"></div>
     </div>
+
+    <script>
+    (function () {
+      "use strict";
+
+      var BASE = 'https://nyeedsxrlnkbxzoritwg.supabase.co';
+      var KEY = 'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7';
+      var list = document.getElementById('kaartenLijst');
+      if (!list) return;
+
+      var CART_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+        '<path d="M3 3h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 7H6"/>' +
+        '<circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg>';
+
+      function money(n) {
+        return new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0);
+      }
+
+      function photoUrl(path) {
+        return BASE + '/storage/v1/object/public/photos/' + encodeURI(path);
+      }
+
+      function buildSlider(photos, title) {
+        var wrap = document.createElement('div');
+        var slider = document.createElement('div');
+        slider.className = 'pr-slider';
+
+        photos.forEach(function (path, i) {
+          var img = document.createElement('img');
+          img.className = photos.length > 1 ? 'pr-photo' : 'pr-photo single';
+          img.src = photoUrl(path);
+          img.alt = title + ' (foto ' + (i + 1) + ')';
+          img.loading = 'lazy';
+          slider.appendChild(img);
+        });
+        wrap.appendChild(slider);
+
+        if (photos.length > 1) {
+          var dots = document.createElement('div');
+          dots.className = 'pr-dots';
+          var dotEls = photos.map(function (_, i) {
+            var d = document.createElement('span');
+            if (i === 0) d.className = 'on';
+            dots.appendChild(d);
+            return d;
+          });
+          slider.addEventListener('scroll', function () {
+            var step = slider.children[1].offsetLeft - slider.children[0].offsetLeft;
+            var idx = step > 0 ? Math.round(slider.scrollLeft / step) : 0;
+            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 2) idx = photos.length - 1;
+            idx = Math.max(0, Math.min(photos.length - 1, idx));
+            dotEls.forEach(function (d, i) { d.classList.toggle('on', i === idx); });
+          }, { passive: true });
+          wrap.appendChild(dots);
+        }
+        return wrap;
+      }
+
+      function buildItem(p) {
+        var item = document.createElement('article');
+        item.className = 'pr-item';
+
+        var title = document.createElement('h2');
+        title.className = 'pr-title';
+        title.textContent = p.title || '';
+        item.appendChild(title);
+
+        var photos = Array.isArray(p.photos) ? p.photos : [];
+        if (photos.length) item.appendChild(buildSlider(photos, p.title || ''));
+
+        var bottom = document.createElement('div');
+        bottom.className = 'pr-bottom';
+
+        var info = document.createElement('div');
+        if (p.description) {
+          var desc = document.createElement('p');
+          desc.className = 'pr-desc';
+          desc.textContent = p.description;
+          info.appendChild(desc);
+        }
+        var price = document.createElement('p');
+        price.className = 'pr-price';
+        price.textContent = money(p.price);
+        info.appendChild(price);
+
+        var buy = document.createElement('div');
+        buy.className = 'pr-buy';
+        var added = document.createElement('span');
+        added.className = 'pr-added';
+        added.setAttribute('aria-live', 'polite');
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pr-btn';
+        btn.setAttribute('aria-label', 'Zet ' + (p.title || 'dit product') + ' in je winkelmandje');
+        btn.innerHTML = CART_ICON;
+
+        var timer = null;
+        btn.addEventListener('click', function () {
+          btn.classList.remove('pop');
+          void btn.offsetWidth;
+          btn.classList.add('pop');
+
+          if (typeof window.creaLandaAddToCart !== 'function') {
+            added.textContent = 'Winkelmandje niet gevonden';
+          } else {
+            window.creaLandaAddToCart('p_' + p.id, p.title || 'Kaart', Number(p.price));
+            added.textContent = 'Toegevoegd!';
+          }
+          added.classList.add('show');
+          clearTimeout(timer);
+          timer = setTimeout(function () { added.classList.remove('show'); }, 1600);
+        });
+
+        buy.appendChild(added);
+        buy.appendChild(btn);
+        bottom.appendChild(info);
+        bottom.appendChild(buy);
+        item.appendChild(bottom);
+        return item;
+      }
+
+      function showMessage(text) {
+        list.innerHTML = '';
+        var p = document.createElement('p');
+        p.className = 'pr-msg';
+        p.textContent = text;
+        list.appendChild(p);
+      }
+
+      fetch(BASE + '/rest/v1/products?select=*&category=eq.kaarten&order=created_at.desc', {
+        headers: { apikey: KEY }
+      })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        })
+        .then(function (items) {
+          list.innerHTML = '';
+          (Array.isArray(items) ? items : []).forEach(function (p) {
+            list.appendChild(buildItem(p));
+          });
+        })
+        .catch(function (err) {
+          showMessage('De kaarten laden niet: ' + err.message);
+        });
+    })();
+    </script>
   </section>
 
   <section class="welcome" id="welcome">
@@ -634,7 +898,18 @@ main {
     renderCart();
   }
 
-  function openMenu() {
+  window.creaLandaAddToCart = function (id, name, price) {
+    const existing = cart.find(function (p) { return p.id === id; });
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ id: String(id), name: String(name), price: Number(price), qty: 1 });
+    }
+    saveCart();
+    renderCart();
+  };
+  
+function openMenu() {
     menuPanel.hidden = false;
     menuPanel.classList.remove("opening");
     void menuPanel.offsetWidth;
