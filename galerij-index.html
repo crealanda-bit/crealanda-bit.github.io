@@ -10,6 +10,7 @@
 :root { --blue: #9EB3D8; --cream: #FCF5EE; --red: #B32C43; --plum: #6F4257; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -131,7 +132,12 @@ figure img {
 }
 
 figcaption {
-  padding: 10px 14px 14px;
+  padding: 10px 14px 6px;
+  color: var(--cream);
+}
+
+.cap-title {
+  display: block;
   font-family: "Great Vibes", cursive;
   font-size: 1.4rem;
   line-height: 1.2;
@@ -146,6 +152,43 @@ figcaption small {
   letter-spacing: .3px;
   color: var(--cream);
 }
+
+/* Knoppen onder elke foto (alleen zichtbaar als je bent ingelogd) */
+.actions, .edit-box { padding: 8px 14px 14px; }
+.actions { display: flex; gap: 10px; }
+
+.act-btn {
+  flex: 1;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--red);
+  color: var(--cream);
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.act-btn.ghost { background: transparent; border: 2px solid var(--cream); }
+.act-btn:disabled { opacity: .6; }
+
+.edit-box input {
+  display: block;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 10px;
+  border: 1px solid var(--red);
+  border-radius: 7px;
+  background: var(--blue);
+  color: var(--cream);
+  caret-color: var(--cream);
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 19px;
+}
+
+.edit-box input::placeholder { color: var(--cream); opacity: .8; }
+.edit-box input:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
+.edit-box .row { display: flex; gap: 10px; }
 </style>
 </head>
 <body>
@@ -183,23 +226,127 @@ figcaption small {
   const $ = (id) => document.getElementById(id);
   const say = (t) => ($('msg').textContent = t);
 
+  let currentSession = null;
+  let firstLoad = true;
+
+  function makeBtn(text, extraClass) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'act-btn' + (extraClass ? ' ' + extraClass : '');
+    b.textContent = text;
+    return b;
+  }
+
+  function makeInput(value, placeholder) {
+    const i = document.createElement('input');
+    i.type = 'text';
+    i.value = value || '';
+    i.placeholder = placeholder;
+    return i;
+  }
+
+  // Titel en beschrijving aanpassen
+  function openEdit(p, fig) {
+    const cap = fig.querySelector('figcaption');
+    const act = fig.querySelector('.actions');
+    cap.hidden = true;
+    act.hidden = true;
+
+    const box = document.createElement('div');
+    box.className = 'edit-box';
+    const t = makeInput(p.title, 'Titel');
+    const d = makeInput(p.description, 'Beschrijving');
+    const row = document.createElement('div');
+    row.className = 'row';
+    const save = makeBtn('Opslaan');
+    const cancel = makeBtn('Annuleren', 'ghost');
+    row.append(save, cancel);
+    box.append(t, d, row);
+
+    cancel.onclick = () => { box.remove(); cap.hidden = false; act.hidden = false; };
+
+    save.onclick = async () => {
+      save.disabled = true;
+      const { data, error } = await db.from('photos')
+        .update({ title: t.value, description: d.value })
+        .eq('id', p.id)
+        .select();
+      if (error || !data || !data.length) {
+        save.disabled = false;
+        alert('Opslaan mislukt: ' + (error ? error.message : 'geen rechten'));
+        return;
+      }
+      p.title = data[0].title;
+      p.description = data[0].description;
+      cap.querySelector('.cap-title').textContent = p.title || '';
+      cap.querySelector('small').textContent = p.description || '';
+      box.remove();
+      cap.hidden = false;
+      act.hidden = false;
+      say('Opgeslagen.');
+    };
+
+    fig.appendChild(box);
+    t.focus();
+  }
+
+  // Foto verwijderen (eerst de regel in de database, dan het bestand)
+  async function removePhoto(p, btn) {
+    if (!confirm('Weet je zeker dat je deze foto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+    btn.disabled = true;
+
+    const { data, error } = await db.from('photos').delete().eq('id', p.id).select();
+    if (error || !data || !data.length) {
+      btn.disabled = false;
+      alert('Verwijderen mislukt: ' + (error ? error.message : 'geen rechten'));
+      return;
+    }
+
+    const { data: removed, error: stErr } = await db.storage.from(BUCKET).remove([p.storage_path]);
+    if (stErr || !removed || !removed.length) {
+      say('Foto is van de site gehaald, maar het bestand bleef in de opslag staan.');
+    } else {
+      say('Foto verwijderd.');
+    }
+    loadGallery();
+  }
+
+  function buildCard(p) {
+    const fig = document.createElement('figure');
+
+    const img = document.createElement('img');
+    img.src = db.storage.from(BUCKET).getPublicUrl(p.storage_path).data.publicUrl;
+    img.loading = 'lazy';
+    img.alt = p.title || '';
+
+    const cap = document.createElement('figcaption');
+    const title = document.createElement('span');
+    title.className = 'cap-title';
+    title.textContent = p.title || '';
+    const small = document.createElement('small');
+    small.textContent = p.description || '';
+    cap.append(title, small);
+
+    fig.append(img, cap);
+
+    if (currentSession) {
+      const act = document.createElement('div');
+      act.className = 'actions';
+      const editBtn = makeBtn('Aanpassen');
+      const delBtn = makeBtn('Verwijderen', 'ghost');
+      editBtn.onclick = () => openEdit(p, fig);
+      delBtn.onclick = () => removePhoto(p, delBtn);
+      act.append(editBtn, delBtn);
+      fig.appendChild(act);
+    }
+    return fig;
+  }
+
   async function loadGallery() {
     const { data, error } = await db.from('photos').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    if (error) return say('Foto\u2019s laden mislukt: ' + error.message);
     $('gallery').innerHTML = '';
-    for (const p of data) {
-      const url = db.storage.from(BUCKET).getPublicUrl(p.storage_path).data.publicUrl;
-      const fig = document.createElement('figure');
-      const img = document.createElement('img');
-      img.src = url; img.loading = 'lazy'; img.alt = p.title || '';
-      const cap = document.createElement('figcaption');
-      cap.textContent = p.title || '';
-      const small = document.createElement('small');
-      small.textContent = p.description || '';
-      cap.appendChild(small);
-      fig.append(img, cap);
-      $('gallery').appendChild(fig);
-    }
+    for (const p of data) $('gallery').appendChild(buildCard(p));
   }
 
   function checkHash() {
@@ -208,12 +355,18 @@ figcaption small {
   window.addEventListener('hashchange', checkHash);
   checkHash();
 
-  function showState(session) {
+  function applySession(session) {
+    const wasLoggedIn = !!currentSession;
+    currentSession = session;
     $('loginForm').classList.toggle('hidden', !!session);
     $('uploadForm').classList.toggle('hidden', !session);
+    if (firstLoad || wasLoggedIn !== !!session) {
+      firstLoad = false;
+      loadGallery();
+    }
   }
-  db.auth.getSession().then(({ data }) => showState(data.session));
-  db.auth.onAuthStateChange((_e, session) => showState(session));
+  db.auth.getSession().then(({ data }) => applySession(data.session));
+  db.auth.onAuthStateChange((_e, session) => applySession(session));
 
   $('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -249,8 +402,6 @@ figcaption small {
     $('uploadForm').reset();
     loadGallery();
   });
-
-  loadGallery();
 </script>
 </body>
 </html>
