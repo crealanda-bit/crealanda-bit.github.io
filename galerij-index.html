@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beheer galerij</title>
+<title>Beheer</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap');
 
@@ -30,10 +30,18 @@ h1 {
   color: var(--cream);
 }
 
+.sec-title {
+  margin: 30px 0 16px;
+  text-align: center;
+  font-family: "Great Vibes", cursive;
+  font-size: 42px;
+  font-weight: 400;
+  color: var(--cream);
+}
+
 .hidden { display: none !important; }
 
-#admin {
-  display: none;
+.box {
   max-width: 520px;
   margin: 0 auto 28px;
   padding: 22px;
@@ -42,7 +50,9 @@ h1 {
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
 
-#admin h3 {
+#admin { display: none; }
+
+.box h3 {
   margin: 0 0 14px;
   text-align: center;
   font-family: "Great Vibes", cursive;
@@ -51,7 +61,7 @@ h1 {
   color: var(--cream);
 }
 
-#admin input {
+.box input, .box select {
   display: block;
   width: 100%;
   margin: 0 0 10px;
@@ -65,10 +75,11 @@ h1 {
   font-size: 19px;
 }
 
-#admin input::placeholder { color: var(--cream); opacity: .8; }
-#admin input:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
+.box select option { color: #222; background: #fff; }
+.box input::placeholder { color: var(--cream); opacity: .8; }
+.box input:focus, .box select:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
 
-#admin input[type="file"]::file-selector-button {
+.box input[type="file"]::file-selector-button {
   margin-right: 12px;
   padding: 8px 14px;
   border: 0;
@@ -79,7 +90,7 @@ h1 {
   cursor: pointer;
 }
 
-#admin button {
+.box button {
   display: block;
   width: 100%;
   margin: 8px 0 0;
@@ -93,14 +104,17 @@ h1 {
   cursor: pointer;
 }
 
-#admin button:active { transform: scale(.98); }
+.box button:disabled { opacity: .6; }
+.box button:active { transform: scale(.98); }
 
-#admin #logoutBtn {
+.box #logoutBtn {
   background: transparent;
   border: 2px solid var(--cream);
 }
 
-#msg {
+.hint { margin: -4px 0 8px; font-size: 17px; opacity: .9; }
+
+.msg {
   min-height: 1.2em;
   margin: 14px 0 0;
   text-align: center;
@@ -153,7 +167,13 @@ figcaption small {
   color: var(--cream);
 }
 
-/* Knoppen onder elke foto (alleen zichtbaar als je bent ingelogd) */
+.cap-price {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.25rem;
+  color: var(--cream);
+}
+
 .actions, .edit-box { padding: 8px 14px 14px; }
 .actions { display: flex; gap: 10px; }
 
@@ -193,9 +213,9 @@ figcaption small {
 </head>
 <body>
 
-<h1>Beheer galerij</h1>
+<h1>Beheer</h1>
 
-<section id="admin">
+<section id="admin" class="box">
   <form id="loginForm">
     <h3>Inloggen</h3>
     <input id="email" type="email" placeholder="E-mail" required>
@@ -211,9 +231,31 @@ figcaption small {
     <button type="submit">Uploaden</button>
     <button type="button" id="logoutBtn">Uitloggen</button>
   </form>
-  <p id="msg"></p>
+  <p id="msg" class="msg"></p>
 </section>
 
+<section id="productSection" hidden>
+  <div class="box">
+    <form id="productForm">
+      <h3>Product toevoegen</h3>
+      <select id="pCategory">
+        <option value="kaarten">Handgemaakte kaarten</option>
+      </select>
+      <input id="pTitle" type="text" placeholder="Titel" required>
+      <input id="pDesc" type="text" placeholder="Beschrijving">
+      <input id="pPrice" type="text" inputmode="decimal" placeholder="Prijs (bijvoorbeeld 3,50)" required>
+      <input id="pFiles" type="file" accept="image/*" multiple required>
+      <p class="hint">Kies maximaal 4 foto's. De eerste foto is de eerste die bezoekers zien.</p>
+      <button type="submit">Product toevoegen</button>
+    </form>
+    <p id="pMsg" class="msg"></p>
+  </div>
+
+  <h2 class="sec-title">Producten</h2>
+  <div class="grid" id="productGrid"></div>
+</section>
+
+<h2 class="sec-title">Galerij</h2>
 <div class="grid" id="gallery"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -225,9 +267,21 @@ figcaption small {
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const $ = (id) => document.getElementById(id);
   const say = (t) => ($('msg').textContent = t);
+  const pSay = (t) => ($('pMsg').textContent = t);
 
   let currentSession = null;
   let firstLoad = true;
+
+  const euro = (n) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0);
+
+  function parsePrice(v) {
+    const n = parseFloat(String(v).trim().replace(',', '.'));
+    return isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null;
+  }
+
+  function publicUrl(path) {
+    return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
 
   function makeBtn(text, extraClass) {
     const b = document.createElement('button');
@@ -245,7 +299,8 @@ figcaption small {
     return i;
   }
 
-  // Titel en beschrijving aanpassen
+  /* ---------- Galerij-foto's ---------- */
+
   function openEdit(p, fig) {
     const cap = fig.querySelector('figcaption');
     const act = fig.querySelector('.actions');
@@ -290,7 +345,6 @@ figcaption small {
     t.focus();
   }
 
-  // Foto verwijderen (eerst de regel in de database, dan het bestand)
   async function removePhoto(p, btn) {
     if (!confirm('Weet je zeker dat je deze foto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
     btn.disabled = true;
@@ -315,7 +369,7 @@ figcaption small {
     const fig = document.createElement('figure');
 
     const img = document.createElement('img');
-    img.src = db.storage.from(BUCKET).getPublicUrl(p.storage_path).data.publicUrl;
+    img.src = publicUrl(p.storage_path);
     img.loading = 'lazy';
     img.alt = p.title || '';
 
@@ -349,22 +403,227 @@ figcaption small {
     for (const p of data) $('gallery').appendChild(buildCard(p));
   }
 
-  function checkHash() {
-    $('admin').style.display = location.hash === '#admin' ? 'block' : 'none';
+  /* ---------- Producten ---------- */
+
+  function fallbackFile(file) {
+    return { blob: file, ext: (file.name.split('.').pop() || 'jpg').toLowerCase(), type: file.type || 'image/jpeg' };
   }
-  window.addEventListener('hashchange', checkHash);
-  checkHash();
+
+  // Verkleint de foto zodat de pagina snel laadt
+  function compressImage(file, maxSide, quality) {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth, h = img.naturalHeight;
+          const scale = Math.min(1, maxSide / Math.max(w, h));
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          c.toBlob((b) => {
+            URL.revokeObjectURL(url);
+            resolve(b ? { blob: b, ext: 'jpg', type: 'image/jpeg' } : fallbackFile(file));
+          }, 'image/jpeg', quality);
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          resolve(fallbackFile(file));
+        }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(fallbackFile(file)); };
+      img.src = url;
+    });
+  }
+
+  function openProductEdit(p, fig) {
+    const cap = fig.querySelector('figcaption');
+    const act = fig.querySelector('.actions');
+    cap.hidden = true;
+    act.hidden = true;
+
+    const box = document.createElement('div');
+    box.className = 'edit-box';
+    const t = makeInput(p.title, 'Titel');
+    const d = makeInput(p.description, 'Beschrijving');
+    const pr = makeInput(String(p.price).replace('.', ','), 'Prijs (bijvoorbeeld 3,50)');
+    pr.inputMode = 'decimal';
+    const row = document.createElement('div');
+    row.className = 'row';
+    const save = makeBtn('Opslaan');
+    const cancel = makeBtn('Annuleren', 'ghost');
+    row.append(save, cancel);
+    box.append(t, d, pr, row);
+
+    cancel.onclick = () => { box.remove(); cap.hidden = false; act.hidden = false; };
+
+    save.onclick = async () => {
+      const price = parsePrice(pr.value);
+      if (!t.value.trim()) return alert('Vul een titel in.');
+      if (price === null) return alert('Vul een geldige prijs in, bijvoorbeeld 3,50.');
+      save.disabled = true;
+      const { data, error } = await db.from('products')
+        .update({ title: t.value.trim(), description: d.value.trim(), price: price })
+        .eq('id', p.id)
+        .select();
+      if (error || !data || !data.length) {
+        save.disabled = false;
+        alert('Opslaan mislukt: ' + (error ? error.message : 'geen rechten'));
+        return;
+      }
+      p.title = data[0].title;
+      p.description = data[0].description;
+      p.price = data[0].price;
+      cap.querySelector('.cap-title').textContent = p.title || '';
+      cap.querySelector('small').textContent = p.description || '';
+      cap.querySelector('.cap-price').textContent = euro(p.price);
+      box.remove();
+      cap.hidden = false;
+      act.hidden = false;
+      pSay('Opgeslagen.');
+    };
+
+    fig.appendChild(box);
+    t.focus();
+  }
+
+  async function removeProduct(p, btn) {
+    if (!confirm('Weet je zeker dat je dit product wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+    btn.disabled = true;
+
+    const { data, error } = await db.from('products').delete().eq('id', p.id).select();
+    if (error || !data || !data.length) {
+      btn.disabled = false;
+      alert('Verwijderen mislukt: ' + (error ? error.message : 'geen rechten'));
+      return;
+    }
+
+    const files = p.photos || [];
+    if (files.length) {
+      const { data: removed, error: stErr } = await db.storage.from(BUCKET).remove(files);
+      if (stErr || !removed || removed.length < files.length) {
+        pSay('Product verwijderd, maar niet alle foto-bestanden zijn uit de opslag gehaald.');
+      } else {
+        pSay('Product verwijderd.');
+      }
+    } else {
+      pSay('Product verwijderd.');
+    }
+    loadProducts();
+  }
+
+  function buildProductCard(p) {
+    const fig = document.createElement('figure');
+
+    if (p.photos && p.photos.length) {
+      const img = document.createElement('img');
+      img.src = publicUrl(p.photos[0]);
+      img.loading = 'lazy';
+      img.alt = p.title || '';
+      fig.appendChild(img);
+    }
+
+    const cap = document.createElement('figcaption');
+    const title = document.createElement('span');
+    title.className = 'cap-title';
+    title.textContent = p.title || '';
+    const small = document.createElement('small');
+    small.textContent = p.description || '';
+    const price = document.createElement('span');
+    price.className = 'cap-price';
+    price.textContent = euro(p.price);
+    cap.append(title, small, price);
+    fig.appendChild(cap);
+
+    const act = document.createElement('div');
+    act.className = 'actions';
+    const editBtn = makeBtn('Aanpassen');
+    const delBtn = makeBtn('Verwijderen', 'ghost');
+    editBtn.onclick = () => openProductEdit(p, fig);
+    delBtn.onclick = () => removeProduct(p, delBtn);
+    act.append(editBtn, delBtn);
+    fig.appendChild(act);
+    return fig;
+  }
+
+  async function loadProducts() {
+    const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
+    if (error) return pSay('Producten laden mislukt: ' + error.message);
+    $('productGrid').innerHTML = '';
+    for (const p of data) $('productGrid').appendChild(buildProductCard(p));
+  }
+
+  $('productForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const title = $('pTitle').value.trim();
+    const price = parsePrice($('pPrice').value);
+    const chosen = Array.from($('pFiles').files);
+    const files = chosen.slice(0, 4);
+
+    if (!title) return pSay('Vul een titel in.');
+    if (price === null) return pSay('Vul een geldige prijs in, bijvoorbeeld 3,50.');
+    if (!files.length) return pSay('Kies minstens één foto.');
+
+    const submitBtn = $('productForm').querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    const paths = [];
+    let inserted = false;
+    try {
+      for (let i = 0; i < files.length; i++) {
+        pSay('Foto ' + (i + 1) + ' van ' + files.length + ' uploaden...');
+        const { blob, ext, type } = await compressImage(files[i], 1600, 0.85);
+        const path = 'products/' + crypto.randomUUID() + '.' + ext;
+        const { error } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
+        if (error) throw new Error('Upload mislukt: ' + error.message);
+        paths.push(path);
+      }
+
+      const { error: dbErr } = await db.from('products').insert({
+        category: $('pCategory').value,
+        title: title,
+        description: $('pDesc').value.trim(),
+        price: price,
+        photos: paths
+      });
+      if (dbErr) throw new Error('Opslaan mislukt: ' + dbErr.message);
+      inserted = true;
+
+      pSay(chosen.length > 4 ? 'Product toegevoegd (de eerste 4 foto\u2019s zijn gebruikt).' : 'Product toegevoegd!');
+      $('productForm').reset();
+    } catch (err) {
+      if (!inserted && paths.length) await db.storage.from(BUCKET).remove(paths);
+      pSay(err.message);
+    } finally {
+      submitBtn.disabled = false;
+    }
+    if (inserted) loadProducts();
+  });
+
+  /* ---------- Inloggen en zichtbaarheid ---------- */
+
+  function updateVisibility() {
+    const onAdmin = location.hash === '#admin';
+    $('admin').style.display = onAdmin ? 'block' : 'none';
+    $('productSection').hidden = !(onAdmin && currentSession);
+  }
+  window.addEventListener('hashchange', updateVisibility);
 
   function applySession(session) {
     const wasLoggedIn = !!currentSession;
     currentSession = session;
     $('loginForm').classList.toggle('hidden', !!session);
     $('uploadForm').classList.toggle('hidden', !session);
+    updateVisibility();
     if (firstLoad || wasLoggedIn !== !!session) {
       firstLoad = false;
       loadGallery();
+      if (session) loadProducts(); else $('productGrid').innerHTML = '';
     }
   }
+  updateVisibility();
   db.auth.getSession().then(({ data }) => applySession(data.session));
   db.auth.onAuthStateChange((_e, session) => applySession(session));
 
@@ -386,7 +645,7 @@ figcaption small {
     say('Bezig met uploaden...');
 
     const ext = file.name.split('.').pop();
-    const path = `${crypto.randomUUID()}.${ext}`;
+    const path = crypto.randomUUID() + '.' + ext;
 
     const { error: upErr } = await db.storage.from(BUCKET).upload(path, file, { contentType: file.type });
     if (upErr) return say('Upload mislukt: ' + upErr.message);
@@ -399,9 +658,4 @@ figcaption small {
     if (dbErr) return say('Opslaan metadata mislukt: ' + dbErr.message);
 
     say('Gelukt!');
-    $('uploadForm').reset();
-    loadGallery();
-  });
-</script>
-</body>
-</html>
+    $('uploadForm').reset(
