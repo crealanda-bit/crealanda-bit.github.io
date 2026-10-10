@@ -766,100 +766,171 @@ main {
 })();
 </script>
 
-<!-- Galerij met hartjes (Supabase) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<!-- Galerij met hartjes -->
 <script>
 (function () {
   "use strict";
 
-  if (typeof supabase === "undefined") return;
+  var BASE = 'https://nyeedsxrlnkbxzoritwg.supabase.co';
+  var KEY = 'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7';
+  var grid = document.getElementById('clGrid');
+  if (!grid) return;
 
-  const sb = supabase.createClient(
-    'https://nyeedsxrlnkbxzoritwg.supabase.co',
-    'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7'
-  );
-  const grid = document.getElementById('clGrid');
+  var css = `
+#clGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.gx-card{margin:0;background:#9EB3D8;border-radius:16px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;transform:translateY(50px) scale(.85);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.9,.3,1.3)}
+.gx-card.show{opacity:1;transform:none}
+.gx-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.gx-body{padding:10px 14px 14px}
+.gx-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-title{margin:0;font-family:"Great Vibes",cursive;font-size:1.4rem;font-weight:700;line-height:1.2;color:#FCF5EE}
+.gx-desc{margin:4px 0 0;font-family:"Bebas Neue",sans-serif;font-size:1.15rem;line-height:1.3;letter-spacing:.3px;color:#FCF5EE}
+.gx-heart{display:flex;align-items:center;gap:6px;flex-shrink:0;border:0;background:transparent;padding:4px;cursor:pointer;font-family:"Bebas Neue",sans-serif;font-size:1.2rem;color:#FCF5EE;-webkit-tap-highlight-color:transparent}
+.gx-heart svg{width:28px;height:28px;fill:none;stroke:#B32C43;stroke-width:2;stroke-linejoin:round;transition:fill .2s}
+.gx-heart.on svg{fill:#B32C43}
+.gx-heart.pop svg{animation:gxPop .35s ease}
+@keyframes gxPop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.gx-msg{color:#FCF5EE;font-family:"Bebas Neue",sans-serif;font-size:1.1rem;text-align:center}
+@media (prefers-reduced-motion:reduce){.gx-card{transition:none;opacity:1;transform:none}.gx-heart.pop svg{animation:none}}
+`;
+  var style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+
+  var HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0;
+      return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+    });
+  }
 
   function visitorId() {
     try {
-      let v = localStorage.getItem('cl_visitor');
-      if (!v) { v = crypto.randomUUID(); localStorage.setItem('cl_visitor', v); }
+      var v = localStorage.getItem('cl_visitor');
+      if (!v) { v = uuid(); localStorage.setItem('cl_visitor', v); }
       return v;
-    } catch (e) { return crypto.randomUUID(); }
+    } catch (e) { return uuid(); }
   }
-  const vid = visitorId();
+  var vid = visitorId();
 
-  const observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) {
-        e.target.classList.add('show');
-        observer.unobserve(e.target);
+  function api(path, body) {
+    var opt = { headers: { apikey: KEY, 'Content-Type': 'application/json' } };
+    if (body !== undefined) { opt.method = 'POST'; opt.body = JSON.stringify(body); }
+    return fetch(BASE + '/rest/v1/' + path, opt).then(function (r) {
+      if (!r.ok) {
+        return r.text().then(function (t) { throw new Error(r.status + ' ' + t); });
       }
+      return r.json();
     });
-  }, { threshold: 0.15 });
+  }
 
-  async function load() {
-    const [p, c, m] = await Promise.all([
-      sb.from('photos').select('*').order('created_at', { ascending: false }),
-      sb.rpc('get_like_counts'),
-      sb.rpc('get_my_likes', { p_visitor: vid })
-    ]);
-    if (p.error) return console.error(p.error);
+  var io = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('show');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 })
+    : null;
 
-    const counts = {};
-    (c.data || []).forEach(function (r) { counts[r.pid] = Number(r.total); });
-    const mine = new Set(m.data || []);
+  function render(res) {
+    var photos = Array.isArray(res[0]) ? res[0] : [];
+    var counts = {}, mine = {};
+    (Array.isArray(res[1]) ? res[1] : []).forEach(function (r) { counts[r.pid] = Number(r.total); });
+    (Array.isArray(res[2]) ? res[2] : []).forEach(function (id) { mine[id] = true; });
 
     grid.innerHTML = '';
 
-    p.data.forEach(function (ph, i) {
-      const fig = document.createElement('figure');
-      fig.className = 'cl-card';
-      fig.style.transitionDelay = ((i % 3) * 90) + 'ms';
+    photos.forEach(function (ph, i) {
+      var n = counts[ph.id] || 0;
+      var liked = !!mine[ph.id];
 
-      const img = document.createElement('img');
-      img.src = sb.storage.from('photos').getPublicUrl(ph.storage_path).data.publicUrl;
-      img.loading = 'lazy';
+      var card = document.createElement('figure');
+      card.className = 'gx-card';
+      card.style.transitionDelay = ((i % 2) * 90) + 'ms';
+
+      var img = document.createElement('img');
+      img.src = BASE + '/storage/v1/object/public/photos/' + encodeURI(ph.storage_path);
       img.alt = ph.title || '';
+      img.loading = 'lazy';
 
-      let n = counts[ph.id] || 0;
-      let liked = mine.has(ph.id);
-      const btn = document.createElement('button');
+      var body = document.createElement('figcaption');
+      body.className = 'gx-body';
+
+      var top = document.createElement('div');
+      top.className = 'gx-top';
+
+      var title = document.createElement('h3');
+      title.className = 'gx-title';
+      title.textContent = ph.title || '';
+
+      var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'cl-heart';
-      const draw = function () {
-        btn.textContent = (liked ? '\u2665 ' : '\u2661 ') + n;
+      btn.className = 'gx-heart';
+      btn.setAttribute('aria-label', 'Hartje geven');
+      btn.innerHTML = HEART + '<span></span>';
+      var num = btn.querySelector('span');
+
+      function draw() {
+        num.textContent = n > 0 ? String(n) : '';
         btn.classList.toggle('on', liked);
-      };
+        btn.setAttribute('aria-pressed', liked ? 'true' : 'false');
+      }
       draw();
 
-      btn.onclick = async function () {
+      btn.addEventListener('click', function () {
         btn.disabled = true;
-        const res = await sb.rpc('toggle_like', { p_photo: ph.id, p_visitor: vid });
-        if (!res.error) {
-          if (res.data && !liked) n += 1;
-          if (!res.data && liked) n = Math.max(0, n - 1);
-          liked = res.data;
-          draw();
-          btn.classList.remove('pop');
-          void btn.offsetWidth;
-          btn.classList.add('pop');
-        }
-        btn.disabled = false;
-      };
+        api('rpc/toggle_like', { p_photo: ph.id, p_visitor: vid })
+          .then(function (now) {
+            if (now && !liked) n += 1;
+            if (!now && liked) n = Math.max(0, n - 1);
+            liked = !!now;
+            draw();
+            btn.classList.remove('pop');
+            void btn.offsetWidth;
+            btn.classList.add('pop');
+          })
+          .catch(function () {})
+          .then(function () { btn.disabled = false; });
+      });
 
-      const cap = document.createElement('figcaption');
-      cap.textContent = ph.title || '';
-      const sm = document.createElement('small');
-      sm.textContent = ph.description || '';
-      cap.appendChild(sm);
+      top.appendChild(title);
+      top.appendChild(btn);
+      body.appendChild(top);
 
-      fig.append(img, btn, cap);
-      grid.appendChild(fig);
-      observer.observe(fig);
+      if (ph.description) {
+        var desc = document.createElement('p');
+        desc.className = 'gx-desc';
+        desc.textContent = ph.description;
+        body.appendChild(desc);
+      }
+
+      card.appendChild(img);
+      card.appendChild(body);
+      grid.appendChild(card);
+
+      if (io) io.observe(card); else card.classList.add('show');
     });
   }
-  load();
+
+  function showError(err) {
+    grid.innerHTML = '';
+    var p = document.createElement('p');
+    p.className = 'gx-msg';
+    p.textContent = 'De foto\u2019s laden niet: ' + err.message;
+    grid.appendChild(p);
+  }
+
+  Promise.all([
+    api('photos?select=*&order=created_at.desc'),
+    api('rpc/get_like_counts', {}).catch(function () { return []; }),
+    api('rpc/get_my_likes', { p_visitor: vid }).catch(function () { return []; })
+  ]).then(render).catch(showError);
 })();
 </script>
 </body>
