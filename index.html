@@ -796,4 +796,71 @@ main {
         observer.unobserve(e.target);
       }
     });
-  }, {
+  }, { threshold: 0.15 });
+
+  async function load() {
+    const [p, c, m] = await Promise.all([
+      sb.from('photos').select('*').order('created_at', { ascending: false }),
+      sb.rpc('get_like_counts'),
+      sb.rpc('get_my_likes', { p_visitor: vid })
+    ]);
+    if (p.error) return console.error(p.error);
+
+    const counts = {};
+    (c.data || []).forEach(function (r) { counts[r.pid] = Number(r.total); });
+    const mine = new Set(m.data || []);
+
+    grid.innerHTML = '';
+
+    p.data.forEach(function (ph, i) {
+      const fig = document.createElement('figure');
+      fig.className = 'cl-card';
+      fig.style.transitionDelay = ((i % 3) * 90) + 'ms';
+
+      const img = document.createElement('img');
+      img.src = sb.storage.from('photos').getPublicUrl(ph.storage_path).data.publicUrl;
+      img.loading = 'lazy';
+      img.alt = ph.title || '';
+
+      let n = counts[ph.id] || 0;
+      let liked = mine.has(ph.id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cl-heart';
+      const draw = function () {
+        btn.textContent = (liked ? '\u2665 ' : '\u2661 ') + n;
+        btn.classList.toggle('on', liked);
+      };
+      draw();
+
+      btn.onclick = async function () {
+        btn.disabled = true;
+        const res = await sb.rpc('toggle_like', { p_photo: ph.id, p_visitor: vid });
+        if (!res.error) {
+          if (res.data && !liked) n += 1;
+          if (!res.data && liked) n = Math.max(0, n - 1);
+          liked = res.data;
+          draw();
+          btn.classList.remove('pop');
+          void btn.offsetWidth;
+          btn.classList.add('pop');
+        }
+        btn.disabled = false;
+      };
+
+      const cap = document.createElement('figcaption');
+      cap.textContent = ph.title || '';
+      const sm = document.createElement('small');
+      sm.textContent = ph.description || '';
+      cap.appendChild(sm);
+
+      fig.append(img, btn, cap);
+      grid.appendChild(fig);
+      observer.observe(fig);
+    });
+  }
+  load();
+})();
+</script>
+</body>
+</html>
