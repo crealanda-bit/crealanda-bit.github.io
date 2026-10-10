@@ -5,17 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Beheer galerij</title>
 <style>
-  body { font-family: system-ui, sans-serif; margin: 0; padding: 1rem; background: #111; color: #eee; }
-  h1 { margin-top: 0; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-  figure { margin: 0; background: #1c1c1c; border-radius: 8px; overflow: hidden; }
-  figure img { width: 100%; height: 200px; object-fit: cover; display: block; }
-  figcaption { padding: 8px; font-size: .9rem; }
-  figcaption small { color: #999; display: block; }
-  #admin { max-width: 360px; margin: 0 0 1.5rem; padding: 1rem; background: #1c1c1c; border-radius: 8px; display: none; }
-  #admin input, #admin button { width: 100%; box-sizing: border-box; margin: 4px 0; padding: 8px; }
-  .hidden { display: none; }
-  #msg { color: #f90; min-height: 1.2em; }
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap');
+
+:root { --blue: #9EB3D8; --cream: #FCF5EE; --red: #B32C43; --plum: #6F4257; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px 14px 40px;
+  background: var(--plum);
+  color: var(--cream);
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 20px;
+}
+
+h1 {
+  margin: 0 0 18px;
+  text-align: center;
+  font-family: "Great Vibes", cursive;
+  font-size: clamp(44px, 9vw, 64px);
+  font-weight: 400;
+  color: var(--cream);
+}
+
+.hidden { display: none !important; }
+
+#admin {
+  display: none;
+  max-width: 520px;
+  margin: 0 auto 28px;
+  padding: 22px;
+  border-radius: 10px;
+  background: var(--blue);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+
+#admin h3 {
+  margin: 0 0 14px;
+  text-align: center;
+  font-family: "Great Vibes", cursive;
+  font-size: 42px;
+  font-weight: 400;
+  color: var(--cream);
+}
+
+#admin input {
+  display: block;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 12px;
+  border: 1px solid var(--red);
+  border-radius: 7px;
+  background: var(--blue);
+  color: var(--cream);
+  caret-color: var(--cream);
+  font: inherit;
+  font-size: 19px;
+}
+
+#admin input::placeholder { color: var(--cream); opacity: .8; }
+#admin input:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
+
+#admin input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--red);
+  color: var(--cream);
+  font: inherit;
+  cursor: pointer;
+}
+
+#admin button {
+  display: block;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 13px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--red);
+  color: var(--cream);
+  font: inherit;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+#admin button:active { transform: scale(.98); }
+
+#admin #logoutBtn {
+  background: transparent;
+  border: 2px solid var(--cream);
+}
+
+#msg {
+  min-height: 1.2em;
+  margin: 14px 0 0;
+  text-align: center;
+  color: var(--cream);
+  font-size: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+figure {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--blue);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+
+figure img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+figcaption {
+  padding: 10px 14px 14px;
+  font-family: "Great Vibes", cursive;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  color: var(--cream);
+}
+
+figcaption small {
+  display: block;
+  margin-top: 4px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: .3px;
+  color: var(--cream);
+}
 </style>
 </head>
 <body>
