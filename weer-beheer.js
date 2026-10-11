@@ -10,7 +10,7 @@ opt.value = 'weer'; opt.textContent = 'Het weer in de polder';
 $('uPage').append(opt);
 const box = document.createElement('div');
 box.hidden = true;
-box.innerHTML = '<div class="wl">Eerste dag</div><input id="wFrom" type="date"><div class="wl">Laatste dag (leeg laten bij 1 dag)</div><input id="wTo" type="date"><input id="wInfo" type="text" placeholder="Hoe was het weer die dag?"><div class="wl">Foto\u2019s en filmpjes (filmpjes maximaal 15 MB)</div><input id="wFiles" type="file" accept="image/*,video/*" multiple><button type="button" id="wBtn">Uploaden</button>';
+box.innerHTML = '<div class="wl">Eerste dag</div><input id="wFrom" type="date"><div class="wl">Laatste dag (leeg laten bij 1 dag)</div><input id="wTo" type="date"><textarea id="wInfo" rows="3" placeholder="Hoe was het weer die dag?"></textarea><div class="wl">Foto\u2019s en filmpjes (filmpjes maximaal 15 MB)</div><input id="wFiles" type="file" accept="image/*,video/*" multiple><button type="button" id="wBtn">Uploaden</button>';
 $('uPage').after(box);
 const hide = [$('file'), $('title'), $('description')], sb = $('uploadForm').querySelector('button[type="submit"]');
 function pick() {
@@ -21,7 +21,6 @@ sb.hidden = w;
 if (w) $('productFields').hidden = true;
 }
 $('uPage').addEventListener('change', pick);
-$('wInfo').onkeydown = (e) => e.key == 'Enter' && e.preventDefault();
 const sec = document.createElement('section');
 sec.hidden = true;
 sec.innerHTML = '<h2 class="sec-title">Het weer</h2><div class="grid" id="wGrid"></div><p class="msg" id="wMsg"></p>';
