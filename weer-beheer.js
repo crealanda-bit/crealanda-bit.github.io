@@ -46,7 +46,7 @@ let blob = f, ext = (f.name.split('.').pop() || 'mp4').toLowerCase(), type = f.t
 if (!isV(f)) { const c = await compressImage(f, 1600, 0.85); blob = c.blob; ext = c.ext; type = c.type; }
 const p = 'weer/' + crypto.randomUUID() + '.' + ext;
 const { error } = await db.storage.from(BUCKET).
-oad(p, blob, { contentType: type });
+.upload(p, blob, { contentType: type });
 if (error) throw new Error('Upload mislukt: ' + error.message);
 paths.push(p);
 }
