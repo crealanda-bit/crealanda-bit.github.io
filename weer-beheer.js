@@ -2,12 +2,13 @@
 const MAX = 15 * 1024 * 1024;
 const VID = /\.(mp4|mov|webm|m4v)$/i;
 const isV = (f) => (f.type || '').startsWith('video') || VID.test(f.name);
+const isVP = (p) => VID.test(p);
 const Y = { day: 'numeric', month: 'long', year: 'numeric' };
 const wd = (s, o) => new Date(s + 'T12:00:00').toLocaleDateString('nl-NL', o);
 const wt = (a, b) => a == b ? wd(a, Y) : (a.slice(0, 7) == b.slice(0, 7) ? +a.slice(8) + '' : wd(a, a.slice(0, 4) == b.slice(0, 4) ? { day: 'numeric', month: 'long' } : Y)) + ' t/m ' + wd(b, Y);
 
 const css = document.createElement('style');
-css.textContent = '.wl{margin:0 0 4px}.box textarea{display:block;width:100%;margin:0 0 10px;padding:12px;border:1px solid var(--red);border-radius:7px;background:var(--blue);color:var(--cream);caret-color:var(--cream);font:inherit;font-size:19px;resize:vertical}.box textarea::placeholder{color:var(--cream);opacity:.8}';
+css.textContent = '.wl{margin:0 0 4px}.box textarea,.edit-box textarea{display:block;width:100%;margin:0 0 8px;padding:12px;border:1px solid var(--red);border-radius:7px;background:var(--blue);color:var(--cream);caret-color:var(--cream);font:inherit;font-size:19px;resize:vertical}.box textarea::placeholder,.edit-box textarea::placeholder{color:var(--cream);opacity:.8}#wGrid{grid-template-columns:1fr}.wth{column-count:4;column-gap:6px;padding:4px 14px 8px}.wth .th{position:relative;break-inside:avoid;margin-bottom:6px}.wth img,.wth video{display:block;width:100%;height:auto;aspect-ratio:auto;object-fit:contain;border-radius:8px}.wth .x{position:absolute;top:3px;right:3px;width:26px;height:26px;padding:0;border:0;border-radius:50%;background:var(--red);color:var(--cream);font:inherit;line-height:1;cursor:pointer}.edit-box .wl{color:var(--cream)}';
 document.head.append(css);
 
 if (![...$('uPage').options].some((o) => o.value === 'weer')) {
@@ -40,23 +41,19 @@ sec.innerHTML = '<h2 class="sec-title">Het weer</h2><div class="grid" id="wGrid"
 $('productSection').after(sec);
 const wSay = (t) => { $('wMsg').textContent = t; };
 
-$('wBtn').onclick = async () => {
-const files = [...$('wFiles').files];
-const a = $('wFrom').value;
-const b = $('wTo').value || a;
-if (!a) return say('Kies eerst de datum.');
-if (b < a) return say('De laatste dag ligt voor de eerste dag.');
-if (!files.length) return say('Kies foto\u2019s of filmpjes.');
+function check(files) {
 const big = files.find((f) => isV(f) && f.size > MAX);
-if (big) return say('Het filmpje \u201c' + big.name + '\u201d is groter dan 15 MB. Kies een kleiner filmpje.');
+if (big) return 'Het filmpje \u201c' + big.name + '\u201d is groter dan 15 MB. Kies een kleiner filmpje.';
 const bad = files.find((f) => !isV(f) && !(f.type || '').startsWith('image'));
-if (bad) return say('\u201c' + bad.name + '\u201d is geen foto of filmpje.');
-const btn = $('wBtn');
+if (bad) return '\u201c' + bad.name + '\u201d is geen foto of filmpje.';
+return '';
+}
+
+async function up(files, report) {
 const paths = [];
-btn.disabled = true;
 try {
 for (let i = 0; i < files.length; i++) {
-say('Uploaden ' + (i + 1) + ' van ' + files.length + '...');
+report('Uploaden ' + (i + 1) + ' van ' + files.length + '...');
 const f = files[i];
 let blob = f;
 let ext = (f.name.split('.').pop() || 'mp4').toLowerCase();
@@ -72,6 +69,27 @@ const res = await db.storage.from(BUCKET).upload(p, blob, { contentType: type })
 if (res.error) throw new Error('Upload mislukt: ' + res.error.message);
 paths.push(p);
 }
+return paths;
+} catch (e) {
+if (paths.length) await db.storage.from(BUCKET).remove(paths);
+throw e;
+}
+}
+
+$('wBtn').onclick = async () => {
+const files = [...$('wFiles').files];
+const a = $('wFrom').value;
+const b = $('wTo').value || a;
+if (!a) return say('Kies eerst de datum.');
+if (b < a) return say('De laatste dag ligt voor de eerste dag.');
+if (!files.length) return say('Kies foto\u2019s of filmpjes.');
+const msg = check(files);
+if (msg) return say(msg);
+const btn = $('wBtn');
+btn.disabled = true;
+let paths = [];
+try {
+paths = await up(files, say);
 const ins = await db.from('weather_days').insert({
 date_from: a,
 date_to: b,
@@ -86,12 +104,105 @@ $('wInfo').value = '';
 $('wFiles').value = '';
 loadWeer();
 } catch (err) {
-if (paths.length) await db.storage.from(BUCKET).remove(paths);
 say(err.message);
 } finally {
 btn.disabled = false;
 }
 };
+
+function thumbs(w) {
+const wrap = document.createElement('div');
+wrap.className = 'wth';
+for (const f of (w.files || [])) {
+const u = publicUrl(f);
+const d = document.createElement('div');
+d.className = 'th';
+let m;
+if (isVP(f)) {
+m = document.createElement('video');
+m.src = u + '#t=0.1';
+m.controls = true;
+m.playsInline = true;
+m.preload = 'metadata';
+} else {
+m = document.createElement('img');
+m.src = u;
+m.loading = 'lazy';
+m.alt = '';
+}
+const x = document.createElement('button');
+x.type = 'button';
+x.className = 'x';
+x.textContent = '\u00d7';
+x.onclick = async () => {
+if (!confirm('Deze foto of dit filmpje verwijderen?')) return;
+x.disabled = true;
+const rest = (w.files || []).filter((p) => p !== f);
+const r = await db.from('weather_days').update({ files: rest }).eq('id', w.id).select();
+if (r.error || !r.data || !r.data.length) {
+x.disabled = false;
+return alert('Verwijderen mislukt: ' + (r.error ? r.error.message : 'geen rechten'));
+}
+await db.storage.from(BUCKET).remove([f]);
+loadWeer();
+};
+d.append(m, x);
+wrap.append(d);
+}
+return wrap;
+}
+
+function openWeerEdit(w, fig, c, act) {
+c.hidden = true;
+act.hidden = true;
+const eb = document.createElement('div');
+eb.className = 'edit-box';
+eb.innerHTML = '<div class="wl">Eerste dag</div><input type="date" class="e1"><div class="wl">Laatste dag (leeg laten bij 1 dag)</div><input type="date" class="e2"><textarea class="e3" rows="3" placeholder="Hoe was het weer die dag?"></textarea><div class="wl">Foto\u2019s of filmpjes erbij (filmpjes maximaal 15 MB)</div><input type="file" class="e4" accept="image/*,video/*" multiple>';
+const e1 = eb.querySelector('.e1');
+const e2 = eb.querySelector('.e2');
+const e3 = eb.querySelector('.e3');
+const e4 = eb.querySelector('.e4');
+e1.value = w.date_from;
+e2.value = w.date_to === w.date_from ? '' : w.date_to;
+e3.value = w.info || '';
+const row = document.createElement('div');
+row.className = 'row';
+const save = makeBtn('Opslaan');
+const cancel = makeBtn('Annuleren', 'ghost');
+row.append(save, cancel);
+eb.append(row);
+cancel.onclick = () => { eb.remove(); c.hidden = false; act.hidden = false; };
+save.onclick = async () => {
+const a = e1.value;
+const b = e2.value || a;
+if (!a) return alert('Kies de datum.');
+if (b < a) return alert('De laatste dag ligt voor de eerste dag.');
+const files = [...e4.files];
+const msg = check(files);
+if (msg) return alert(msg);
+save.disabled = true;
+let paths = [];
+try {
+if (files.length) paths = await up(files, wSay);
+const r = await db.from('weather_days').update({
+date_from: a,
+date_to: b,
+info: e3.value.trim(),
+files: (w.files || []).concat(paths)
+}).eq('id', w.id).select();
+if (r.error || !r.data || !r.data.length) {
+if (paths.length) await db.storage.from(BUCKET).remove(paths);
+throw new Error('Opslaan mislukt: ' + (r.error ? r.error.message : 'geen rechten'));
+}
+wSay('Opgeslagen.');
+loadWeer();
+} catch (err) {
+save.disabled = false;
+alert(err.message);
+}
+};
+fig.append(eb);
+}
 
 async function loadWeer() {
 sec.hidden = !(location.hash === '#admin' && currentSession);
@@ -107,11 +218,13 @@ const t = document.createElement('span');
 t.className = 'cap-title';
 t.textContent = wt(w.date_from, w.date_to);
 const s = document.createElement('small');
-s.textContent = (w.info || '') + ' (' + (w.files || []).length + ' bestanden)';
+s.textContent = w.info || '';
 c.append(t, s);
 const act = document.createElement('div');
 act.className = 'actions';
+const edit = makeBtn('Aanpassen');
 const del = makeBtn('Verwijderen', 'ghost');
+edit.onclick = () => openWeerEdit(w, f, c, act);
 del.onclick = async () => {
 if (!confirm('Deze dag met alle foto\u2019s en filmpjes verwijderen?')) return;
 del.disabled = true;
@@ -123,8 +236,8 @@ return alert('Verwijderen mislukt: ' + (r.error ? r.error.message : 'geen rechte
 if ((w.files || []).length) await db.storage.from(BUCKET).remove(w.files);
 loadWeer();
 };
-act.append(del);
-f.append(c, act);
+act.append(edit, del);
+f.append(thumbs(w), c, act);
 g.append(f);
 }
 }
