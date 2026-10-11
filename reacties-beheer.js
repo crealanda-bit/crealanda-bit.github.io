@@ -1,6 +1,6 @@
 (() => {
 const css = document.createElement('style');
-css.textContent = '.cday{max-width:1080px;margin:0 auto 18px;padding:16px;border-radius:12px;background:var(--blue);box-shadow:0 6px 18px rgba(0,0,0,.25)}.cday h3{margin:0 0 10px;font-family:"Great Vibes",cursive;font-size:34px;font-weight:400;color:var(--cream)}.cit{padding:10px 0;border-top:1px solid #FCF5EE70}.cit b{font-size:22px}.cit small{display:block;font-size:17px;opacity:.9;overflow-wrap:anywhere}.cit small a{color:var(--cream)}.cit p{margin:4px 0 8px;font-size:20px;white-space:pre-wrap;overflow-wrap:anywhere}.cit .act-btn{flex:none;padding:6px 16px}';
+css.textContent = '.cday{max-width:1080px;margin:0 auto 18px;padding:16px;border-radius:12px;background:var(--blue);box-shadow:0 6px 18px rgba(0,0,0,.25)}.cday h3{margin:0 0 10px;font-family:"Great Vibes",cursive;font-size:34px;font-weight:400;color:var(--cream)}.cit{padding:10px 0;border-top:1px solid #FCF5EE70}.cit b{font-family:"Great Vibes",cursive;font-weight:400;font-size:30px}.cit small{display:block;font-size:17px;opacity:.9;overflow-wrap:anywhere}.cit small a{color:var(--cream)}.cit p{margin:4px 0 8px;font-size:20px;white-space:pre-wrap;overflow-wrap:anywhere}.cit .act-btn{flex:none;padding:6px 16px}';
 document.head.append(css);
 
 const sec = document.createElement('section');
