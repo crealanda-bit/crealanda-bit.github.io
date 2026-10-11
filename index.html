@@ -6,7 +6,7 @@
 <title>Crea Landa</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap" rel="stylesheet">
 <script>
-function clMelding(t){var b=document.createElement("div");b.style.cssText="position:fixed;z-index:99999;left:0;right:0;bottom:0;background:#fff;color:#000;font:14px/1.4 Arial;padding:10px;border-top:3px solid red";b.textContent=t;document.documentElement.appendChild(b)}
+function clMelding(t){var b=document.getElementById("clBalk");if(!b){b=document.createElement("div");b.id="clBalk";b.style.cssText="position:fixed;z-index:99999;left:0;right:0;bottom:0;max-height:60%;overflow:auto;background:#fff;color:#000;font:14px/1.4 Arial;padding:10px;border-top:3px solid red";document.documentElement.appendChild(b)}var p=document.createElement("div");p.style.cssText="margin-bottom:6px";p.textContent=t;b.appendChild(p)}
 onerror=function(m,u,l){clMelding("Fout: "+m+" (regel "+l+")")};
 addEventListener("load",function(){setTimeout(function(){if(!window.__ok)clMelding("Het script is niet gestart: het bestand is waarschijnlijk afgekapt of onjuist geüpload.")},1500)});
 </script>
