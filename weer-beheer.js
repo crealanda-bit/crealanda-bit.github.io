@@ -45,4 +45,61 @@ const f = files[i];
 let blob = f, ext = (f.name.split('.').pop() || 'mp4').toLowerCase(), type = f.type || 'video/mp4';
 if (!isV(f)) { const c = await compressImage(f, 1600, 0.85); blob = c.blob; ext = c.ext; type = c.type; }
 const p = 'weer/' + crypto.randomUUID() + '.' + ext;
-const { error } = await db.storage.from(BUCKET).upl
+const { error } = await db.storage.from(BUCKET).
+oad(p, blob, { contentType: type });
+if (error) throw new Error('Upload mislukt: ' + error.message);
+paths.push(p);
+}
+const { error: dbErr } = await db.from('weather_days').insert({
+date_from: a,
+date_to: b,
+info: $('wInfo').value.trim(),
+files: paths
+});
+if (dbErr) throw new Error('Opslaan mislukt: ' + dbErr.message);
+say('Gelukt! Het staat op de pagina Het Weer In De Polder.');
+$('wFrom').value = '';
+$('wTo').value = '';
+$('wInfo').value = '';
+$('wFiles').value = '';
+loadWeer();
+} catch (err) {
+if (paths.length) await db.storage.from(BUCKET).remove(paths);
+say(err.message);
+} finally {
+btn.disabled = false;
+}
+};
+async function loadWeer() {
+sec.hidden = !(location.hash === '#admin' && currentSession);
+if (sec.hidden) return;
+const { data, error } = await db.from('weather_days').select('*').order('date_from', { ascending: false });
+if (error) return wSay('Laden mislukt: ' + error.message);
+const g = $('wGrid');
+g.innerHTML = '';
+for (const w of data) {
+const f = document.createElement('figure'), c = document.createElement('figcaption');
+c.innerHTML = '<span class="cap-title"></span><small></small>';
+c.firstChild.textContent = wt(w.date_from, w.date_to);
+c.lastChild.textContent = (w.info || '') + ' (' + (w.files || []).length + ' bestanden)';
+const act = document.createElement('div');
+act.className = 'actions';
+const del = makeBtn('Verwijderen', 'ghost');
+del.onclick = async () => {
+if (!confirm('Deze dag met alle foto\u2019s en filmpjes verwijderen?')) return;
+del.disabled = true;
+const { data: d, error: e } = await db.from('weather_days').delete().eq('id', w.id).select();
+if (e || !d || !d.length) { del.disabled = false; return alert('Verwijderen mislukt: ' + (e ? e.message : 'geen rechten')); }
+if ((w.files || []).length) await db.storage.from(BUCKET).remove(w.files);
+loadWeer();
+};
+act.append(del);
+f.append(c, act);
+g.append(f);
+}
+}
+window.addEventListener('hashchange', loadWeer);
+db.auth.onAuthStateChange(() => setTimeout(loadWeer, 0));
+pick();
+loadWeer();
+})();
