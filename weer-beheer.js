@@ -99,6 +99,6 @@ g.append(f);
 }
 window.addEventListener('hashchange', loadWeer);
 db.auth.onAuthStateChange(() => setTimeout(loadWeer, 0));
-pick();
+pick(); window.addEventListener('pageshow', () => setTimeout(pick, 0));
 loadWeer();
 })();
