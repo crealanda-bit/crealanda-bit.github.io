@@ -248,6 +248,13 @@ cursor: pointer;
 </section>
 <h2 class="sec-title">Galerij</h2>
 <div class="grid" id="gallery"></div>
+<p id="gMsg" class="msg">Laden… (Blijft hier “Laden…” staan, dan draait het script niet.)</p>
+<script>
+/* Toont fouten zichtbaar bovenaan de pagina */
+(function(){function show(m){var d=document.getElementById('errBox');if(!d){d=document.createElement('div');d.id='errBox';d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;padding:10px 12px;border-radius:8px;background:#B32C43;color:#FCF5EE;font:16px/1.3 sans-serif;word-break:break-word';document.body.appendChild(d)}d.textContent='Fout: '+m}
+window.addEventListener('error',function(e){show((e.message||'onbekend')+(e.filename?' ('+e.filename.split('/').pop()+':'+e.lineno+')':''))});
+window.addEventListener('unhandledrejection',function(e){show(e.reason&&e.reason.message||e.reason)})})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 const SUPABASE_URL = 'https://nyeedsxrlnkbxzoritwg.supabase.co';
@@ -370,9 +377,10 @@ return fig;
 }
 async function loadGallery() {
 const { data, error } = await db.from('photos').select('*').order('created_at', { ascending: false });
-if (error) return say('Foto\u2019s laden mislukt: ' + error.message);
+if (error) { $('gMsg').textContent = 'Foto\u2019s laden mislukt: ' + error.message; return; }
 $('gallery').innerHTML = '';
 for (const p of data) $('gallery').appendChild(buildCard(p));
+$('gMsg').textContent = data.length ? '' : 'Nog geen foto\u2019s in de galerij.';
 }
 /* ---------- Producten ---------- */
 function fallbackFile(file) {
@@ -620,27 +628,4 @@ say('Bezig met uploaden...');
 const paths = [];
 let inserted = false;
 try {
-for (let n = 0; n < files.length; n++) {
-if (files.length > 1) say('Bezig met uploaden... (' + (n + 1) + ' van ' + files.length + ')');
-const { blob, ext, type } = await compressImage(files[n], 1600, 0.85);
-const path = 'products/' + crypto.randomUUID() + '.' + ext;
-const { error } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
-if (error) throw new Error('Upload mislukt: ' + error.message);
-paths.push(path);
-}
-const { error: dbErr } = await db.from('products').insert({
-category: 'kaarten',
-title: title,
-description: $('description').value.trim(),
-grams: grams,
-price: price,
-photo: paths[0],
-photos: paths
-});
-if (dbErr) throw new Error('Opslaan mislukt: ' + dbErr.message);
-inserted = true;
-say('Gelukt! Het product staat op de pagina Handgemaakte Kaarten.');
-const keep = $('uPage').value;
-$('uploadForm').reset();
-$('uPage').value = keep;
-applyPageChoice(
+for (l
