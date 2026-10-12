@@ -179,6 +179,13 @@ font-size: 19px;
 .edit-box input::placeholder { color: var(--cream); opacity: .8; }
 .edit-box input:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
 .edit-box .row { display: flex; gap: 10px; }
+.hint { margin: -4px 0 10px; font-size: 17px; letter-spacing: .3px; }
+.edit-box input[type="file"]::file-selector-button { margin-right: 10px; padding: 6px 12px; border: 0; border-radius: 6px; background: var(--red); color: var(--cream); font: inherit; cursor: pointer; }
+.edit-lbl { margin: 4px 0 8px; font-size: 18px; letter-spacing: .3px; }
+.thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
+.th { position: relative; width: 70px; height: 70px; }
+.th img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; border-radius: 8px; display: block; }
+.th button { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--red); color: var(--cream); font-family: "Bebas Neue", sans-serif; font-size: 20px; line-height: 1; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -198,6 +205,7 @@ font-size: 19px;
 <option value="weer">Het Weer In De Polder</option>
 </select>
 <input id="file" type="file" accept="image/*" required>
+<p id="fileHint" class="hint" hidden>Je kunt meerdere foto's tegelijk kiezen. De eerste foto is de hoofdfoto.</p>
 <input id="title" type="text" placeholder="Titel">
 <input id="description" type="text" placeholder="Beschrijving">
 <div id="productFields" hidden>
@@ -375,7 +383,10 @@ img.src = url;
 });
 }
 function productFiles(p) {
-return [p.photo].concat(p.photos || []).filter(Boolean);
+return Array.from(new Set([p.photo].concat(p.photos || []).filter(Boolean)));
+}
+function priceLine(p, n) {
+return (p.grams ? p.grams + ' gram \u00b7 ' : '') + euro(p.price) + (n > 1 ? ' \u00b7 ' + n + ' foto\u2019s' : '');
 }
 function openProductEdit(p, fig) {
 const cap = fig.querySelector('figcaption');
@@ -390,40 +401,90 @@ const g = makeInput(p.grams ? String(p.grams) : '', 'Gewicht in gram');
 g.inputMode = 'numeric';
 const pr = makeInput(String(p.price).replace('.', ','), 'Prijs (bijvoorbeeld 3,50)');
 pr.inputMode = 'decimal';
+const items = productFiles(p).map((path) => ({ path }));
+const removed = [];
+const lbl = document.createElement('p');
+lbl.className = 'edit-lbl';
+lbl.textContent = 'Foto\u2019s (de eerste is de hoofdfoto)';
+const thumbs = document.createElement('div');
+thumbs.className = 'thumbs';
+const addIn = document.createElement('input');
+addIn.type = 'file';
+addIn.accept = 'image/*';
+addIn.multiple = true;
+function drawThumbs() {
+thumbs.innerHTML = '';
+items.forEach((it, i) => {
+const w = document.createElement('div');
+w.className = 'th';
+const im = document.createElement('img');
+im.src = it.path ? publicUrl(it.path) : it.url;
+im.alt = '';
+const x = document.createElement('button');
+x.type = 'button';
+x.textContent = '\u00d7';
+x.setAttribute('aria-label', 'Foto verwijderen');
+x.onclick = () => {
+if (it.path) removed.push(it.path); else URL.revokeObjectURL(it.url);
+items.splice(i, 1);
+drawThumbs();
+};
+w.append(im, x);
+thumbs.append(w);
+});
+}
+addIn.onchange = () => {
+Array.from(addIn.files).forEach((f) => items.push({ file: f, url: URL.createObjectURL(f) }));
+addIn.value = '';
+drawThumbs();
+};
+drawThumbs();
 const row = document.createElement('div');
 row.className = 'row';
 const save = makeBtn('Opslaan');
 const cancel = makeBtn('Annuleren', 'ghost');
 row.append(save, cancel);
-box.append(t, d, g, pr, row);
-cancel.onclick = () => { box.remove(); cap.hidden = false; act.hidden = false; };
+box.append(t, d, g, pr, lbl, thumbs, addIn, row);
+cancel.onclick = () => {
+items.forEach((it) => it.url && URL.revokeObjectURL(it.url));
+box.remove();
+cap.hidden = false;
+act.hidden = false;
+};
 save.onclick = async () => {
 const grams = parseGrams(g.value);
 const price = parsePrice(pr.value);
 if (!t.value.trim()) return alert('Vul een titel in.');
 if (grams === null) return alert('Vul het gewicht in gram in, bijvoorbeeld 120.');
 if (price === null) return alert('Vul een geldige prijs in, bijvoorbeeld 3,50.');
+if (!items.length) return alert('Een product heeft minstens \u00e9\u00e9n foto nodig.');
 save.disabled = true;
+const uploaded = [];
+try {
+const finalPaths = [];
+for (const it of items) {
+if (it.path) { finalPaths.push(it.path); continue; }
+const { blob, ext, type } = await compressImage(it.file, 1600, 0.85);
+const path = 'products/' + crypto.randomUUID() + '.' + ext;
+const { error: upErr } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
+if (upErr) throw new Error('Upload mislukt: ' + upErr.message);
+uploaded.push(path);
+finalPaths.push(path);
+}
 const { data, error } = await db.from('products')
-.update({ title: t.value.trim(), description: d.value.trim(), grams: grams, price: price })
+.update({ title: t.value.trim(), description: d.value.trim(), grams: grams, price: price, photo: finalPaths[0], photos: finalPaths })
 .eq('id', p.id)
 .select();
-if (error || !data || !data.length) {
-save.disabled = false;
-alert('Opslaan mislukt: ' + (error ? error.message : 'geen rechten'));
-return;
-}
-p.title = data[0].title;
-p.description = data[0].description;
-p.grams = data[0].grams;
-p.price = data[0].price;
-cap.querySelector('.cap-title').textContent = p.title || '';
-cap.querySelector('small').textContent = p.description || '';
-cap.querySelector('.cap-price').textContent = p.grams + ' gram \u00b7 ' + euro(p.price);
-box.remove();
-cap.hidden = false;
-act.hidden = false;
+if (error || !data || !data.length) throw new Error(error ? error.message : 'geen rechten');
+if (removed.length) await db.storage.from(BUCKET).remove(removed);
+items.forEach((it) => it.url && URL.revokeObjectURL(it.url));
 pSay('Opgeslagen.');
+loadProducts();
+} catch (err) {
+if (uploaded.length) await db.storage.from(BUCKET).remove(uploaded);
+save.disabled = false;
+alert('Opslaan mislukt: ' + err.message);
+}
 };
 fig.appendChild(box);
 t.focus();
@@ -468,7 +529,7 @@ const small = document.createElement('small');
 small.textContent = p.description || '';
 const price = document.createElement('span');
 price.className = 'cap-price';
-price.textContent = (p.grams ? p.grams + ' gram \u00b7 ' : '') + euro(p.price);
+price.textContent = priceLine(p, files.length);
 cap.append(title, small, price);
 fig.appendChild(cap);
 const act = document.createElement('div');
@@ -489,7 +550,10 @@ for (const p of data) $('productGrid').appendChild(buildProductCard(p));
 }
 /* ---------- Uploaden ---------- */
 function applyPageChoice() {
-$('productFields').hidden = $('uPage').value !== 'kaarten';
+const isProduct = $('uPage').value === 'kaarten';
+$('productFields').hidden = !isProduct;
+$('fileHint').hidden = !isProduct;
+$('file').multiple = isProduct;
 }
 $('uPage').addEventListener('change', applyPageChoice);
 applyPageChoice();
@@ -512,7 +576,7 @@ $('uPage').value = keep;
 applyPageChoice();
 loadGallery();
 }
-async function uploadProduct(file) {
+async function uploadProduct(files) {
 const title = $('title').value.trim();
 const grams = parseGrams($('uGrams').value);
 const price = parsePrice($('uPrice').value);
@@ -520,20 +584,25 @@ if (!title) return say('Vul een titel in.');
 if (grams === null) return say('Vul het gewicht in gram in, bijvoorbeeld 120.');
 if (price === null) return say('Vul een geldige prijs in, bijvoorbeeld 3,50.');
 say('Bezig met uploaden...');
-let path = null;
+const paths = [];
 let inserted = false;
 try {
-const { blob, ext, type } = await compressImage(file, 1600, 0.85);
-path = 'products/' + crypto.randomUUID() + '.' + ext;
+for (let n = 0; n < files.length; n++) {
+if (files.length > 1) say('Bezig met uploaden... (' + (n + 1) + ' van ' + files.length + ')');
+const { blob, ext, type } = await compressImage(files[n], 1600, 0.85);
+const path = 'products/' + crypto.randomUUID() + '.' + ext;
 const { error } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
 if (error) throw new Error('Upload mislukt: ' + error.message);
+paths.push(path);
+}
 const { error: dbErr } = await db.from('products').insert({
 category: 'kaarten',
 title: title,
 description: $('description').value.trim(),
 grams: grams,
 price: price,
-photo: path
+photo: paths[0],
+photos: paths
 });
 if (dbErr) throw new Error('Opslaan mislukt: ' + dbErr.message);
 inserted = true;
@@ -543,57 +612,4 @@ $('uploadForm').reset();
 $('uPage').value = keep;
 applyPageChoice();
 } catch (err) {
-if (!inserted && path) await db.storage.from(BUCKET).remove([path]);
-say(err.message);
-}
-if (inserted) loadProducts();
-}
-$('uploadForm').addEventListener('submit', async (e) => {
-e.preventDefault();
-const file = $('file').files[0];
-if (!file) return;
-const submitBtn = $('uploadForm').querySelector('button[type="submit"]');
-submitBtn.disabled = true;
-try {
-if ($('uPage').value === 'kaarten') await uploadProduct(file);
-else await uploadGalleryPhoto(file);
-} finally {
-submitBtn.disabled = false;
-}
-});
-/* ---------- Inloggen en zichtbaarheid ---------- */
-function updateVisibility() {
-const onAdmin = location.hash === '#admin';
-$('admin').style.display = onAdmin ? 'block' : 'none';
-$('productSection').hidden = !(onAdmin && currentSession);
-}
-window.addEventListener('hashchange', updateVisibility);
-function applySession(session) {
-const wasLoggedIn = !!currentSession;
-currentSession = session;
-$('loginForm').classList.toggle('hidden', !!session);
-$('uploadForm').classList.toggle('hidden', !session);
-updateVisibility();
-if (firstLoad || wasLoggedIn !== !!session) {
-firstLoad = false;
-loadGallery();
-if (session) loadProducts(); else $('productGrid').innerHTML = '';
-}
-}
-updateVisibility();
-db.auth.getSession().then(({ data }) => applySession(data.session));
-db.auth.onAuthStateChange((_e, session) => applySession(session));
-$('loginForm').addEventListener('submit', async (e) => {
-e.preventDefault();
-const { error } = await db.auth.signInWithPassword({
-email: $('email').value,
-password: $('password').value,
-});
-say(error ? 'Inloggen mislukt: ' + error.message : 'Ingelogd.');
-});
-$('logoutBtn').addEventListener('click', () => db.auth.signOut());
-</script>
-<script src="weer-beheer.js"></script>
-<script src="reacties-beheer.js"></script>
-</body>
-</html>
+if (!inserted && paths.length) await db.storage.from(BUCKET).remove
