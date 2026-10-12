@@ -224,12 +224,25 @@ font-size: 19px;
 </section>
 <h2 class="sec-title">Galerij</h2>
 <div class="grid" id="gallery"></div>
+<p id="gMsg" class="msg"></p>
+<script>
+(function(){function show(m){var d=document.getElementById('errBox');if(!d){d=document.createElement('div');d.id='errBox';d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;padding:10px 12px;border-radius:8px;background:#B32C43;color:#FCF5EE;font:16px/1.3 sans-serif;word-break:break-word';document.body.appendChild(d)}d.textContent='Fout: '+m}
+window.addEventListener('error',function(e){show((e.message||'onbekend')+(e.filename?' ('+e.filename.split('/').pop()+':'+e.lineno+')':''))});
+window.addEventListener('unhandledrejection',function(e){show(e.reason&&e.reason.message||e.reason)})})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 const SUPABASE_URL = 'https://nyeedsxrlnkbxzoritwg.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7';
 const BUCKET = 'photos';
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* Geen vergrendeling tussen tabbladen: voorkomt dat het inloggen blijft hangen */
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { lock: async (name, acquireTimeout, fn) => await fn() } });
+/* Openbare gegevens ophalen zonder inlog, net als de gewone website */
+async function restGet(path) {
+const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: { apikey: SUPABASE_KEY } });
+if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
+return r.json();
+}
 const $ = (id) => document.getElementById(id);
 const say = (t) => ($('msg').textContent = t);
 const pSay = (t) => ($('pMsg').textContent = t);
@@ -345,10 +358,14 @@ fig.appendChild(act);
 return fig;
 }
 async function loadGallery() {
-const { data, error } = await db.from('photos').select('*').order('created_at', { ascending: false });
-if (error) return say('Foto\u2019s laden mislukt: ' + error.message);
+try {
+const data = await restGet('photos?select=*&order=created_at.desc');
 $('gallery').innerHTML = '';
 for (const p of data) $('gallery').appendChild(buildCard(p));
+$('gMsg').textContent = data.length ? '' : 'Nog geen foto\u2019s in de galerij.';
+} catch (e) {
+$('gMsg').textContent = 'Foto\u2019s laden mislukt: ' + e.message;
+}
 }
 /* ---------- Producten ---------- */
 function fallbackFile(file) {
@@ -543,10 +560,13 @@ fig.appendChild(act);
 return fig;
 }
 async function loadProducts() {
-const { data, error } = await db.from('products').select('*').order('created_at', { ascending: false });
-if (error) return pSay('Producten laden mislukt: ' + error.message);
+try {
+const data = await restGet('products?select=*&order=created_at.desc');
 $('productGrid').innerHTML = '';
 for (const p of data) $('productGrid').appendChild(buildProductCard(p));
+} catch (e) {
+pSay('Producten laden mislukt: ' + e.message);
+}
 }
 /* ---------- Uploaden ---------- */
 function applyPageChoice() {
@@ -582,34 +602,3 @@ const grams = parseGrams($('uGrams').value);
 const price = parsePrice($('uPrice').value);
 if (!title) return say('Vul een titel in.');
 if (grams === null) return say('Vul het gewicht in gram in, bijvoorbeeld 120.');
-if (price === null) return say('Vul een geldige prijs in, bijvoorbeeld 3,50.');
-say('Bezig met uploaden...');
-const paths = [];
-let inserted = false;
-try {
-for (let n = 0; n < files.length; n++) {
-if (files.length > 1) say('Bezig met uploaden... (' + (n + 1) + ' van ' + files.length + ')');
-const { blob, ext, type } = await compressImage(files[n], 1600, 0.85);
-const path = 'products/' + crypto.randomUUID() + '.' + ext;
-const { error } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
-if (error) throw new Error('Upload mislukt: ' + error.message);
-paths.push(path);
-}
-const { error: dbErr } = await db.from('products').insert({
-category: 'kaarten',
-title: title,
-description: $('description').value.trim(),
-grams: grams,
-price: price,
-photo: paths[0],
-photos: paths
-});
-if (dbErr) throw new Error('Opslaan mislukt: ' + dbErr.message);
-inserted = true;
-say('Gelukt! Het product staat op de pagina Handgemaakte Kaarten.');
-const keep = $('uPage').value;
-$('uploadForm').reset();
-$('uPage').value = keep;
-applyPageChoice();
-} catch (err) {
-if (!inserted && paths.length) await db.storage.from(BUCKET).remove
