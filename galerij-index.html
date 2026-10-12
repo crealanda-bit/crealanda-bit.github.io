@@ -6,186 +6,45 @@
 <title>Beheer</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap');
-:root { --blue: #9EB3D8; --cream: #FCF5EE; --red: #B32C43; --plum: #6F4257; }
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-body {
-margin: 0;
-padding: 20px 14px 40px;
-background: var(--plum);
-color: var(--cream);
-font-family: "Bebas Neue", sans-serif;
-font-size: 20px;
-}
-h1 {
-margin: 0 0 18px;
-text-align: center;
-font-family: "Great Vibes", cursive;
-font-size: clamp(44px, 9vw, 64px);
-font-weight: 400;
-color: var(--cream);
-}
-.sec-title {
-margin: 30px 0 16px;
-text-align: center;
-font-family: "Great Vibes", cursive;
-font-size: 42px;
-font-weight: 400;
-color: var(--cream);
-}
-.hidden { display: none !important; }
-.box {
-max-width: 520px;
-margin: 0 auto 28px;
-padding: 22px;
-border-radius: 10px;
-background: var(--blue);
-box-shadow: 0 6px 18px rgba(0,0,0,.25);
-}
-#admin { display: none; }
-.box h3 {
-margin: 0 0 14px;
-text-align: center;
-font-family: "Great Vibes", cursive;
-font-size: 42px;
-font-weight: 400;
-color: var(--cream);
-}
-.box input, .box select {
-display: block;
-width: 100%;
-margin: 0 0 10px;
-padding: 12px;
-border: 1px solid var(--red);
-border-radius: 7px;
-background: var(--blue);
-color: var(--cream);
-caret-color: var(--cream);
-font: inherit;
-font-size: 19px;
-}
-.box select option { color: #222; background: #fff; }
-.box input::placeholder { color: var(--cream); opacity: .8; }
-.box input:focus, .box select:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
-.box input[type="file"]::file-selector-button {
-margin-right: 12px;
-padding: 8px 14px;
-border: 0;
-border-radius: 6px;
-background: var(--red);
-color: var(--cream);
-font: inherit;
-cursor: pointer;
-}
-.box button {
-display: block;
-width: 100%;
-margin: 8px 0 0;
-padding: 13px;
-border: 0;
-border-radius: 8px;
-background: var(--red);
-color: var(--cream);
-font: inherit;
-font-size: 23px;
-cursor: pointer;
-}
-.box button:disabled { opacity: .6; }
-.box button:active { transform: scale(.98); }
-.box #logoutBtn {
-background: transparent;
-border: 2px solid var(--cream);
-}
-.msg {
-min-height: 1.2em;
-margin: 14px 0 0;
-text-align: center;
-color: var(--cream);
-font-size: 20px;
-}
-.grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-gap: 18px;
-max-width: 1080px;
-margin: 0 auto;
-}
-figure {
-margin: 0;
-overflow: hidden;
-border-radius: 16px;
-background: var(--blue);
-box-shadow: 0 6px 18px rgba(0,0,0,.25);
-}
-figure img {
-display: block;
-width: 100%;
-aspect-ratio: 4 / 3;
-object-fit: cover;
-}
-figcaption {
-padding: 10px 14px 6px;
-color: var(--cream);
-}
-.cap-title {
-display: block;
-font-family: "Great Vibes", cursive;
-font-size: 1.4rem;
-line-height: 1.2;
-color: var(--cream);
-}
-figcaption small {
-display: block;
-margin-top: 4px;
-font-family: "Bebas Neue", sans-serif;
-font-size: 1.15rem;
-letter-spacing: .3px;
-color: var(--cream);
-}
-.cap-price {
-display: block;
-margin-top: 4px;
-font-size: 1.25rem;
-color: var(--cream);
-}
-.actions, .edit-box { padding: 8px 14px 14px; }
-.actions { display: flex; gap: 10px; }
-.act-btn {
-flex: 1;
-padding: 10px;
-border: 0;
-border-radius: 8px;
-background: var(--red);
-color: var(--cream);
-font-family: "Bebas Neue", sans-serif;
-font-size: 20px;
-cursor: pointer;
-}
-.act-btn.ghost { background: transparent; border: 2px solid var(--cream); }
-.act-btn:disabled { opacity: .6; }
-.edit-box input {
-display: block;
-width: 100%;
-margin: 0 0 8px;
-padding: 10px;
-border: 1px solid var(--red);
-border-radius: 7px;
-background: var(--blue);
-color: var(--cream);
-caret-color: var(--cream);
-font-family: "Bebas Neue", sans-serif;
-font-size: 19px;
-}
-.edit-box input::placeholder { color: var(--cream); opacity: .8; }
-.edit-box input:focus { outline: 2px solid var(--cream); outline-offset: 2px; }
-.edit-box .row { display: flex; gap: 10px; }
-.hint { margin: -4px 0 10px; font-size: 17px; letter-spacing: .3px; }
-.edit-box input[type="file"]::file-selector-button { margin-right: 10px; padding: 6px 12px; border: 0; border-radius: 6px; background: var(--red); color: var(--cream); font: inherit; cursor: pointer; }
-.edit-lbl { margin: 4px 0 8px; font-size: 18px; letter-spacing: .3px; }
-.thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
-.th { position: relative; width: 70px; height: 70px; }
-.th img { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; border-radius: 8px; display: block; }
-.th button { position: absolute; top: -6px; right: -6px; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 50%; background: var(--red); color: var(--cream); font-family: "Bebas Neue", sans-serif; font-size: 20px; line-height: 1; cursor: pointer; }
+:root{--blue:#9EB3D8;--cream:#FCF5EE;--red:#B32C43;--plum:#6F4257}
+*{box-sizing:border-box}
+[hidden],.hidden{display:none!important}
+body{margin:0;padding:20px 14px 40px;background:var(--plum);color:var(--cream);font:20px "Bebas Neue",sans-serif}
+h1,.sec-title,.box h3,.cap-title{font-family:"Great Vibes",cursive;font-weight:400;color:var(--cream)}
+h1{margin:0 0 18px;text-align:center;font-size:clamp(44px,9vw,64px)}
+.sec-title{margin:30px 0 16px;text-align:center;font-size:42px}
+.box{max-width:520px;margin:0 auto 28px;padding:22px;border-radius:10px;background:var(--blue);box-shadow:0 6px 18px #00000040}
+#admin{display:none}
+.box h3{margin:0 0 14px;text-align:center;font-size:42px}
+.box input,.box select,.edit-box input{display:block;width:100%;margin:0 0 10px;padding:12px;border:1px solid var(--red);border-radius:7px;background:var(--blue);color:var(--cream);caret-color:var(--cream);font:19px "Bebas Neue",sans-serif}
+.edit-box input{margin-bottom:8px;padding:10px}
+.box select option{color:#222;background:#fff}
+input::placeholder{color:var(--cream);opacity:.8}
+input:focus,select:focus{outline:2px solid var(--cream);outline-offset:2px}
+input[type=file]::file-selector-button{margin-right:12px;padding:8px 14px;border:0;border-radius:6px;background:var(--red);color:var(--cream);font:inherit;cursor:pointer}
+.box button{display:block;width:100%;margin:8px 0 0;padding:13px;border:0;border-radius:8px;background:var(--red);color:var(--cream);font:23px "Bebas Neue",sans-serif;cursor:pointer}
+button:disabled{opacity:.6}
+.box button:active{transform:scale(.98)}
+.box #logoutBtn,.act-btn.ghost{background:transparent;border:2px solid var(--cream)}
+.msg{min-height:1.2em;margin:14px 0 0;text-align:center;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;max-width:1080px;margin:0 auto}
+figure{margin:0;overflow:hidden;border-radius:16px;background:var(--blue);box-shadow:0 6px 18px #00000040}
+figure img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+figcaption{padding:10px 14px 6px}
+.cap-title{display:block;font-size:1.4rem;line-height:1.2}
+figcaption small{display:block;margin-top:4px;font-size:1.15rem;letter-spacing:.3px}
+.cap-price{display:block;margin-top:4px;font-size:1.25rem}
+.actions,.edit-box{padding:8px 14px 14px}
+.actions,.edit-box .row,.thumbs{display:flex;gap:10px}
+.act-btn,.th button{border:0;background:var(--red);color:var(--cream);font:20px "Bebas Neue",sans-serif;cursor:pointer}
+.act-btn{flex:1;padding:10px;border-radius:8px}
+.hint,.edit-lbl{margin:4px 0 8px;font-size:18px;letter-spacing:.3px}
+.hint{margin:-4px 0 10px;font-size:17px}
+.edit-box input[type=file]::file-selector-button{margin-right:10px;padding:6px 12px}
+.thumbs{flex-wrap:wrap;margin:0 0 10px}
+.th{position:relative;width:70px;height:70px}
+.th img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;border-radius:8px;display:block}
+.th button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;padding:0;border-radius:50%;line-height:1}
 </style>
 </head>
 <body>
@@ -205,7 +64,7 @@ font-size: 19px;
 <option value="weer">Het Weer In De Polder</option>
 </select>
 <input id="file" type="file" accept="image/*" required>
-<p id="fileHint" class="hint" hidden>Je kunt meerdere foto's tegelijk kiezen. De eerste foto is de hoofdfoto.</p>
+<p id="fileHint" class="hint" hidden>Kies meerdere foto's tegelijk. De eerste is de hoofdfoto.</p>
 <input id="title" type="text" placeholder="Titel">
 <input id="description" type="text" placeholder="Beschrijving">
 <div id="productFields" hidden>
@@ -225,300 +84,292 @@ font-size: 19px;
 <h2 class="sec-title">Galerij</h2>
 <div class="grid" id="gallery"></div>
 <p id="gMsg" class="msg"></p>
-<script>
-(function(){function show(m){var d=document.getElementById('errBox');if(!d){d=document.createElement('div');d.id='errBox';d.style.cssText='position:fixed;left:8px;right:8px;bottom:8px;z-index:9999;padding:10px 12px;border-radius:8px;background:#B32C43;color:#FCF5EE;font:16px/1.3 sans-serif;word-break:break-word';document.body.appendChild(d)}d.textContent='Fout: '+m}
-window.addEventListener('error',function(e){show((e.message||'onbekend')+(e.filename?' ('+e.filename.split('/').pop()+':'+e.lineno+')':''))});
-window.addEventListener('unhandledrejection',function(e){show(e.reason&&e.reason.message||e.reason)})})();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-const SUPABASE_URL = 'https://nyeedsxrlnkbxzoritwg.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7';
-const BUCKET = 'photos';
-/* Geen vergrendeling tussen tabbladen: voorkomt dat het inloggen blijft hangen */
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { lock: async (name, acquireTimeout, fn) => await fn() } });
-/* Openbare gegevens ophalen zonder inlog, net als de gewone website */
-async function restGet(path) {
-const r = await fetch(SUPABASE_URL + '/rest/v1/' + path, { headers: { apikey: SUPABASE_KEY } });
-if (!r.ok) throw new Error(r.status + ' ' + (await r.text()));
+const SUPABASE_URL='https://nyeedsxrlnkbxzoritwg.supabase.co';
+const SUPABASE_KEY='sb_publishable_zjsw5kOIEZXbGszdm8T_jQ_CU6GHCC7';
+const BUCKET='photos';
+const mk=(t)=>document.createElement(t);
+const STG=()=>db.storage.from(BUCKET);
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{lock:async (name,acquireTimeout,fn)=>await fn()}});
+async function restGet(path){
+const r=await fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_KEY}});
+if (!r.ok) throw new Error(r.status+' '+(await r.text()));
 return r.json();
 }
-const $ = (id) => document.getElementById(id);
-const say = (t) => ($('msg').textContent = t);
-const pSay = (t) => ($('pMsg').textContent = t);
-let currentSession = null;
-let firstLoad = true;
-const euro = (n) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0);
-function parsePrice(v) {
-const n = parseFloat(String(v).trim().replace(',', '.'));
-return isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null;
+const $=(id)=>document.getElementById(id);
+const say=(t)=>($('msg').textContent=t);
+const pSay=(t)=>($('pMsg').textContent=t);
+let currentSession=null;
+let firstLoad=true;
+const euro=(n)=>new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR'}).format(Number(n)||0);
+function parsePrice(v){
+const n=parseFloat(String(v).trim().replace(',','.'));
+return isFinite(n)&&n>=0?Math.round(n*100) / 100:null;
 }
-function parseGrams(v) {
-const g = parseInt(String(v).replace(/\D/g, ''), 10);
-return g > 0 ? g : null;
+function parseGrams(v){
+const g=parseInt(String(v).replace(/\D/g,''),10);
+return g>0?g:null;
 }
-function publicUrl(path) {
-return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+function publicUrl(path){
+return STG().getPublicUrl(path).data.publicUrl;
 }
-function makeBtn(text, extraClass) {
-const b = document.createElement('button');
-b.type = 'button';
-b.className = 'act-btn' + (extraClass ? ' ' + extraClass : '');
-b.textContent = text;
+function makeBtn(text,extraClass){
+const b=mk('button');
+b.type='button';
+b.className='act-btn'+(extraClass?' '+extraClass:'');
+b.textContent=text;
 return b;
 }
-function makeInput(value, placeholder) {
-const i = document.createElement('input');
-i.type = 'text';
-i.value = value || '';
-i.placeholder = placeholder;
+function makeInput(value,placeholder){
+const i=mk('input');
+i.type='text';
+i.value=value||'';
+i.placeholder=placeholder;
 return i;
 }
-/* ---------- Galerij-foto's ---------- */
-function openEdit(p, fig) {
-const cap = fig.querySelector('figcaption');
-const act = fig.querySelector('.actions');
-cap.hidden = true;
-act.hidden = true;
-const box = document.createElement('div');
-box.className = 'edit-box';
-const t = makeInput(p.title, 'Titel');
-const d = makeInput(p.description, 'Beschrijving');
-const row = document.createElement('div');
-row.className = 'row';
-const save = makeBtn('Opslaan');
-const cancel = makeBtn('Annuleren', 'ghost');
-row.append(save, cancel);
-box.append(t, d, row);
-cancel.onclick = () => { box.remove(); cap.hidden = false; act.hidden = false; };
-save.onclick = async () => {
-save.disabled = true;
-const { data, error } = await db.from('photos')
-.update({ title: t.value, description: d.value })
-.eq('id', p.id)
+function openEdit(p,fig){
+const cap=fig.querySelector('figcaption');
+const act=fig.querySelector('.actions');
+cap.hidden=true;
+act.hidden=true;
+const box=mk('div');
+box.className='edit-box';
+const t=makeInput(p.title,'Titel');
+const d=makeInput(p.description,'Beschrijving');
+const row=mk('div');
+row.className='row';
+const save=makeBtn('Opslaan');
+const cancel=makeBtn('Annuleren','ghost');
+row.append(save,cancel);
+box.append(t,d,row);
+cancel.onclick=()=>{box.remove();cap.hidden=false;act.hidden=false;};
+save.onclick=async ()=>{
+save.disabled=true;
+const {data,error}=await db.from('photos')
+.update({title:t.value,description:d.value})
+.eq('id',p.id)
 .select();
-if (error || !data || !data.length) {
-save.disabled = false;
-alert('Opslaan mislukt: ' + (error ? error.message : 'geen rechten'));
+if (error||!data||!data.length){
+save.disabled=false;
+alert('Opslaan mislukt: '+(error?error.message:'geen rechten'));
 return;
 }
-p.title = data[0].title;
-p.description = data[0].description;
-cap.querySelector('.cap-title').textContent = p.title || '';
-cap.querySelector('small').textContent = p.description || '';
+p.title=data[0].title;
+p.description=data[0].description;
+cap.querySelector('.cap-title').textContent=p.title||'';
+cap.querySelector('small').textContent=p.description||'';
 box.remove();
-cap.hidden = false;
-act.hidden = false;
+cap.hidden=false;
+act.hidden=false;
 say('Opgeslagen.');
 };
 fig.appendChild(box);
 t.focus();
 }
-async function removePhoto(p, btn) {
-if (!confirm('Weet je zeker dat je deze foto wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
-btn.disabled = true;
-const { data, error } = await db.from('photos').delete().eq('id', p.id).select();
-if (error || !data || !data.length) {
-btn.disabled = false;
-alert('Verwijderen mislukt: ' + (error ? error.message : 'geen rechten'));
+async function removePhoto(p,btn){
+if (!confirm('Foto verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+btn.disabled=true;
+const {data,error}=await db.from('photos').delete().eq('id',p.id).select();
+if (error||!data||!data.length){
+btn.disabled=false;
+alert('Verwijderen mislukt: '+(error?error.message:'geen rechten'));
 return;
 }
-const { data: removed, error: stErr } = await db.storage.from(BUCKET).remove([p.storage_path]);
-if (stErr || !removed || !removed.length) {
-say('Foto is van de site gehaald, maar het bestand bleef in de opslag staan.');
+const {data:removed,error:stErr}=await STG().remove([p.storage_path]);
+if (stErr||!removed||!removed.length){
+say('Foto verwijderd, maar het bestand bleef in de opslag.');
 } else {
 say('Foto verwijderd.');
 }
 loadGallery();
 }
-function buildCard(p) {
-const fig = document.createElement('figure');
-const img = document.createElement('img');
-img.src = publicUrl(p.storage_path);
-img.loading = 'lazy';
-img.alt = p.title || '';
-const cap = document.createElement('figcaption');
-const title = document.createElement('span');
-title.className = 'cap-title';
-title.textContent = p.title || '';
-const small = document.createElement('small');
-small.textContent = p.description || '';
-cap.append(title, small);
-fig.append(img, cap);
-if (currentSession) {
-const act = document.createElement('div');
-act.className = 'actions';
-const editBtn = makeBtn('Aanpassen');
-const delBtn = makeBtn('Verwijderen', 'ghost');
-editBtn.onclick = () => openEdit(p, fig);
-delBtn.onclick = () => removePhoto(p, delBtn);
-act.append(editBtn, delBtn);
+function buildCard(p){
+const fig=mk('figure');
+const img=mk('img');
+img.src=publicUrl(p.storage_path);
+img.loading='lazy';
+img.alt=p.title||'';
+const cap=mk('figcaption');
+const title=mk('span');
+title.className='cap-title';
+title.textContent=p.title||'';
+const small=mk('small');
+small.textContent=p.description||'';
+cap.append(title,small);
+fig.append(img,cap);
+if (currentSession){
+const act=mk('div');
+act.className='actions';
+const editBtn=makeBtn('Aanpassen');
+const delBtn=makeBtn('Verwijderen','ghost');
+editBtn.onclick=()=>openEdit(p,fig);
+delBtn.onclick=()=>removePhoto(p,delBtn);
+act.append(editBtn,delBtn);
 fig.appendChild(act);
 }
 return fig;
 }
-async function loadGallery() {
+async function loadGallery(){
 try {
-const data = await restGet('photos?select=*&order=created_at.desc');
-$('gallery').innerHTML = '';
+const data=await restGet('photos?select=*&order=created_at.desc');
+$('gallery').innerHTML='';
 for (const p of data) $('gallery').appendChild(buildCard(p));
-$('gMsg').textContent = data.length ? '' : 'Nog geen foto\u2019s in de galerij.';
-} catch (e) {
-$('gMsg').textContent = 'Foto\u2019s laden mislukt: ' + e.message;
+$('gMsg').textContent=data.length?'':'Nog geen foto\u2019s in de galerij.';
+} catch (e){
+$('gMsg').textContent='Foto\u2019s laden mislukt: '+e.message;
 }
 }
-/* ---------- Producten ---------- */
-function fallbackFile(file) {
-return { blob: file, ext: (file.name.split('.').pop() || 'jpg').toLowerCase(), type: file.type || 'image/jpeg' };
+function fallbackFile(file){
+return {blob:file,ext:(file.name.split('.').pop()||'jpg').toLowerCase(),type:file.type||'image/jpeg'};
 }
-// Verkleint de foto zodat de pagina snel laadt
-function compressImage(file, maxSide, quality) {
-return new Promise((resolve) => {
-const url = URL.createObjectURL(file);
-const img = new Image();
-img.onload = () => {
+function compressImage(file,maxSide,quality){
+return new Promise((resolve)=>{
+const url=URL.createObjectURL(file);
+const img=new Image();
+img.onload=()=>{
 try {
-let w = img.naturalWidth, h = img.naturalHeight;
-const scale = Math.min(1, maxSide / Math.max(w, h));
-w = Math.round(w * scale);
-h = Math.round(h * scale);
-const c = document.createElement('canvas');
-c.width = w;
-c.height = h;
-c.getContext('2d').drawImage(img, 0, 0, w, h);
-c.toBlob((b) => {
+let w=img.naturalWidth,h=img.naturalHeight;
+const scale=Math.min(1,maxSide / Math.max(w,h));
+w=Math.round(w*scale);
+h=Math.round(h*scale);
+const c=mk('canvas');
+c.width=w;
+c.height=h;
+c.getContext('2d').drawImage(img,0,0,w,h);
+c.toBlob((b)=>{
 URL.revokeObjectURL(url);
-resolve(b ? { blob: b, ext: 'jpg', type: 'image/jpeg' } : fallbackFile(file));
-}, 'image/jpeg', quality);
-} catch (e) {
+resolve(b?{blob:b,ext:'jpg',type:'image/jpeg'}:fallbackFile(file));
+},'image/jpeg',quality);
+} catch (e){
 URL.revokeObjectURL(url);
 resolve(fallbackFile(file));
 }
 };
-img.onerror = () => { URL.revokeObjectURL(url); resolve(fallbackFile(file)); };
-img.src = url;
+img.onerror=()=>{URL.revokeObjectURL(url);resolve(fallbackFile(file));};
+img.src=url;
 });
 }
-function productFiles(p) {
-return Array.from(new Set([p.photo].concat(p.photos || []).filter(Boolean)));
+function productFiles(p){
+return Array.from(new Set([p.photo].concat(p.photos||[]).filter(Boolean)));
 }
-function priceLine(p, n) {
-return (p.grams ? p.grams + ' gram \u00b7 ' : '') + euro(p.price) + (n > 1 ? ' \u00b7 ' + n + ' foto\u2019s' : '');
+function priceLine(p,n){
+return (p.grams?p.grams+' gram \u00b7 ':'')+euro(p.price)+(n>1?' \u00b7 '+n+' foto\u2019s':'');
 }
-function openProductEdit(p, fig) {
-const cap = fig.querySelector('figcaption');
-const act = fig.querySelector('.actions');
-cap.hidden = true;
-act.hidden = true;
-const box = document.createElement('div');
-box.className = 'edit-box';
-const t = makeInput(p.title, 'Titel');
-const d = makeInput(p.description, 'Beschrijving');
-const g = makeInput(p.grams ? String(p.grams) : '', 'Gewicht in gram');
-g.inputMode = 'numeric';
-const pr = makeInput(String(p.price).replace('.', ','), 'Prijs (bijvoorbeeld 3,50)');
-pr.inputMode = 'decimal';
-const items = productFiles(p).map((path) => ({ path }));
-const removed = [];
-const lbl = document.createElement('p');
-lbl.className = 'edit-lbl';
-lbl.textContent = 'Foto\u2019s (de eerste is de hoofdfoto)';
-const thumbs = document.createElement('div');
-thumbs.className = 'thumbs';
-const addIn = document.createElement('input');
-addIn.type = 'file';
-addIn.accept = 'image/*';
-addIn.multiple = true;
-function drawThumbs() {
-thumbs.innerHTML = '';
-items.forEach((it, i) => {
-const w = document.createElement('div');
-w.className = 'th';
-const im = document.createElement('img');
-im.src = it.path ? publicUrl(it.path) : it.url;
-im.alt = '';
-const x = document.createElement('button');
-x.type = 'button';
-x.textContent = '\u00d7';
-x.setAttribute('aria-label', 'Foto verwijderen');
-x.onclick = () => {
-if (it.path) removed.push(it.path); else URL.revokeObjectURL(it.url);
-items.splice(i, 1);
+function openProductEdit(p,fig){
+const cap=fig.querySelector('figcaption');
+const act=fig.querySelector('.actions');
+cap.hidden=true;
+act.hidden=true;
+const box=mk('div');
+box.className='edit-box';
+const t=makeInput(p.title,'Titel');
+const d=makeInput(p.description,'Beschrijving');
+const g=makeInput(p.grams?String(p.grams):'','Gewicht in gram');
+g.inputMode='numeric';
+const pr=makeInput(String(p.price).replace('.',','),'Prijs (bijvoorbeeld 3,50)');
+pr.inputMode='decimal';
+const items=productFiles(p).map((path)=>({path}));
+const removed=[];
+const lbl=mk('p');
+lbl.className='edit-lbl';
+lbl.textContent='Foto\u2019s (de eerste is de hoofdfoto)';
+const thumbs=mk('div');
+thumbs.className='thumbs';
+const addIn=mk('input');
+addIn.type='file';
+addIn.accept='image/*';
+addIn.multiple=true;
+function drawThumbs(){
+thumbs.innerHTML='';
+items.forEach((it,i)=>{
+const w=mk('div');
+w.className='th';
+const im=mk('img');
+im.src=it.path?publicUrl(it.path):it.url;
+im.alt='';
+const x=mk('button');
+x.type='button';
+x.textContent='\u00d7';
+x.setAttribute('aria-label','Foto verwijderen');
+x.onclick=()=>{
+if (it.path) removed.push(it.path);else URL.revokeObjectURL(it.url);
+items.splice(i,1);
 drawThumbs();
 };
-w.append(im, x);
+w.append(im,x);
 thumbs.append(w);
 });
 }
-addIn.onchange = () => {
-Array.from(addIn.files).forEach((f) => items.push({ file: f, url: URL.createObjectURL(f) }));
-addIn.value = '';
+addIn.onchange=()=>{
+Array.from(addIn.files).forEach((f)=>items.push({file:f,url:URL.createObjectURL(f)}));
+addIn.value='';
 drawThumbs();
 };
 drawThumbs();
-const row = document.createElement('div');
-row.className = 'row';
-const save = makeBtn('Opslaan');
-const cancel = makeBtn('Annuleren', 'ghost');
-row.append(save, cancel);
-box.append(t, d, g, pr, lbl, thumbs, addIn, row);
-cancel.onclick = () => {
-items.forEach((it) => it.url && URL.revokeObjectURL(it.url));
+const row=mk('div');
+row.className='row';
+const save=makeBtn('Opslaan');
+const cancel=makeBtn('Annuleren','ghost');
+row.append(save,cancel);
+box.append(t,d,g,pr,lbl,thumbs,addIn,row);
+cancel.onclick=()=>{
+items.forEach((it)=>it.url&&URL.revokeObjectURL(it.url));
 box.remove();
-cap.hidden = false;
-act.hidden = false;
+cap.hidden=false;
+act.hidden=false;
 };
-save.onclick = async () => {
-const grams = parseGrams(g.value);
-const price = parsePrice(pr.value);
+save.onclick=async ()=>{
+const grams=parseGrams(g.value);
+const price=parsePrice(pr.value);
 if (!t.value.trim()) return alert('Vul een titel in.');
-if (grams === null) return alert('Vul het gewicht in gram in, bijvoorbeeld 120.');
-if (price === null) return alert('Vul een geldige prijs in, bijvoorbeeld 3,50.');
+if (grams===null) return alert('Vul het gewicht in gram in.');
+if (price===null) return alert('Vul een geldige prijs in.');
 if (!items.length) return alert('Een product heeft minstens \u00e9\u00e9n foto nodig.');
-save.disabled = true;
-const uploaded = [];
+save.disabled=true;
+const uploaded=[];
 try {
-const finalPaths = [];
-for (const it of items) {
-if (it.path) { finalPaths.push(it.path); continue; }
-const { blob, ext, type } = await compressImage(it.file, 1600, 0.85);
-const path = 'products/' + crypto.randomUUID() + '.' + ext;
-const { error: upErr } = await db.storage.from(BUCKET).upload(path, blob, { contentType: type });
-if (upErr) throw new Error('Upload mislukt: ' + upErr.message);
+const finalPaths=[];
+for (const it of items){
+if (it.path){finalPaths.push(it.path);continue;}
+const {blob,ext,type}=await compressImage(it.file,1600,0.85);
+const path='products/'+crypto.randomUUID()+'.'+ext;
+const {error:upErr}=await STG().upload(path,blob,{contentType:type});
+if (upErr) throw new Error('Upload mislukt: '+upErr.message);
 uploaded.push(path);
 finalPaths.push(path);
 }
-const { data, error } = await db.from('products')
-.update({ title: t.value.trim(), description: d.value.trim(), grams: grams, price: price, photo: finalPaths[0], photos: finalPaths })
-.eq('id', p.id)
+const {data,error}=await db.from('products')
+.update({title:t.value.trim(),description:d.value.trim(),grams:grams,price:price,photo:finalPaths[0],photos:finalPaths})
+.eq('id',p.id)
 .select();
-if (error || !data || !data.length) throw new Error(error ? error.message : 'geen rechten');
-if (removed.length) await db.storage.from(BUCKET).remove(removed);
-items.forEach((it) => it.url && URL.revokeObjectURL(it.url));
+if (error||!data||!data.length) throw new Error(error?error.message:'geen rechten');
+if (removed.length) await STG().remove(removed);
+items.forEach((it)=>it.url&&URL.revokeObjectURL(it.url));
 pSay('Opgeslagen.');
 loadProducts();
-} catch (err) {
-if (uploaded.length) await db.storage.from(BUCKET).remove(uploaded);
-save.disabled = false;
-alert('Opslaan mislukt: ' + err.message);
+} catch (err){
+if (uploaded.length) await STG().remove(uploaded);
+save.disabled=false;
+alert('Opslaan mislukt: '+err.message);
 }
 };
 fig.appendChild(box);
 t.focus();
 }
-async function removeProduct(p, btn) {
-if (!confirm('Weet je zeker dat je dit product wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
-btn.disabled = true;
-const { data, error } = await db.from('products').delete().eq('id', p.id).select();
-if (error || !data || !data.length) {
-btn.disabled = false;
-alert('Verwijderen mislukt: ' + (error ? error.message : 'geen rechten'));
+async function removeProduct(p,btn){
+if (!confirm('Product verwijderen? Dit kan niet ongedaan worden gemaakt.')) return;
+btn.disabled=true;
+const {data,error}=await db.from('products').delete().eq('id',p.id).select();
+if (error||!data||!data.length){
+btn.disabled=false;
+alert('Verwijderen mislukt: '+(error?error.message:'geen rechten'));
 return;
 }
-const files = productFiles(p);
-if (files.length) {
-const { data: removed, error: stErr } = await db.storage.from(BUCKET).remove(files);
-if (stErr || !removed || removed.length < files.length) {
+const files=productFiles(p);
+if (files.length){
+const {data:removed,error:stErr}=await STG().remove(files);
+if (stErr||!removed||removed.length<files.length){
 pSay('Product verwijderd, maar het foto-bestand bleef in de opslag staan.');
 } else {
 pSay('Product verwijderd.');
@@ -528,77 +379,160 @@ pSay('Product verwijderd.');
 }
 loadProducts();
 }
-function buildProductCard(p) {
-const fig = document.createElement('figure');
-const files = productFiles(p);
-if (files.length) {
-const img = document.createElement('img');
-img.src = publicUrl(files[0]);
-img.loading = 'lazy';
-img.alt = p.title || '';
+function buildProductCard(p){
+const fig=mk('figure');
+const files=productFiles(p);
+if (files.length){
+const img=mk('img');
+img.src=publicUrl(files[0]);
+img.loading='lazy';
+img.alt=p.title||'';
 fig.appendChild(img);
 }
-const cap = document.createElement('figcaption');
-const title = document.createElement('span');
-title.className = 'cap-title';
-title.textContent = p.title || '';
-const small = document.createElement('small');
-small.textContent = p.description || '';
-const price = document.createElement('span');
-price.className = 'cap-price';
-price.textContent = priceLine(p, files.length);
-cap.append(title, small, price);
+const cap=mk('figcaption');
+const title=mk('span');
+title.className='cap-title';
+title.textContent=p.title||'';
+const small=mk('small');
+small.textContent=p.description||'';
+const price=mk('span');
+price.className='cap-price';
+price.textContent=priceLine(p,files.length);
+cap.append(title,small,price);
 fig.appendChild(cap);
-const act = document.createElement('div');
-act.className = 'actions';
-const editBtn = makeBtn('Aanpassen');
-const delBtn = makeBtn('Verwijderen', 'ghost');
-editBtn.onclick = () => openProductEdit(p, fig);
-delBtn.onclick = () => removeProduct(p, delBtn);
-act.append(editBtn, delBtn);
+const act=mk('div');
+act.className='actions';
+const editBtn=makeBtn('Aanpassen');
+const delBtn=makeBtn('Verwijderen','ghost');
+editBtn.onclick=()=>openProductEdit(p,fig);
+delBtn.onclick=()=>removeProduct(p,delBtn);
+act.append(editBtn,delBtn);
 fig.appendChild(act);
 return fig;
 }
-async function loadProducts() {
+async function loadProducts(){
 try {
-const data = await restGet('products?select=*&order=created_at.desc');
-$('productGrid').innerHTML = '';
+const data=await restGet('products?select=*&order=created_at.desc');
+$('productGrid').innerHTML='';
 for (const p of data) $('productGrid').appendChild(buildProductCard(p));
-} catch (e) {
-pSay('Producten laden mislukt: ' + e.message);
+} catch (e){
+pSay('Producten laden mislukt: '+e.message);
 }
 }
-/* ---------- Uploaden ---------- */
-function applyPageChoice() {
-const isProduct = $('uPage').value === 'kaarten';
-$('productFields').hidden = !isProduct;
-$('fileHint').hidden = !isProduct;
-$('file').multiple = isProduct;
+function applyPageChoice(){
+const isProduct=$('uPage').value==='kaarten';
+$('productFields').hidden=!isProduct;
+$('fileHint').hidden=!isProduct;
+$('file').multiple=isProduct;
 }
-$('uPage').addEventListener('change', applyPageChoice);
+$('uPage').addEventListener('change',applyPageChoice);
 applyPageChoice();
-async function uploadGalleryPhoto(file) {
+async function uploadGalleryPhoto(file){
 say('Bezig met uploaden...');
-const ext = file.name.split('.').pop();
-const path = crypto.randomUUID() + '.' + ext;
-const { error: upErr } = await db.storage.from(BUCKET).upload(path, file, { contentType: file.type });
-if (upErr) return say('Upload mislukt: ' + upErr.message);
-const { error: dbErr } = await db.from('photos').insert({
-storage_path: path,
-title: $('title').value,
-description: $('description').value,
+const ext=file.name.split('.').pop();
+const path=crypto.randomUUID()+'.'+ext;
+const {error:upErr}=await STG().upload(path,file,{contentType:file.type});
+if (upErr) return say('Upload mislukt: '+upErr.message);
+const {error:dbErr}=await db.from('photos').insert({
+storage_path:path,
+title:$('title').value,
+description:$('description').value,
 });
-if (dbErr) return say('Opslaan metadata mislukt: ' + dbErr.message);
+if (dbErr) return say('Opslaan metadata mislukt: '+dbErr.message);
 say('Gelukt! De foto staat in de galerij.');
-const keep = $('uPage').value;
+const keep=$('uPage').value;
 $('uploadForm').reset();
-$('uPage').value = keep;
+$('uPage').value=keep;
 applyPageChoice();
 loadGallery();
 }
-async function uploadProduct(files) {
-const title = $('title').value.trim();
-const grams = parseGrams($('uGrams').value);
-const price = parsePrice($('uPrice').value);
+async function uploadProduct(files){
+const title=$('title').value.trim();
+const grams=parseGrams($('uGrams').value);
+const price=parsePrice($('uPrice').value);
 if (!title) return say('Vul een titel in.');
-if (grams === null) return say('Vul het gewicht in gram in, bijvoorbeeld 120.');
+if (grams===null) return say('Vul het gewicht in gram in.');
+if (price===null) return say('Vul een geldige prijs in.');
+say('Bezig met uploaden...');
+const paths=[];
+let inserted=false;
+try {
+for (let n=0;n<files.length;n++){
+if (files.length>1) say('Bezig met uploaden... ('+(n+1)+' van '+files.length+')');
+const {blob,ext,type}=await compressImage(files[n],1600,0.85);
+const path='products/'+crypto.randomUUID()+'.'+ext;
+const {error}=await STG().upload(path,blob,{contentType:type});
+if (error) throw new Error('Upload mislukt: '+error.message);
+paths.push(path);
+}
+const {error:dbErr}=await db.from('products').insert({
+category:'kaarten',
+title:title,
+description:$('description').value.trim(),
+grams:grams,
+price:price,
+photo:paths[0],
+photos:paths
+});
+if (dbErr) throw new Error('Opslaan mislukt: '+dbErr.message);
+inserted=true;
+say('Gelukt! Het product staat op de pagina Handgemaakte Kaarten.');
+const keep=$('uPage').value;
+$('uploadForm').reset();
+$('uPage').value=keep;
+applyPageChoice();
+} catch (err){
+if (!inserted&&paths.length) await STG().remove(paths);
+say(err.message);
+}
+if (inserted) loadProducts();
+}
+$('uploadForm').addEventListener('submit',async (e)=>{
+e.preventDefault();
+const files=Array.from($('file').files);
+if (!files.length) return;
+const submitBtn=$('uploadForm').querySelector('button[type="submit"]');
+submitBtn.disabled=true;
+try {
+if ($('uPage').value==='kaarten') await uploadProduct(files);
+else await uploadGalleryPhoto(files[0]);
+} finally {
+submitBtn.disabled=false;
+}
+});
+function updateVisibility(){
+const onAdmin=location.hash==='#admin';
+$('admin').style.display=onAdmin?'block':'none';
+$('productSection').hidden=!(onAdmin&&currentSession);
+}
+window.addEventListener('hashchange',updateVisibility);
+function applySession(session){
+const wasLoggedIn=!!currentSession;
+currentSession=session;
+$('loginForm').classList.toggle('hidden',!!session);
+$('uploadForm').classList.toggle('hidden',!session);
+updateVisibility();
+if (firstLoad||wasLoggedIn!==!!session){
+firstLoad=false;
+loadGallery();
+if (session) loadProducts();else $('productGrid').innerHTML='';
+}
+}
+updateVisibility();
+loadGallery();
+db.auth.getSession().then(({data})=>applySession(data.session));
+db.auth.onAuthStateChange((_e,session)=>applySession(session));
+$('loginForm').addEventListener('submit',async (e)=>{
+e.preventDefault();
+const {error}=await db.auth.signInWithPassword({
+email:$('email').value,
+password:$('password').value,
+});
+say(error?'Inloggen mislukt: '+error.message:'Ingelogd.');
+});
+$('logoutBtn').addEventListener('click',()=>db.auth.signOut());
+</script>
+<script src="weer-beheer.js"></script>
+<script src="reacties-beheer.js"></script>
+</body>
+</html>
