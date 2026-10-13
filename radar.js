@@ -1,10 +1,11 @@
-/* Regenradar Crea Landa - radar: RainViewer.com, kaart: OpenStreetMap / CARTO, kaartprogramma: Leaflet */
+/* Regenradar Crea Landa - radar: RainViewer.com, kaart: OpenStreetMap, kaartprogramma: Leaflet */
 (function(){
   var wp=document.getElementById('pw');if(!wp||window.pwRadarLoaded)return;window.pwRadarLoaded=1;
   var API='https://api.rainviewer.com/public/weather-maps.json';
   var pl=window.pwPlace||null,box,mapEl,map,mk,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
+  '.pwr-base{filter:grayscale(1) brightness(1.08) contrast(.85)}.pwr-map .leaflet-control-attribution{font-size:10px;line-height:1.3;padding:0 5px;background:#ffffffb0}'+
   '.pwr-map{position:relative;height:360px;border-radius:10px;overflow:hidden;background:#ffffff26}'+
   '#pwr-m{position:absolute;inset:0;font:12px Oswald,Arial,sans-serif}'+
   '.pwr-map.locked #pwr-m{pointer-events:none}'+
@@ -52,8 +53,8 @@
 
   function init(){
     map=L.map(mapEl,{attributionControl:false,minZoom:5,maxZoom:10}).setView([pl.lat,pl.lon],7);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
-    L.control.attribution({prefix:false}).addAttribution('\u00A9 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> \u00A9 <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> \u00B7 radar <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a>').addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:'pwr-base'}).addTo(map);
+    L.control.attribution({prefix:false}).addAttribution('\u00A9 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>').addTo(map);
     mk=L.circleMarker([pl.lat,pl.lon],{radius:7,color:'#FCF5EE',weight:2,fillColor:'#B32C43',fillOpacity:1}).addTo(map);
     loadFrames();setInterval(loadFrames,300000);
     setTimeout(function(){map.invalidateSize()},300);
