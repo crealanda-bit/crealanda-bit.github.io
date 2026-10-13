@@ -103,16 +103,16 @@
     gifUrl=URL.createObjectURL(blob);
     var ov=document.createElement('div');ov.className='pwr-gv';
     var im=new Image();im.src=gifUrl;im.alt='Regenradar';
-    var rij=document.createElement('div');rij.className='rij';
-    var a=document.createElement('a');a.className='gb';a.href=gifUrl;a.download='regenradar-crea-landa.gif';a.textContent='Opslaan';
+    var rij=document.createElement('div');rij.className='pwr-rij';
+    var a=document.createElement('a');a.className='pwr-gb';a.href=gifUrl;a.download='regenradar-crea-landa.gif';a.textContent='Opslaan';
     rij.appendChild(a);
     var file=null;try{file=new File([blob],'regenradar-crea-landa.gif',{type:'image/gif'})}catch(e){}
     if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
-      var d=document.createElement('button');d.type='button';d.className='gb';d.textContent='Delen';
+      var d=document.createElement('button');d.type='button';d.className='pwr-gb';d.textContent='Delen';
       d.onclick=function(){navigator.share({files:[file],title:'Regenradar Crea Landa'}).catch(function(){})};
       rij.appendChild(d);
     }
-    var x=document.createElement('button');x.type='button';x.className='gb';x.textContent='Sluiten';
+    var x=document.createElement('button');x.type='button';x.className='pwr-gb';x.textContent='Sluiten';
     x.onclick=function(){ov.remove()};ov.onclick=function(e){if(e.target===ov)ov.remove()};
     rij.appendChild(x);ov.appendChild(im);ov.appendChild(rij);document.body.appendChild(ov);
   }
