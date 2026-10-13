@@ -40,13 +40,12 @@
  '.pwr-lock{display:none;position:absolute;inset:0;z-index:1100;align-items:flex-end;justify-content:center;padding:12px 12px 70px;cursor:pointer}'+
  '.pwr-map.locked .pwr-lock{display:flex}'+
  '.pwr-lock span{background:#B32C43;color:#FCF5EE;padding:7px 14px;border-radius:8px;font-size:19px}'+
- '.pwr-leg{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:max-content;z-index:1000;padding:6px 9px 4px;border-radius:8px;background:#6F4257;pointer-events:none;font:12px/1.2 Oswald,Arial,sans-serif;color:#FCF5EE}'+
+ /* legenda: regen en sneeuw naast elkaar, boven de bronvermelding */
+ '.pwr-leg{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:max-content;z-index:1000;display:flex;align-items:flex-start;gap:12px;padding:6px 9px 4px;border-radius:8px;background:#6F4257;pointer-events:none;font:12px/1.2 Oswald,Arial,sans-serif;color:#FCF5EE}'+
  '.pwr-leg i{display:block;height:8px;border-radius:4px;box-shadow:0 0 0 1px #FCF5EE66}'+
  '.pwr-leg .pwr-lb{display:flex;justify-content:space-between;margin-top:3px}'+
- '.pwr-leg .pwr-lr{width:132px}.pwr-leg .pwr-lrow{display:flex;align-items:center}'+
- '.pwr-map:not(.no-rain) .pwr-lrow{margin-top:4px}'+
- '.pwr-leg .pwr-lsn{display:flex;align-items:center;gap:4px}.pwr-leg .pwr-lsn i{width:30px}'+
- '.pwr-map.no-rain .pwr-lr,.pwr-map.no-snow .pwr-lsn,.pwr-map.no-snow .pwr-lrow{display:none}'+
+ '.pwr-leg .pwr-lr{width:132px}.pwr-leg .pwr-ls{width:56px}.pwr-leg .pwr-ls .pwr-lb{justify-content:center}'+
+ '.pwr-map.no-rain .pwr-lr,.pwr-map.no-snow .pwr-ls{display:none}'+
  '.pwr-map.no-rain.no-snow .pwr-leg{display:none}'+
  '.pwr-bl{position:absolute;right:8px;top:8px;z-index:1200;display:flex;flex-direction:column;gap:1px;padding:5px 5px 4px;border-radius:8px;background:#6F4257eb;color:#FCF5EE;font:12px/1.2 Oswald,Arial,sans-serif}'+
  '.pwr-map.no-blits .pwr-bl{display:none}'+
@@ -132,7 +131,7 @@
    '<div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div>'+
    '<div class="pwr-bl"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div>'+
    '<div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div>'+
-   '<div class="pwr-lrow"><span class="pwr-lsn"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><span>Sneeuw</span></span></div></div></div>'+
+   '<div class="pwr-ls"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Sneeuw</span></div></div></div></div>'+
    '<div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button>'+
    '<input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div>'+
    '<p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
