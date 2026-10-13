@@ -15,7 +15,7 @@
   var BWIN=900000; /* bliksem blijft 15 minuten zichtbaar */
 
   var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifBusy=false;
-  var blitsGone=false,on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
+  var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
   '.pwr-base{filter:grayscale(1) brightness(1.08) contrast(.85)}.pwr-map .leaflet-control-attribution{font-size:10px;line-height:1.3;padding:0 5px;background:#ffffffb0}'+
@@ -138,8 +138,8 @@
     function lock(v){m.classList.toggle('locked',v);$('pwr-l').textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
     box.querySelector('.pwr-lock').onclick=function(){lock(false)};
     $('pwr-l').onclick=function(){lock(!m.classList.contains('locked'))};
-    $('pwr-p').onclick=function(){timer?pause():play()};
-    $('pwr-s').oninput=function(){pause();show(+this.value)};
+    $('pwr-p').onclick=function(){if(timer){wantPlay=false;pause()}else{wantPlay=true;play()}};
+    $('pwr-s').oninput=function(){wantPlay=false;pause();show(+this.value)};
     $('pwr-g').onclick=gifKlik;
     [].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
       b.onclick=function(){
@@ -156,10 +156,11 @@
         if(!started){started=true;loadLeaflet()}
         else if(map)setTimeout(function(){map.invalidateSize()},50);
         toggles();
+        if(wantPlay&&frames.length&&!timer)play();
       }else{pause();wsStop()}
     };
     new IntersectionObserver(function(es){
-      if(es[0].isIntersecting){if(!started&&!body.hidden){started=true;loadLeaflet()}}else pause();
+      if(es[0].isIntersecting){if(!started&&!body.hidden){started=true;loadLeaflet()}else if(wantPlay&&frames.length&&!timer&&!body.hidden)play()}else pause();
     },{threshold:.1}).observe(box);
   }
 
@@ -256,6 +257,7 @@
         return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10}).addTo(map);
       });
       $('pwr-s').max=f.length-1;show(f.length-1);
+      if(eerste){eerste=false;if(wantPlay)play()} /* radar start meteen met lopen */
     }).catch(function(){$('pwr-t').textContent='Radar niet beschikbaar'});
   }
 
