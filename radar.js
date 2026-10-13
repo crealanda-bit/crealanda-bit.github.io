@@ -20,7 +20,7 @@
   var BWIN=900000; /* bliksem blijft 15 minuten zichtbaar */
 
   var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifBusy=false;
-  var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:false},strikes=[],boltLayer=null,wolkenLaag=null;
+  var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:true},strikes=[],boltLayer=null,wolkenLaag=null;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
   '.pwr-base{filter:grayscale(1) brightness(1.08) contrast(.85)}.pwr-map .leaflet-control-attribution{font-size:10px;line-height:1.3;padding:0 5px;background:#ffffffb0}'+
@@ -129,7 +129,7 @@
       '<button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button>'+
       '<button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button>'+
       '<button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button>'+
-      '<button type="button" class="pwr-pc" data-l="wolken" aria-pressed="false">Wolken</button></span>'+
+      '<button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button></span>'+
       '<button id="pwr-g" type="button" class="alt">GIF</button></div>'+
       '<div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div>'+
       '<div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div>'+
@@ -150,9 +150,8 @@
     [].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
       b.onclick=function(){
         var k=b.getAttribute('data-l');
-        if(k==='wolken'){on.wolken=!on.wolken;toggles();return} /* wolken staan los van regen, sneeuw en bliksem */
-        if(on.rain&&on.snow&&(on.blits||blitsGone)){on.rain=on.snow=on.blits=false;on[k]=true} /* alles aan: eerste tik = alleen deze laag */
-        else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits){on.rain=on.snow=true;on.blits=!blitsGone}} /* niets over: weer alles */
+        if(on.rain&&on.snow&&on.wolken&&(on.blits||blitsGone)){on.rain=on.snow=on.blits=on.wolken=false;on[k]=true} /* alles aan: eerste tik = alleen deze laag */
+        else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits&&!on.wolken){on.rain=on.snow=on.wolken=true;on.blits=!blitsGone}} /* niets over: weer alles */
         toggles();
       };
     });
@@ -190,7 +189,13 @@
   }
 
   /* ===== bliksem (Blitzortung) ===== */
-  var ws=null,wsWant=false,wsRetry=null;
+  var ws=null,wsWant=false,wsRetry=null,wsOpen=false;
+  /* tekst in de legenda: laat zien of de bliksemverbinding werkt en of er bliksem is */
+  function blLabel(){
+    var l=box&&box.querySelector('.pwr-lbl');if(!l)return;
+    var n=frames.length?zichtbaar(idx).length:0;
+    l.textContent='\u26A1 '+(!wsOpen?'Verbinden\u2026':(n?'Bliksem':'Geen bliksem'));
+  }
   function lzw(b){var a,e={},d=b.split(''),c=d[0],f=c,g=[c],h=256,o=h;for(var i=1;i<d.length;i++){a=d[i].charCodeAt(0);a=h>a?d[i]:e[a]?e[a]:f+c;g.push(a);c=a.charAt(0);e[o]=f+c;o++;f=a}return g.join('')}
   function wsStart(k){
     if(!wsWant)return;
@@ -198,21 +203,21 @@
     var opened=false,s;
     try{s=new WebSocket(WS[k])}catch(e){wsStart(k+1);return}
     ws=s;
-    s.onopen=function(){opened=true;try{s.send('{"a":111}')}catch(e){}};
+    s.onopen=function(){opened=true;wsOpen=true;blLabel();try{s.send('{"a":111}')}catch(e){}};
     s.onmessage=function(e){
       try{var d=JSON.parse(lzw(e.data));if(typeof d.lat==='number'&&typeof d.lon==='number')strike(d.lat,d.lon)}catch(x){}
     };
     s.onerror=function(){};
     s.onclose=function(){
-      if(ws!==s)return;ws=null;
+      if(ws!==s)return;ws=null;wsOpen=false;blLabel();
       if(!wsWant)return;
       if(opened)wsRetry=setTimeout(function(){wsStart(k)},15000);else wsStart(k+1);
     };
   }
-  function wsStop(){wsWant=false;clearTimeout(wsRetry);if(ws){var s=ws;ws=null;try{s.close()}catch(e){}}}
+  function wsStop(){wsWant=false;clearTimeout(wsRetry);wsOpen=false;if(ws){var s=ws;ws=null;try{s.close()}catch(e){}}blLabel()}
   function wsFail(){
     on.blits=false;blitsGone=true;wsWant=false;
-    var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow){on.rain=on.snow=true}
+    var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow&&!on.wolken){on.rain=on.snow=on.wolken=true}
     toggles();
   }
   function strike(lat,lon){
@@ -235,6 +240,7 @@
     var v=zichtbaar(i),ids={};
     v.forEach(function(x){x.s.m.setOpacity(x.op);ids[x.s.t+'_'+x.s.lat]=1});
     strikes.forEach(function(s){if(!ids[s.t+'_'+s.lat])s.m.setOpacity(0)});
+    blLabel();
   }
 
   function loadLeaflet(){
