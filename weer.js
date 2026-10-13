@@ -104,7 +104,7 @@
   var FOTOS_TEL=6;  /* aantal foto's per dag meteen zichtbaar op telefoon */
   var wl=document.getElementById('weerLijst');if(!wl)return;
   function knop(t){var b=document.createElement('button');b.type='button';b.textContent=t;
-    b.style.cssText='display:block;margin:12px auto 0;padding:10px 18px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:21px "Bebas Neue",sans-serif;cursor:pointer;grid-column:1/-1';return b}
+    b.style.cssText='display:block;margin:10px auto 0;padding:8px 14px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:19px "Bebas Neue",sans-serif;white-space:nowrap;cursor:pointer;grid-column:1/-1';return b}
   function apply(){
     var secs=[].slice.call(wl.querySelectorAll('.wdag'));
     if(!secs.length)return;
@@ -113,11 +113,11 @@
       if(s.dataset.pw)return;s.dataset.pw='1';
       var g=s.querySelector('.wg');if(!g)return;
       var it=[].slice.call(g.children);if(it.length<=FOTOS)return;
-      var extra=it.slice(FOTOS),open=false,n=extra.length,b=knop('Alle foto\u2019s tonen (+'+n+')');
+      var extra=it.slice(FOTOS),open=false,n=extra.length,b=knop('+'+n+' foto\u2019s');
       extra.forEach(function(e){e.style.display='none'});
       b.onclick=function(){open=!open;
         extra.forEach(function(e){e.style.display=open?'':'none'});
-        b.textContent=open?'Minder foto\u2019s tonen':'Alle foto\u2019s tonen (+'+n+')'};
+        b.textContent=open?'Minder foto\u2019s':'+'+n+' foto\u2019s'};
       g.after(b);
     });
     if(secs.length>DAGEN&&!wl.dataset.pwDagen){
