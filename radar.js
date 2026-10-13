@@ -1,8 +1,13 @@
-/* Regenradar Crea Landa - radar: RainViewer.com, kaart: OpenStreetMap, kaartprogramma: Leaflet, bliksem: Blitzortung.org, gif: gif.js */
+/* Regenradar Crea Landa - radar: RainViewer.com, kaart: OpenStreetMap, kaartprogramma: Leaflet, bliksem: Blitzortung.org, gif: gif.js, wolken: EUMETSAT Meteosat */
 (function(){
   var wp=document.getElementById('pw');if(!wp||window.pwRadarLoaded)return;window.pwRadarLoaded=1;
   var API='https://api.rainviewer.com/public/weather-maps.json';
   var START_OPEN=true; /* true = radar staat open bij binnenkomst, false = ingeklapt */
+
+  /* ===== Wolken (satelliet van EUMETSAT, gratis, geen sleutel nodig) ===== */
+  var SAT_URL='https://view.eumetsat.int/geoserver/wms';
+  var SAT_LAAG='mtg_fd:ir105_hrfi'; /* infrarood, elke 10 min. Werkt dit niet? Probeer 'msg_fes:rgb_eview' */
+  var SAT_OPACITY=.65;              /* 0 = onzichtbaar, 1 = volledig dekkend */
 
   /* ===== Kleuren (pas gerust aan) ===== */
   var HEX=['#9EB3D8','#627EB5','#D9667A','#B32C43','#7E1D30','#3E1A2C'];   /* regen: licht -> zwaar */
@@ -15,7 +20,7 @@
   var BWIN=900000; /* bliksem blijft 15 minuten zichtbaar */
 
   var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifBusy=false;
-  var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
+  var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:false},strikes=[],boltLayer=null,wolkenLaag=null;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
   '.pwr-base{filter:grayscale(1) brightness(1.08) contrast(.85)}.pwr-map .leaflet-control-attribution{font-size:10px;line-height:1.3;padding:0 5px;background:#ffffffb0}'+
@@ -123,7 +128,8 @@
       '<div class="pwr-top"><span class="pwr-ch">'+
       '<button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button>'+
       '<button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button>'+
-      '<button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button></span>'+
+      '<button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button>'+
+      '<button type="button" class="pwr-pc" data-l="wolken" aria-pressed="false">Wolken</button></span>'+
       '<button id="pwr-g" type="button" class="alt">GIF</button></div>'+
       '<div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div>'+
       '<div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div>'+
@@ -132,7 +138,7 @@
       '<input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden\u2026</span></div>'+
       '<p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
     var foot=wp.querySelector('.pw-foot');wp.insertBefore(box,foot);
-    foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> \u00B7 bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a>');
+    foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> \u00B7 bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a> \u00B7 wolken van <a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a>');
     mapEl=$('pwr-m');
     var m=box.querySelector('.pwr-map'),body=$('pwr-body'),hb=$('pwr-h');
     function lock(v){m.classList.toggle('locked',v);$('pwr-l').textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
@@ -144,6 +150,7 @@
     [].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
       b.onclick=function(){
         var k=b.getAttribute('data-l');
+        if(k==='wolken'){on.wolken=!on.wolken;toggles();return} /* wolken staan los van regen, sneeuw en bliksem */
         if(on.rain&&on.snow&&(on.blits||blitsGone)){on.rain=on.snow=on.blits=false;on[k]=true} /* alles aan: eerste tik = alleen deze laag */
         else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits){on.rain=on.snow=true;on.blits=!blitsGone}} /* niets over: weer alles */
         toggles();
@@ -164,15 +171,20 @@
     },{threshold:.1}).observe(box);
   }
 
-  /* knopjes Regen / Sneeuw / Bliksem */
+  /* knopjes Regen / Sneeuw / Bliksem / Wolken */
   function toggles(){
     if(!box)return;
     var m=box.querySelector('.pwr-map');
-    ['rain','snow','blits'].forEach(function(k){
+    ['rain','snow','blits','wolken'].forEach(function(k){
       m.classList.toggle('no-'+k,!on[k]);
       var b=box.querySelector('.pwr-pc[data-l="'+k+'"]');b.classList.toggle('on',on[k]);b.setAttribute('aria-pressed',on[k]);
     });
     if(!map)return;
+    /* wolken (satelliet) */
+    if(wolkenLaag){
+      if(on.wolken&&!$('pwr-body').hidden){if(!map.hasLayer(wolkenLaag))wolkenLaag.addTo(map)}
+      else if(map.hasLayer(wolkenLaag))map.removeLayer(wolkenLaag);
+    }
     if(on.blits&&!$('pwr-body').hidden){map.addLayer(boltLayer);wsWant=true;if(!ws)wsStart(0);bolts(idx)}
     else{map.removeLayer(boltLayer);wsStop()}
   }
@@ -241,6 +253,12 @@
     L.control.attribution({prefix:false}).addAttribution('\u00A9 <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>').addTo(map);
     mk=L.circleMarker([pl.lat,pl.lon],{radius:7,color:'#FCF5EE',weight:2,fillColor:'#B32C43',fillOpacity:1}).addTo(map);
     boltLayer=L.layerGroup();
+    /* wolkenlaag (satelliet): ligt onder de radar (zIndex 5 tegen 10) */
+    wolkenLaag=L.tileLayer.wms(SAT_URL,{
+      layers:SAT_LAAG,format:'image/png',transparent:true,version:'1.3.0',
+      opacity:SAT_OPACITY,zIndex:5,maxZoom:10,
+      attribution:'Contains modified EUMETSAT Meteosat data '+new Date().getFullYear()
+    });
     loadFrames();setInterval(loadFrames,300000);
     setInterval(function(){if(frames.length&&idx===frames.length-1)bolts(idx)},30000);
     setTimeout(function(){map.invalidateSize()},300);
@@ -248,6 +266,8 @@
   }
 
   function loadFrames(){
+    /* wolken elke 5 minuten verversen zodat je het nieuwste beeld ziet */
+    if(wolkenLaag&&on.wolken&&map&&map.hasLayer(wolkenLaag))wolkenLaag.setParams({_:Date.now()});
     fetch(API).then(function(r){return r.json()}).then(function(d){
       var f=(d.radar&&d.radar.past)||[];if(!f.length)throw 0;
       if(f[f.length-1].time===lastKey)return;lastKey=f[f.length-1].time;
