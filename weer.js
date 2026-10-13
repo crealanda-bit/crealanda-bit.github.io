@@ -38,6 +38,7 @@
   }
   function get(){
     if(!place)return;
+    setTimeout(function(){document.dispatchEvent(new CustomEvent('pw-place',{detail:place}))},0);
     clearInterval(timer);
     var u='https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+
     '&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m'+
@@ -182,4 +183,36 @@
     if(!a||!a.querySelector('img'))return;
     e.preventDefault();open(a.href);
   });
+})();
+
+/* ===== Radarkaart (Windy) onder de weerwaarden ===== */
+(function(){
+  var host=document.getElementById('pw');if(!host)return;
+  var T=[['radar','Radar','radar'],['wind','Wind','ecmwf'],['temp','Temperatuur','ecmwf'],['clouds','Wolken','ecmwf']];
+  var cur=0,pl=null,box=null,fr=null,map=null,lk=null;
+  var st=document.createElement('style');
+  st.textContent='#pw-radar{margin-top:6px}.pwr-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}'+
+  '.pw .pwr-tabs button{background:#ffffff40;padding:7px 13px;font-size:19px}.pw .pwr-tabs button.on{background:#B32C43}'+
+  '.pwr-map{position:relative;height:360px;border-radius:10px;overflow:hidden;background:#ffffff26}.pwr-map iframe{display:block;width:100%;height:100%;border:0}'+
+  '.pwr-map.locked iframe{pointer-events:none}.pwr-lock{display:none;position:absolute;inset:0;align-items:flex-end;justify-content:center;padding:12px;cursor:pointer}'+
+  '.pwr-map.locked .pwr-lock{display:flex}.pwr-lock span{background:#B32C43;color:#FCF5EE;padding:7px 14px;border-radius:8px;font-size:19px}'+
+  '@media(min-width:700px){.pwr-map{height:440px}}';
+  document.head.appendChild(st);
+  function url(){var t=T[cur],la=pl.lat.toFixed(3),lo=pl.lon.toFixed(3);
+    return 'https://embed.windy.com/embed2.html?lat='+la+'&lon='+lo+'&detailLat='+la+'&detailLon='+lo+'&zoom=7&level=surface&overlay='+t[0]+'&product='+t[2]+
+    '&menu=&message=&marker=true&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1'}
+  function setLock(v){map.classList.toggle('locked',v);lk.textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
+  function build(){
+    box=document.createElement('div');box.id='pw-radar';
+    box.innerHTML='<h3>Radar</h3><div class="pwr-tabs"></div><div class="pwr-map locked"><iframe title="Weerkaart" loading="lazy"></iframe><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div></div><p style="text-align:center;margin:10px 0 0"><button type="button" class="alt">Kaart bedienen</button></p>';
+    var tabs=box.querySelector('.pwr-tabs');map=box.querySelector('.pwr-map');fr=box.querySelector('iframe');lk=box.querySelector('button.alt');
+    T.forEach(function(t,i){var b=document.createElement('button');b.type='button';b.textContent=t[1];if(!i)b.className='on';
+      b.onclick=function(){cur=i;[].forEach.call(tabs.children,function(x,j){x.classList.toggle('on',j===i)});update()};tabs.appendChild(b)});
+    box.querySelector('.pwr-lock').onclick=function(){setLock(false)};
+    lk.onclick=function(){setLock(!map.classList.contains('locked'))};
+    var foot=host.querySelector('.pw-foot');host.insertBefore(box,foot);
+    foot.insertAdjacentHTML('beforeend','<br>Radarkaart van <a href="https://www.windy.com/" target="_blank" rel="noopener">Windy.com</a>');
+  }
+  function update(){var u=url();if(fr.dataset.u!==u){fr.dataset.u=u;fr.src=u}}
+  document.addEventListener('pw-place',function(e){pl=e.detail;if(!box)build();update()});
 })();
