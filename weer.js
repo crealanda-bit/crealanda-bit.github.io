@@ -11,7 +11,8 @@
   95:['Onweer','⛈️'],96:['Onweer met hagel','⛈️'],99:['Zwaar onweer met hagel','⛈️']};
   function wc(c){return WC[c]||['Onbekend','🌡️']}
   function bft(k){var t=[1,6,12,20,29,39,50,62,75,89,103,118],n=0;while(n<t.length&&k>=t[n])n++;return n}
-  function dir(d){return ['N','NNO','NO','ONO','O','OZO','ZO','ZZO','Z','ZZW','ZW','WZW','W','WNW','NW','NNW'][Math.round(d/22.5)%16]}
+  function dir(d){return ['noord','noordoost','oost','zuidoost','zuid','zuidwest','west','noordwest'][Math.round(d/45)%8]}
+  function arrow(d){return '<span style="display:inline-block;transform:rotate('+((d+180)%360)+'deg)">↑</span>'}
   function r(n){return Math.round(n)}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function save(p){try{localStorage.setItem('pw-place',JSON.stringify(p))}catch(e){}}
@@ -59,7 +60,7 @@
     '<div class="pw-now"><div class="pw-ico">'+w[1]+'</div><div class="pw-temp">'+r(c.temperature_2m)+'°</div></div></div>'+
     '<div class="pw-grid">'+
     card('Voelt als',r(c.apparent_temperature)+'°')+
-    card('Wind',wk+' km/u '+dir(c.wind_direction_10m)+' (kracht '+bft(wk)+')')+
+    card('Wind',wk+' km/u '+arrow(c.wind_direction_10m)+'<br><span style="font:15px Oswald,Arial,sans-serif">uit het '+dir(c.wind_direction_10m)+' · kracht '+bft(wk)+'</span>')+
     card('Windstoten',r(c.wind_gusts_10m)+' km/u')+
     card('Luchtvochtigheid',c.relative_humidity_2m+'%')+
     card('Neerslag nu',c.precipitation+' mm')+
@@ -79,5 +80,12 @@
       place={name:'Mijn locatie',sub:'',lat:p.coords.latitude,lon:p.coords.longitude};input.value='';get();
     },function(){out.innerHTML='<p class="pw-msg">Locatie niet toegestaan. Typ gewoon je plaats in.</p>'});
   };
-  var s=load();if(s){place=s;input.value=s.name;get()}
+  function startPlace(){
+    fetch('https://geocoding-api.open-meteo.com/v1/search?count=5&language=nl&format=json&name=Espel')
+    .then(function(r){return r.json()}).then(function(d){
+      var l=d.results||[],p=l.filter(function(x){return x.admin1==='Flevoland'})[0]||l[0];
+      if(p){place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat:p.latitude,lon:p.longitude};input.value=p.name;get()}
+    }).catch(function(){});
+  }
+  var s=load();if(s){place=s;input.value=s.name;get()}else startPlace();
 })();
