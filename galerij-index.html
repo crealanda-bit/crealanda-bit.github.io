@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beheer</title>
+<title>Crea Landa Beheer</title>
+<link rel="manifest" href="beheer-manifest.json">
+<meta name="theme-color" content="#7E1F33">
+<link rel="apple-touch-icon" href="Naamloos%20-%2003%20oktober%202026%20om%2018.42.59%20(1).png">
+<script>navigator.serviceWorker&&navigator.serviceWorker.register("sw.js")</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&display=swap');
 :root{--blue:#9EB3D8;--cream:#FCF5EE;--red:#B32C43;--plum:#6F4257}
@@ -45,10 +49,18 @@ figcaption small{display:block;margin-top:4px;font-size:1.15rem;letter-spacing:.
 .th{position:relative;width:70px;height:70px}
 .th img{width:100%;height:100%;aspect-ratio:auto;object-fit:cover;border-radius:8px;display:block}
 .th button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;padding:0;border-radius:50%;line-height:1}
+.top{display:flex;align-items:center;gap:12px;margin:-20px -14px 22px;padding:10px 18px;background:#7E1F33;box-shadow:0 3px 12px #0003}
+.top img{width:52px;height:52px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.top .nm{font:400 clamp(30px,7vw,40px) "Great Vibes",cursive;color:var(--cream);white-space:nowrap}
+.top .lbl{margin-left:auto;padding:5px 12px;border-radius:8px;background:var(--cream);color:#7E1F33;font-size:20px;letter-spacing:1px}
 </style>
 </head>
 <body>
-<h1>Beheer</h1>
+<header class="top">
+<img src="Naamloos - 03 oktober 2026 om 18.42.59 (1).png" alt="Crea Landa logo" onerror="this.style.display='none'">
+<span class="nm">Crea Landa</span>
+<span class="lbl">Beheer</span>
+</header>
 <section id="admin" class="box">
 <form id="loginForm">
 <h3>Inloggen</h3>
