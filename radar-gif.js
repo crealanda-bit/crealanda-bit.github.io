@@ -44,9 +44,11 @@
         bx.putImageData(bd,0,0);
         var mp=map.latLngToContainerPoint([pl.lat,pl.lon]);
         var gif=new GIF({workers:2,quality:2,width:w,height:h,workerScript:workerUrl});
-        var lh=(10+(on.rain?25.4:0)+(on.snow?(on.rain?4:0)+14.4:0))*sc,pd=9*sc,mx=document.createElement('canvas').getContext('2d');
+        /* legenda regen + sneeuw naast elkaar, boven de bronvermelding */
+        var pd=9*sc,mx=document.createElement('canvas').getContext('2d');
         mx.font=(12*sc)+'px Oswald,Arial,sans-serif';
-        var lw=on.rain?150*sc:(on.snow?34*sc+mx.measureText('Sneeuw').width:0)+2*pd,lx=(w-lw)/2,ly=h-8*sc-lh;
+        var lh=35.4*sc,rainW=132*sc,snowW=56*sc,lgap=12*sc;
+        var lw=(on.rain?rainW:0)+(on.snow?snowW:0)+(on.rain&&on.snow?lgap:0)+2*pd,lx=(w-lw)/2,ly=h-24*sc-lh;
         /* bliksemlegenda rechtsboven, onder de tijd */
         var rh=15*sc,blw=2*pd+16*sc,blh=BLAB.length*rh+8*sc,bx0,by0=40*sc;
         BLAB.forEach(function(t){blw=Math.max(blw,2*pd+16*sc+mx.measureText(t).width)});
@@ -73,23 +75,23 @@
           /* plaatsmarkering */
           x.beginPath();x.arc(mp.x*sc,mp.y*sc,7*sc,0,7);x.fillStyle='#B32C43';x.fill();
           x.lineWidth=2*sc;x.strokeStyle='#FCF5EE';x.stroke();
-          /* legenda regen en sneeuw */
+          /* legenda regen en sneeuw (naast elkaar) */
           x.textBaseline='alphabetic';
           if(on.rain||on.snow){
             rr(x,lx,ly,lw,lh,8*sc);x.fillStyle='#6F4257';x.fill();
-            var y0=ly+6*sc;x.fillStyle='#FCF5EE';x.font=(12*sc)+'px Oswald,Arial,sans-serif';
+            var y0=ly+6*sc,cx=lx+pd,by=y0+22*sc;
+            x.font=(12*sc)+'px Oswald,Arial,sans-serif';
             if(on.rain){
-              rr(x,lx+pd,y0,lw-2*pd,8*sc,4*sc);x.fillStyle=balk(x,lx+pd,lw-2*pd,HEX);x.fill();
-              x.fillStyle='#FCF5EE';var by=y0+22*sc;
-              x.textAlign='left';x.fillText('Licht',lx+pd,by);
-              x.textAlign='center';x.fillText('Zwaar',w/2,by);
-              x.textAlign='right';x.fillText('Extreem',lx+lw-pd,by);
-              y0+=25.4*sc;
+              rr(x,cx,y0,rainW,8*sc,4*sc);x.fillStyle=balk(x,cx,rainW,HEX);x.fill();
+              x.fillStyle='#FCF5EE';
+              x.textAlign='left';x.fillText('Licht',cx,by);
+              x.textAlign='center';x.fillText('Zwaar',cx+rainW/2,by);
+              x.textAlign='right';x.fillText('Extreem',cx+rainW,by);
+              cx+=rainW+lgap;
             }
             if(on.snow){
-              if(on.rain)y0+=4*sc;
-              rr(x,lx+pd,y0+3*sc,30*sc,8*sc,4*sc);x.fillStyle=balk(x,lx+pd,30*sc,SNOWHEX);x.fill();
-              x.fillStyle='#FCF5EE';x.textAlign='left';x.fillText('Sneeuw',lx+pd+34*sc,y0+11*sc);
+              rr(x,cx,y0,snowW,8*sc,4*sc);x.fillStyle=balk(x,cx,snowW,SNOWHEX);x.fill();
+              x.fillStyle='#FCF5EE';x.textAlign='center';x.fillText('Sneeuw',cx+snowW/2,by);
             }
           }
           /* tijd en bronvermelding */
