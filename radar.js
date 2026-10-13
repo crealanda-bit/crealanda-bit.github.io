@@ -14,7 +14,7 @@
   var WS=['wss://ws1.blitzortung.org/','wss://ws7.blitzortung.org/','wss://ws8.blitzortung.org/','wss://ws1.blitzortung.org:3000/'];
   var BWIN=900000; /* bliksem blijft 15 minuten zichtbaar */
 
-  var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifUrl='',gifBusy=false;
+  var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifBusy=false;
   var on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
@@ -140,7 +140,7 @@
     $('pwr-l').onclick=function(){lock(!m.classList.contains('locked'))};
     $('pwr-p').onclick=function(){timer?pause():play()};
     $('pwr-s').oninput=function(){pause();show(+this.value)};
-    $('pwr-g').onclick=maakGif;
+    $('pwr-g').onclick=gifKlik;
     [].forEach.call(box.querySelectorAll('.pc'),function(b){
       b.onclick=function(){var k=b.getAttribute('data-l');on[k]=!on[k];toggles()};
     });
@@ -275,75 +275,21 @@
     var p=$('pwr-p');if(p){p.textContent='\u25B6';p.setAttribute('aria-label','Afspelen')}
   }
 
-  /* ===== GIF maken van de radarbeweging ===== */
-  var workerUrl='';
-  function laadGif(cb,err){
-    if(window.GIF&&workerUrl)return cb();
-    var u='https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/';
-    fetch(u+'gif.worker.js').then(function(r){return r.text()}).then(function(t){
-      workerUrl=URL.createObjectURL(new Blob([t],{type:'text/javascript'}));
-      if(window.GIF)return cb();
-      var s=document.createElement('script');s.src=u+'gif.js';s.onload=cb;s.onerror=err;document.head.appendChild(s);
-    }).catch(err);
+  /* GIF-maker staat in radar-gif.js en wordt pas geladen als je op GIF drukt */
+  window.pwRadar={s:function(){return{map:map,base:base,layers:layers,frames:frames,on:on,pl:pl,mapEl:mapEl,zichtbaar:zichtbaar,tijd:tijd,HEX:HEX,SNOWHEX:SNOWHEX,pause:pause,gb:$('pwr-g')}}};
+  function gifKlik(){
+    if(window.pwRadarGif)return window.pwRadarGif();
+    var gb=$('pwr-g'),s=document.createElement('script');gb.textContent='\u2026';
+    s.src='radar-gif.js';s.onload=function(){gb.textContent='GIF';window.pwRadarGif&&window.pwRadarGif()};
+    s.onerror=function(){gb.textContent='Mislukt';setTimeout(function(){gb.textContent='GIF'},3000)};
+    document.head.appendChild(s);
   }
-  function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
-  function maakGif(){
-    if(gifBusy||!layers.length||!map)return;
-    pause();gifBusy=true;
-    var gb=$('pwr-g');gb.disabled=true;gb.textContent='Even\u2026';
-    function klaar(){gifBusy=false;gb.disabled=false;gb.textContent='GIF'}
-    function fout(){klaar();gb.textContent='Mislukt';setTimeout(function(){gb.textContent='GIF'},3000)}
-    laadGif(function(){
-      try{
-        var mr=mapEl.getBoundingClientRect(),W=mr.width,H=mr.height,sc=Math.min(1,520/W),w=Math.round(W*sc),h=Math.round(H*sc);
-        function cv(){var c=document.createElement('canvas');c.width=w;c.height=h;return c}
-        function teken(ctx,list){[].forEach.call(list,function(e){var r=e.getBoundingClientRect();if(r.width)ctx.drawImage(e,(r.left-mr.left)*sc,(r.top-mr.top)*sc,r.width*sc,r.height*sc)})}
-        var bc=cv(),bx=bc.getContext('2d');bx.fillStyle='#d8d8d8';bx.fillRect(0,0,w,h);
-        teken(bx,base.getContainer().querySelectorAll('img.leaflet-tile'));
-        var bd=bx.getImageData(0,0,w,h),p=bd.data;
-        for(var i=0;i<p.length;i+=4){
-          var g=(p[i]*.299+p[i+1]*.587+p[i+2]*.114)*1.08;g=(g-127.5)*.85+127.5;
-          p[i]=p[i+1]=p[i+2]=g<0?0:g>255?255:g;
-        }
-        bx.putImageData(bd,0,0);
-        var mp=map.latLngToContainerPoint([pl.lat,pl.lon]);
-        var gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:workerUrl});
-        var ex=on.snow||on.blits,lh=(10+(on.rain?25.4:0)+(ex?(on.rain?4:0)+14.4:0))*sc,lw=150*sc,lx=(w-lw)/2,ly=h-8*sc-lh,pd=9*sc;
-        function balk(x,lft,wd,cols){
-          var gr=x.createLinearGradient(lft,0,lft+wd,0);
-          cols.forEach(function(k,j){gr.addColorStop(j/(cols.length-1),k)});return gr;
-        }
-        frames.forEach(function(fr,n){
-          var c=cv(),x=c.getContext('2d');
-          x.drawImage(bc,0,0);
-          x.globalAlpha=.85;teken(x,layers[n].getContainer().querySelectorAll('canvas'));x.globalAlpha=1;
-          /* bliksem */
-          if(on.blits){
-            x.font=(17*sc)+'px Arial,sans-serif';x.textAlign='center';x.textBaseline='middle';
-            zichtbaar(n).forEach(function(v){
-              var q=map.latLngToContainerPoint([v.s.lat,v.s.lon]);
-              x.globalAlpha=v.op;x.fillText('\u26A1',q.x*sc,q.y*sc);
-            });
-            x.globalAlpha=1;
-          }
-          /* plaatsmarkering */
-          x.beginPath();x.arc(mp.x*sc,mp.y*sc,7*sc,0,7);x.fillStyle='#B32C43';x.fill();
-          x.lineWidth=2*sc;x.strokeStyle='#FCF5EE';x.stroke();
-          /* legenda */
-          x.textBaseline='alphabetic';
-          if(on.rain||ex){
-            rr(x,lx,ly,lw,lh,8*sc);x.fillStyle='#6F4257';x.fill();
-            var y0=ly+6*sc;x.fillStyle='#FCF5EE';x.font=(12*sc)+'px Oswald,Arial,sans-serif';
-            if(on.rain){
-              rr(x,lx+pd,y0,lw-2*pd,8*sc,4*sc);x.fillStyle=balk(x,lx+pd,lw-2*pd,HEX);x.fill();
-              x.fillStyle='#FCF5EE';var by=y0+22*sc;
-              x.textAlign='left';x.fillText('Licht',lx+pd,by);
-              x.textAlign='center';x.fillText('Zwaar',w/2,by);
-              x.textAlign='right';x.fillText('Extreem',lx+lw-pd,by);
-              y0+=25.4*sc;
-            }
-            if(ex){
-              if(on.rain)y0+=4*sc;
-              if(on.snow){
-                rr(x,lx+pd,y0+3*sc,30*sc,8*sc,4*sc);x.fillStyle=balk(x,lx+pd,30*sc,SNOWHEX);x.fill();
-                x.fillStyle='#FCF5EE';x.textAlign='left';x.fillText('Sneeuw',lx+pd+34*sc,y0+11*sc)
+
+  function place(p){
+    pl=p;
+    if(!box)build();
+    if(map){map.setView([pl.lat,pl.lon],map.getZoom());mk.setLatLng([pl.lat,pl.lon])}
+  }
+  document.addEventListener('pw-place',function(e){place(e.detail)});
+  if(pl)place(pl);
+})();
