@@ -22,10 +22,10 @@
     function fout(){klaar();gb.textContent='Mislukt';setTimeout(function(){gb.textContent='GIF'},3000)}
     laadGif(function(){
       try{
-        var mr=mapEl.getBoundingClientRect(),W=mr.width,H=mr.height,sc=Math.min(1,520/W),w=Math.round(W*sc),h=Math.round(H*sc);
+        var mr=mapEl.getBoundingClientRect(),W=mr.width,H=mr.height,sc=Math.min(2,720/W),w=Math.round(W*sc),h=Math.round(H*sc);
         function cv(){var c=document.createElement('canvas');c.width=w;c.height=h;return c}
         function teken(ctx,list){[].forEach.call(list,function(e){var r=e.getBoundingClientRect();if(r.width)ctx.drawImage(e,(r.left-mr.left)*sc,(r.top-mr.top)*sc,r.width*sc,r.height*sc)})}
-        var bc=cv(),bx=bc.getContext('2d');bx.fillStyle='#d8d8d8';bx.fillRect(0,0,w,h);
+        var bc=cv(),bx=bc.getContext('2d');bx.imageSmoothingQuality='high';bx.fillStyle='#d8d8d8';bx.fillRect(0,0,w,h);
         teken(bx,base.getContainer().querySelectorAll('img.leaflet-tile'));
         var bd=bx.getImageData(0,0,w,h),p=bd.data;
         for(var i=0;i<p.length;i+=4){
@@ -34,7 +34,7 @@
         }
         bx.putImageData(bd,0,0);
         var mp=map.latLngToContainerPoint([pl.lat,pl.lon]);
-        var gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:workerUrl});
+        var gif=new GIF({workers:2,quality:2,width:w,height:h,workerScript:workerUrl});
         var ex=on.snow||on.blits,lh=(10+(on.rain?25.4:0)+(ex?(on.rain?4:0)+14.4:0))*sc,pd=9*sc,mx=document.createElement('canvas').getContext('2d');
         mx.font=(12*sc)+'px Oswald,Arial,sans-serif';
         var lw=on.rain?150*sc:(on.snow?34*sc+mx.measureText('Sneeuw').width:0)+(on.snow&&on.blits?10*sc:0)+(on.blits?mx.measureText('\u26A1 Bliksem').width:0)+2*pd,lx=(w-lw)/2,ly=h-8*sc-lh;
@@ -43,7 +43,7 @@
           cols.forEach(function(k,j){gr.addColorStop(j/(cols.length-1),k)});return gr;
         }
         frames.forEach(function(fr,n){
-          var c=cv(),x=c.getContext('2d');
+          var c=cv(),x=c.getContext('2d');x.imageSmoothingQuality='high';
           x.drawImage(bc,0,0);
           x.globalAlpha=.85;teken(x,layers[n].getContainer().querySelectorAll('canvas'));x.globalAlpha=1;
           /* bliksem */
