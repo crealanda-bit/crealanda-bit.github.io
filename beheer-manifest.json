@@ -1,1 +1,18 @@
+{
+  "name": "Crea Landa Beheer",
+  "short_name": "Beheer",
+  "start_url": "galerij-index.html#admin",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#6F4257",
+  "theme_color": "#7E1F33",
+  "icons": [
+    {
+      "src": "Naamloos%20-%2003%20oktober%202026%20om%2018.42.59%20(1).png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
 
