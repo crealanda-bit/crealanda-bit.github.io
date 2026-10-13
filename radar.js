@@ -15,15 +15,15 @@
   var BWIN=900000; /* bliksem blijft 15 minuten zichtbaar */
 
   var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],idx=0,timer=null,host='',lastKey=0,started=false,gifBusy=false;
-  var on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
+  var blitsGone=false,on={rain:true,snow:true,blits:true},strikes=[],boltLayer=null;
   var st=document.createElement('style');
   st.textContent='#pw-radar{margin-top:6px}'+
   '.pwr-base{filter:grayscale(1) brightness(1.08) contrast(.85)}.pwr-map .leaflet-control-attribution{font-size:10px;line-height:1.3;padding:0 5px;background:#ffffffb0}'+
   '.pwr-top{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px}'+
   '.pwr-ch{display:flex;gap:5px;flex-wrap:wrap}'+
   '.pw .pwr-top button{padding:7px 11px;font-size:18px;border-radius:8px}'+
-  '.pw .pwr-top .pc{background:#ffffff26;color:#FCF5EEb3;box-shadow:inset 0 0 0 1px #B32C43}'+
-  '.pw .pwr-top .pc.on{background:#B32C43;color:#FCF5EE;box-shadow:none}'+
+  '.pw .pwr-top .pwr-pc{background:#ffffff26;color:#FCF5EEb3;box-shadow:inset 0 0 0 1px #B32C43}'+
+  '.pw .pwr-top .pwr-pc.on{background:#B32C43;color:#FCF5EE;box-shadow:none}'+
   '.pwr-map{position:relative;height:360px;border-radius:10px;overflow:hidden;background:#ffffff26}'+
   '.pwr-cr,.pwr-cs{position:absolute;left:0;top:0;width:100%;height:100%}'+
   '.pwr-map.no-rain .pwr-cr,.pwr-map.no-snow .pwr-cs{display:none}'+
@@ -35,12 +35,12 @@
   '.pwr-lock span{background:#B32C43;color:#FCF5EE;padding:7px 14px;border-radius:8px;font-size:19px}'+
   '.pwr-leg{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:150px;z-index:1000;padding:6px 9px 4px;border-radius:8px;background:#6F4257;pointer-events:none;font:12px/1.2 Oswald,Arial,sans-serif;color:#FCF5EE}'+
   '.pwr-leg i{display:block;height:8px;border-radius:4px;box-shadow:0 0 0 1px #FCF5EE66}'+
-  '.pwr-leg .lb{display:flex;justify-content:space-between;margin-top:3px}'+
-  '.pwr-leg .lrow{display:flex;justify-content:space-between;align-items:center}'+
-  '.pwr-map:not(.no-rain) .lrow{margin-top:4px}'+
-  '.pwr-leg .lsn{display:flex;align-items:center;gap:4px}.pwr-leg .lsn i{width:30px}'+
-  '.pwr-map.no-rain .lr,.pwr-map.no-snow .lsn,.pwr-map.no-blits .lbl{display:none}'+
-  '.pwr-map.no-snow.no-blits .lrow{display:none}'+
+  '.pwr-leg .pwr-lb{display:flex;justify-content:space-between;margin-top:3px}'+
+  '.pwr-leg .pwr-lrow{display:flex;justify-content:space-between;align-items:center}'+
+  '.pwr-map:not(.no-rain) .pwr-lrow{margin-top:4px}'+
+  '.pwr-leg .pwr-lsn{display:flex;align-items:center;gap:4px}.pwr-leg .pwr-lsn i{width:30px}'+
+  '.pwr-map.no-rain .pwr-lr,.pwr-map.no-snow .pwr-lsn,.pwr-map.no-blits .pwr-lbl{display:none}'+
+  '.pwr-map.no-snow.no-blits .pwr-lrow{display:none}'+
   '.pwr-map.no-rain.no-snow.no-blits .pwr-leg{display:none}'+
   '.pwr-bar{display:flex;align-items:center;gap:10px;margin-top:10px}'+
   '.pw .pwr-bar button{width:46px;height:42px;padding:0;font-size:20px}'+
@@ -48,8 +48,8 @@
   '#pwr-t{min-width:112px;text-align:right;font:16px Oswald,Arial,sans-serif}'+
   '.pwr-gv{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:#000000b3;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}'+
   '.pwr-gv img{max-width:100%;max-height:68vh;border-radius:12px;box-shadow:0 10px 40px #0006}'+
-  '.pwr-gv .rij{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}'+
-  '.pwr-gv .gb{display:inline-block;border:0;border-radius:8px;padding:10px 18px;background:#B32C43;color:#FCF5EE;font:21px/1 "Bebas Neue",sans-serif;text-decoration:none;cursor:pointer}'+
+  '.pwr-gv .pwr-rij{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}'+
+  '.pwr-gv .pwr-gb{display:inline-block;border:0;border-radius:8px;padding:10px 18px;background:#B32C43;color:#FCF5EE;font:21px/1 "Bebas Neue",sans-serif;text-decoration:none;cursor:pointer}'+
   '@media(min-width:700px){.pwr-map{height:440px}}';
   document.head.appendChild(st);
 
@@ -121,13 +121,13 @@
     box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'\u25B4':'\u25BE')+'</button></p>'+
       '<div id="pwr-body"'+(START_OPEN?'':' hidden')+'>'+
       '<div class="pwr-top"><span class="pwr-ch">'+
-      '<button type="button" class="pc on" data-l="rain" aria-pressed="true">Regen</button>'+
-      '<button type="button" class="pc on" data-l="snow" aria-pressed="true">Sneeuw</button>'+
-      '<button type="button" class="pc on" data-l="blits" aria-pressed="true">Bliksem</button></span>'+
+      '<button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button>'+
+      '<button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button>'+
+      '<button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button></span>'+
       '<button id="pwr-g" type="button" class="alt">GIF</button></div>'+
       '<div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div>'+
-      '<div class="pwr-leg"><div class="lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div>'+
-      '<div class="lrow"><span class="lsn"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><span>Sneeuw</span></span><span class="lbl">\u26A1 Bliksem</span></div></div></div>'+
+      '<div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div>'+
+      '<div class="pwr-lrow"><span class="pwr-lsn"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><span>Sneeuw</span></span><span class="pwr-lbl">\u26A1 Bliksem</span></div></div></div>'+
       '<div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">\u25B6</button>'+
       '<input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden\u2026</span></div>'+
       '<p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
@@ -141,8 +141,13 @@
     $('pwr-p').onclick=function(){timer?pause():play()};
     $('pwr-s').oninput=function(){pause();show(+this.value)};
     $('pwr-g').onclick=gifKlik;
-    [].forEach.call(box.querySelectorAll('.pc'),function(b){
-      b.onclick=function(){var k=b.getAttribute('data-l');on[k]=!on[k];toggles()};
+    [].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
+      b.onclick=function(){
+        var k=b.getAttribute('data-l');
+        if(on.rain&&on.snow&&(on.blits||blitsGone)){on.rain=on.snow=on.blits=false;on[k]=true} /* alles aan: eerste tik = alleen deze laag */
+        else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits){on.rain=on.snow=true;on.blits=!blitsGone}} /* niets over: weer alles */
+        toggles();
+      };
     });
     hb.onclick=function(){
       var open=body.hidden;body.hidden=!open;
@@ -164,7 +169,7 @@
     var m=box.querySelector('.pwr-map');
     ['rain','snow','blits'].forEach(function(k){
       m.classList.toggle('no-'+k,!on[k]);
-      var b=box.querySelector('.pc[data-l="'+k+'"]');b.classList.toggle('on',on[k]);b.setAttribute('aria-pressed',on[k]);
+      var b=box.querySelector('.pwr-pc[data-l="'+k+'"]');b.classList.toggle('on',on[k]);b.setAttribute('aria-pressed',on[k]);
     });
     if(!map)return;
     if(on.blits&&!$('pwr-body').hidden){map.addLayer(boltLayer);wsWant=true;if(!ws)wsStart(0);bolts(idx)}
@@ -193,8 +198,8 @@
   }
   function wsStop(){wsWant=false;clearTimeout(wsRetry);if(ws){var s=ws;ws=null;try{s.close()}catch(e){}}}
   function wsFail(){
-    on.blits=false;wsWant=false;
-    var b=box&&box.querySelector('.pc[data-l="blits"]');if(b)b.hidden=true;
+    on.blits=false;blitsGone=true;wsWant=false;
+    var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow){on.rain=on.snow=true}
     toggles();
   }
   function strike(lat,lon){
