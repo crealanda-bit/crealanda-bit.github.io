@@ -99,14 +99,16 @@
 
 /* ===== Compacte weerberichten: pas de twee getallen hieronder aan als je wilt ===== */
 (function(){
-  var DAGEN=3;   /* aantal dagen dat meteen zichtbaar is */
-  var FOTOS=8;   /* aantal foto's per dag dat meteen zichtbaar is */
+  var DAGEN=4;      /* aantal dagen dat meteen zichtbaar is (2 naast elkaar) */
+  var FOTOS_PC=8;   /* aantal foto's per dag meteen zichtbaar op computer */
+  var FOTOS_TEL=6;  /* aantal foto's per dag meteen zichtbaar op telefoon */
   var wl=document.getElementById('weerLijst');if(!wl)return;
   function knop(t){var b=document.createElement('button');b.type='button';b.textContent=t;
-    b.style.cssText='display:block;margin:12px auto 0;padding:10px 18px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:21px "Bebas Neue",sans-serif;cursor:pointer';return b}
+    b.style.cssText='display:block;margin:12px auto 0;padding:10px 18px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:21px "Bebas Neue",sans-serif;cursor:pointer;grid-column:1/-1';return b}
   function apply(){
     var secs=[].slice.call(wl.querySelectorAll('.wdag'));
     if(!secs.length)return;
+    var FOTOS=innerWidth<650?FOTOS_TEL:FOTOS_PC;
     secs.forEach(function(s){
       if(s.dataset.pw)return;s.dataset.pw='1';
       var g=s.querySelector('.wg');if(!g)return;
@@ -130,4 +132,54 @@
   }
   new MutationObserver(apply).observe(wl,{childList:true});
   apply();
+})();
+
+/* ===== Weerpagina: 2 dagen naast elkaar + foto vergroten met wazige achtergrond ===== */
+(function(){
+  var wl=document.getElementById('weerLijst');if(!wl)return;
+  var st=document.createElement('style');
+  st.textContent='#weerLijst{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start}'+
+  '#weerLijst>p{grid-column:1/-1}#weerLijst .wdag{min-width:0}'+
+  '#weerLijst .wt{white-space:normal;line-height:1.1;font-size:clamp(20px,5.4vw,30px)}'+
+  '#weerLijst .wg a{cursor:zoom-in}'+
+  '@media(max-width:650px){#weerLijst{column-gap:10px}#weerLijst .wg{grid-template-columns:repeat(2,1fr)}#weerLijst .wi{font-size:15px}}'+
+  '.pwl{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:56px 20px 24px;background:#00000066;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:pwlIn .25s ease both}'+
+  '.pwl.out{animation:pwlOut .2s ease both}'+
+  '.pwl-box{position:relative;line-height:0;animation:pwlPlop .65s ease both}'+
+  '.pwl.out .pwl-box{transform:scale(.94);opacity:0;transition:transform .2s,opacity .2s}'+
+  '.pwl-img{display:block;width:auto;height:auto;max-width:min(calc(100vw - 40px),900px);max-height:calc(100vh - 130px);max-height:calc(100dvh - 130px);border-radius:14px;box-shadow:0 10px 40px #0006}'+
+  '.pwl-x{position:absolute;right:-4px;bottom:100%;margin-bottom:2px;width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:0}'+
+  '.pwl-x svg{width:26px;height:26px;fill:none;stroke:#FCF5EE;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 3px #000a)}'+
+  '@keyframes pwlIn{from{opacity:0}}@keyframes pwlOut{to{opacity:0}}'+
+  '@keyframes pwlPlop{0%{opacity:0;transform:scale(.88)}75%{opacity:1;transform:scale(1.02)}}';
+  document.head.appendChild(st);
+  function open(url){
+    var img=new Image();
+    img.onload=function(){
+      var ov=document.createElement('div'),box=document.createElement('div'),x=document.createElement('button');
+      ov.className='pwl';box.className='pwl-box';x.className='pwl-x';x.type='button';
+      x.setAttribute('aria-label','Sluiten');
+      x.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+      img.className='pwl-img';img.alt='';
+      box.appendChild(x);box.appendChild(img);ov.appendChild(box);document.body.appendChild(ov);
+      document.body.style.overflow='hidden';
+      function key(e){if(e.key==='Escape')close()}
+      function close(){
+        if(ov.classList.contains('out'))return;
+        ov.classList.add('out');document.body.style.overflow='';
+        document.removeEventListener('keydown',key);
+        setTimeout(function(){ov.remove()},200);
+      }
+      x.onclick=close;
+      ov.onclick=function(e){if(e.target===ov)close()};
+      document.addEventListener('keydown',key);
+    };
+    img.onerror=function(){window.open(url,'_blank')};
+    img.src=url;
+  }
+  wl.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('.wg a');
+    if(!a||!a.querySelector('img'))return;
+    e.preventDefault();open(a.href);
+  });
 })();
