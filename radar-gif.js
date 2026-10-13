@@ -35,7 +35,9 @@
         bx.putImageData(bd,0,0);
         var mp=map.latLngToContainerPoint([pl.lat,pl.lon]);
         var gif=new GIF({workers:2,quality:10,width:w,height:h,workerScript:workerUrl});
-        var ex=on.snow||on.blits,lh=(10+(on.rain?25.4:0)+(ex?(on.rain?4:0)+14.4:0))*sc,lw=150*sc,lx=(w-lw)/2,ly=h-8*sc-lh,pd=9*sc;
+        var ex=on.snow||on.blits,lh=(10+(on.rain?25.4:0)+(ex?(on.rain?4:0)+14.4:0))*sc,pd=9*sc,mx=document.createElement('canvas').getContext('2d');
+        mx.font=(12*sc)+'px Oswald,Arial,sans-serif';
+        var lw=on.rain?150*sc:(on.snow?34*sc+mx.measureText('Sneeuw').width:0)+(on.snow&&on.blits?10*sc:0)+(on.blits?mx.measureText('\u26A1 Bliksem').width:0)+2*pd,lx=(w-lw)/2,ly=h-8*sc-lh;
         function balk(x,lft,wd,cols){
           var gr=x.createLinearGradient(lft,0,lft+wd,0);
           cols.forEach(function(k,j){gr.addColorStop(j/(cols.length-1),k)});return gr;
