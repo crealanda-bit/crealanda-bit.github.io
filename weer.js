@@ -185,5 +185,49 @@
   });
 })();
 
+/* ===== Weerpagina in 2 pagina's: 1 = plaats, temperatuur en radar, 2 = weerfoto's. Swipen of op de bolletjes tikken ===== */
+(function(){
+  var wp=document.getElementById('weerPage');if(!wp)return;
+  var st=document.createElement('style');
+  st.textContent='.pwd{display:flex;justify-content:center;gap:2px;height:28px;margin:-33px 0 5px}'+
+  '.pwd button{width:28px;height:28px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center}'+
+  '.pwd button::after{content:"";width:12px;height:12px;border-radius:50%;border:2px solid #FCF5EE;background:transparent;opacity:.6;transition:background .2s,opacity .2s}'+
+  '.pwd button.on::after{background:#FCF5EE;opacity:1}'+
+  '#weerPage.p2 .k9>*:not(h1):not(#weerLijst){display:none!important}'+
+  '#weerPage:not(.p2) #weerLijst{display:none!important}'+
+  '@keyframes pwSR{from{opacity:0;transform:translateX(40px)}}@keyframes pwSL{from{opacity:0;transform:translateX(-40px)}}'+
+  '#weerPage.sr .k9>*:not(h1){animation:pwSR .3s ease both}#weerPage.sl .k9>*:not(h1){animation:pwSL .3s ease both}';
+  document.head.appendChild(st);
+  var d=document.createElement('div');d.className='pwd';
+  d.innerHTML='<button type="button" class="on" aria-label="Pagina 1: weer en radar"></button><button type="button" aria-label="Pagina 2: weerfoto\u2019s"></button>';
+  wp.insertBefore(d,wp.firstChild);
+  var b=d.children,cur=0,tm;
+  function go(n){
+    if(n===cur)return;
+    var old=cur;cur=n;
+    wp.classList.toggle('p2',n===1);
+    b[0].classList.toggle('on',n===0);b[1].classList.toggle('on',n===1);
+    wp.classList.remove('sr','sl');void wp.offsetWidth;
+    wp.classList.add(n>old?'sr':'sl');
+    clearTimeout(tm);tm=setTimeout(function(){wp.classList.remove('sr','sl')},350);
+    window.scrollTo(0,0);
+    if(n===0)setTimeout(function(){window.dispatchEvent(new Event('resize'))},60);
+  }
+  b[0].onclick=function(){go(0)};
+  b[1].onclick=function(){go(1)};
+  var x0=0,y0=0,ok=false;
+  document.addEventListener('touchstart',function(e){
+    ok=false;
+    if(e.touches.length!==1||!wp.classList.contains('active'))return;
+    if(e.target.closest&&e.target.closest('.leaflet-container,.pw-scroll,input,textarea,select,video,.pwl'))return;
+    x0=e.touches[0].clientX;y0=e.touches[0].clientY;ok=true;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(!ok)return;ok=false;
+    var t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)go(dx<0?1:0);
+  },{passive:true});
+})();
+
 /* ===== Radar laden (radar.js moet naast dit bestand staan) ===== */
 (function(){var s=document.createElement('script');s.src='radar.js';document.body.appendChild(s)})();
