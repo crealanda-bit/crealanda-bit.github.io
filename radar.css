@@ -123,40 +123,43 @@
   position:absolute;
   transform:translate(-50%,-50%);
   display:flex;
-  align-items:center;
-  gap:4px;
-  padding:4px 8px 3px;
-  border-radius:9px;
-  background:#6F4257f2;
-  color:#FCF5EE;
-  border:1.5px solid #FCF5EE;
-  font:21px/1 "Bebas Neue",sans-serif;
-  white-space:nowrap;
-  box-shadow:0 2px 6px #0005
-}
-.pwr-wm div.r{background:#B32C43}
-.pwr-wm div.c{
   flex-direction:column;
-  gap:2px
+  align-items:center;
+  gap:1px;
+  padding:3px 6px 2px;
+  border-radius:7px;
+  background:#6F4257;
+  color:#FCF5EE;
+  border:1px solid #FCF5EE;
+  font:15px/1 "Bebas Neue",sans-serif;
+  white-space:nowrap;
+  box-shadow:0 1px 4px #0005
 }
 .pwr-wm b{
   display:flex;
   align-items:center;
-  gap:4px;
+  gap:3px;
   font-weight:400
 }
 .pwr-wm svg{
-  width:17px;
-  height:17px;
+  width:12px;
+  height:12px;
   flex-shrink:0
 }
-.pwr-wm small{
-  font:12px Oswald,Arial,sans-serif;
-  opacity:.95
+.pwr-wm small{font:10px/1.1 Oswald,Arial,sans-serif}
+.pwr-wm.m div{
+  padding:2px 4px 1px;
+  border-radius:6px;
+  font-size:13px
 }
+.pwr-wm.m svg{
+  width:10px;
+  height:10px
+}
+.pwr-wm.m small{font-size:8.5px}
 .pwr-map.no-wind .pwr-wc{display:none}
 
-/* legenda: dun balkje onderaan */
+/* legenda: onderaan, per laag een titel in Great Vibes */
 .pwr-leg{
   position:absolute;
   left:50%;
@@ -166,14 +169,20 @@
   max-width:96%;
   z-index:1000;
   display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:6px 9px 4px;
+  align-items:flex-end;
+  gap:8px;
+  padding:5px 8px 4px;
   border-radius:8px;
-  background:#6F4257e6;
+  background:#6F4257f2;
   pointer-events:none;
-  font:12px/1.2 Oswald,Arial,sans-serif;
+  font:11px/1.2 Oswald,Arial,sans-serif;
   color:#FCF5EE
+}
+.pwr-leg .pwr-lt{
+  font:700 15px/1 "Great Vibes",cursive;
+  text-align:center;
+  white-space:nowrap;
+  margin-bottom:3px
 }
 .pwr-leg i{
   display:block;
@@ -185,11 +194,10 @@
   justify-content:space-between;
   margin-top:3px
 }
-.pwr-leg .pwr-lr{width:104px}
-.pwr-leg .pwr-ls{width:46px}
-.pwr-leg .pwr-lw{width:54px}
-.pwr-leg .pwr-lwd{width:54px}
-.pwr-leg .pwr-ls .pwr-lb{justify-content:center}
+.pwr-leg .pwr-lr{width:96px}
+.pwr-leg .pwr-ls{width:52px}
+.pwr-leg .pwr-lw{width:48px}
+.pwr-leg .pwr-lwd{width:48px}
 .pwr-map.no-rain .pwr-lr,
 .pwr-map.no-snow .pwr-ls,
 .pwr-map.no-wolken .pwr-lw,
