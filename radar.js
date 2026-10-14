@@ -37,10 +37,9 @@ document.body.appendChild(sv);
 function $(i){return document.getElementById(i)}
 function satOp(){return(on.rain||on.snow)?SAT_OPACITY:SAT_SOLO}
 function allOn(){return on.rain&&on.snow&&on.wolken&&on.wind&&(on.blits||blitsGone)}
-/* metingen: alleen wind aan = windmetingen, regen + wolken aan (niet alles) = regenmetingen, alles aan = geen metingen */
+/* metingen: alleen windmetingen, nooit met wolken erbij en niet als alles aan staat */
 function meet(){
-if(on.wind&&!on.rain&&!on.snow&&!on.wolken&&!on.blits)return 'wind';
-if(on.rain&&on.wolken&&!allOn())return 'regen';
+if(on.wind&&!on.wolken&&!allOn())return 'wind';
 return '';
 }
 function canPlay(){return readyOk&&frames.length&&!timer&&vis&&$('pwr-body')&&!$('pwr-body').hidden}
