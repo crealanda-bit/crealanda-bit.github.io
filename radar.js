@@ -4,16 +4,17 @@ var API='https://api.rainviewer.com/public/weather-maps.json';
 var START_OPEN=true;
 var SAT_URL='https://view.eumetsat.int/geoserver/wms';
 var SAT_LAAG='mtg_fd:ir105_hrfi';
-var SAT_OPACITY=.45;   
-var SAT_SOLO=.75;      
+var SAT_OPACITY=.45;   /* wolken samen met regen */
+var SAT_SOLO=.75;      /* alleen wolken aan: duidelijker */
 var SAT_LAG=0;
 var SAT_CORS=true;
 var AANTAL=8;
-var STAP=550,STAP_LAATST=2000; 
+var STAP=550,STAP_LAATST=2000; /* ms per beeld / pauze op het laatste beeld */
+/* kaartkleuren: DONKER = lijnen/letters/water, LICHT = land */
 var KAART_DONKER='#5C77AD',KAART_LICHT='#EAF0F8';
 var HEX=['#9EB3D8','#627EB5','#D9667A','#B32C43','#7E1D30','#3E1A2C'];
 var SNOWHEX=['#D6BFD9','#AE86B4','#7E4F8C'];
-var WINDHEX=['#5C77AD','#6F4257','#B32C43','#3E1A2C']; 
+var WINDHEX=['#5C77AD','#6F4257','#B32C43','#3E1A2C']; /* zelfde kleuren als KL in wind.js */
 var BMAX=[5,15,30,60,120];
 var BLAB=['0-5 min','5-15 min','15-30 min','30-60 min','1-2 uur'];
 var BCOL=['#B32C43','#D9667A','#FCF5EE','#9EB3D8','#627EB5'];
