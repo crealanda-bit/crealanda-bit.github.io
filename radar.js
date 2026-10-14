@@ -9,10 +9,12 @@ var SAT_SOLO=.75;      /* alleen wolken aan: duidelijker */
 var SAT_LAG=0;
 var SAT_CORS=true;
 var AANTAL=8;
+var STAP=550,STAP_LAATST=2000; /* ms per beeld / pauze op het laatste beeld */
 /* kaartkleuren: DONKER = lijnen/letters/water, LICHT = land */
 var KAART_DONKER='#5C77AD',KAART_LICHT='#EAF0F8';
 var HEX=['#9EB3D8','#627EB5','#D9667A','#B32C43','#7E1D30','#3E1A2C'];
 var SNOWHEX=['#D6BFD9','#AE86B4','#7E4F8C'];
+var WINDHEX=['#5C77AD','#6F4257','#B32C43','#3E1A2C']; /* zelfde kleuren als KL in wind.js */
 var BMAX=[5,15,30,60,120];
 var BLAB=['0-5 min','5-15 min','15-30 min','30-60 min','1-2 uur'];
 var BCOL=['#B32C43','#D9667A','#FCF5EE','#9EB3D8','#627EB5'];
@@ -23,7 +25,8 @@ var BWIN=BMAX[BMAX.length-1]*60000;
 var BOLTP='<path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="#6F4257" stroke-width="1.3" stroke-linejoin="round"/>';
 function bsvg(c){return '<svg viewBox="0 0 24 24" fill="currentColor"'+(c?' style="color:'+c+'"':'')+'>'+BOLTP+'</svg>'}
 var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],wolkenLagen=[],idx=0,timer=null,host='',lastKey=0,started=false;
-var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:true},bon=[1,1,1,1,1],strikes=[],boltLayer=null;
+var wantPlay=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:true,wind:true},bon=[1,1,1,1,1],strikes=[],boltLayer=null;
+var vis=true,readyOk=false,lid=0;
 /* stijl staat in radar.css */
 var cl=document.createElement('link');cl.rel='stylesheet';cl.href='radar.css';document.head.appendChild(cl);
 var kd=rgb(KAART_DONKER),kl=rgb(KAART_LICHT);window.pwKaart={d:kd,l:kl};
@@ -33,6 +36,14 @@ sv.innerHTML='<svg width="0" height="0"><filter id="pwr-duo" color-interpolation
 document.body.appendChild(sv);
 function $(i){return document.getElementById(i)}
 function satOp(){return(on.rain||on.snow)?SAT_OPACITY:SAT_SOLO}
+function allOn(){return on.rain&&on.snow&&on.wolken&&on.wind&&(on.blits||blitsGone)}
+/* metingen: alleen wind aan = windmetingen, regen + wolken aan (niet alles) = regenmetingen, alles aan = geen metingen */
+function meet(){
+if(on.wind&&!on.rain&&!on.snow&&!on.wolken&&!on.blits)return 'wind';
+if(on.rain&&on.wolken&&!allOn())return 'regen';
+return '';
+}
+function canPlay(){return readyOk&&frames.length&&!timer&&vis&&$('pwr-body')&&!$('pwr-body').hidden}
 function rgb2hsl(r,g,b){
 r/=255;g/=255;b/=255;
 var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,h=0,s=0,d=mx-mn;
@@ -93,16 +104,16 @@ return tile;
 }
 function build(){
 box=document.createElement('div');box.id='pw-radar';
-box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'▴':'▾')+'</button></p><div id="pwr-body"'+(START_OPEN?'':' hidden')+'><div class="pwr-top"><span class="pwr-ch"><button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button><button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button><button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button><button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button></span></div><div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div><div class="pwr-bl dicht"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div><div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div><div class="pwr-ls"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Sneeuw</span></div></div><div class="pwr-lw"><i style="background:linear-gradient(90deg,#2c2c38,#8d8d9c,#fff)"></i><div class="pwr-lb"><span>Laag</span><span>Hoog</span></div></div></div></div><div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button><input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div><div class="pwr-acts"><button id="pwr-f" type="button" class="alt">Foto</button><button id="pwr-g" type="button" class="alt">GIF</button></div><p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
+box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'▴':'▾')+'</button></p><div id="pwr-body"'+(START_OPEN?'':' hidden')+'><div class="pwr-top"><span class="pwr-ch"><button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button><button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button><button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button><button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button><button type="button" class="pwr-pc on" data-l="wind" aria-pressed="true">Wind</button></span></div><div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div><div class="pwr-bl dicht"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div><div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div><div class="pwr-ls"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Sneeuw</span></div></div><div class="pwr-lw"><i style="background:linear-gradient(90deg,#2c2c38,#8d8d9c,#fff)"></i><div class="pwr-lb"><span>Laag</span><span>Hoog</span></div></div><div class="pwr-lwd"><i style="background:linear-gradient(90deg,'+WINDHEX.join(',')+')"></i><div class="pwr-lb"><span>Zacht</span><span>Hard</span></div></div></div></div><div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button><input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div><div class="pwr-acts"><button id="pwr-f" type="button" class="alt">Foto</button><button id="pwr-g" type="button" class="alt">GIF</button></div><p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
 var foot=wp.querySelector('.pw-foot');wp.insertBefore(box,foot);
-foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> · bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a> · wolken van <a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a>');
+foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> · bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a> · wolken van <a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a> · wind van <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>');
 mapEl=$('pwr-m');
 box.style.setProperty('--kl',KAART_LICHT);
 var m=box.querySelector('.pwr-map'),body=$('pwr-body'),hb=$('pwr-h');
 function lock(v){m.classList.toggle('locked',v);$('pwr-l').textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
 box.querySelector('.pwr-lock').onclick=function(){lock(false)};
 $('pwr-l').onclick=function(){lock(!m.classList.contains('locked'))};
-$('pwr-p').onclick=function(){if(timer){wantPlay=false;pause()}else{wantPlay=true;play()}};
+$('pwr-p').onclick=function(){if(timer){wantPlay=false;pause()}else{wantPlay=true;if(canPlay())play()}};
 $('pwr-s').oninput=function(){wantPlay=false;pause();show(+this.value)};
 $('pwr-g').onclick=function(){gifKlik()};$('pwr-f').onclick=function(){gifKlik(1)};
 box.querySelector('.pwr-bl').onclick=function(e){
@@ -114,8 +125,8 @@ b.classList.toggle('off',!bon[k]);b.setAttribute('aria-pressed',!!bon[k]);bolts(
 [].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
 b.onclick=function(){
 var k=b.getAttribute('data-l');
-if(on.rain&&on.snow&&on.wolken&&(on.blits||blitsGone)){on.rain=on.snow=on.blits=on.wolken=false;on[k]=true}
-else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits&&!on.wolken){on.rain=on.snow=on.wolken=true;on.blits=!blitsGone}}
+if(allOn()){on.rain=on.snow=on.blits=on.wolken=on.wind=false;on[k]=true}
+else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits&&!on.wolken&&!on.wind){on.rain=on.snow=on.wolken=on.wind=true;on.blits=!blitsGone}}
 toggles();
 };
 });
@@ -126,17 +137,22 @@ if(open){
 if(!started){started=true;loadLeaflet()}
 else if(map)setTimeout(function(){map.invalidateSize()},50);
 toggles();
-if(wantPlay&&frames.length&&!timer)play();
-}else{pause();wsStop()}
+if(wantPlay&&canPlay())play();
+}else{pause();wsStop();if(window.pwWind)pwWind.set(false,'')}
 };
 new IntersectionObserver(function(es){
-if(es[0].isIntersecting){if(!started&&!body.hidden){started=true;loadLeaflet()}else if(wantPlay&&frames.length&&!timer&&!body.hidden)play()}else pause();
+vis=es[0].isIntersecting;
+if(vis){
+if(!started&&!body.hidden){started=true;loadLeaflet()}
+else if(wantPlay&&canPlay())play();
+if(window.pwWind)pwWind.resume();
+}else{pause();if(window.pwWind)pwWind.pause()}
 },{threshold:.1}).observe(box);
 }
 function toggles(){
 if(!box)return;
 var m=box.querySelector('.pwr-map');
-['rain','snow','blits','wolken'].forEach(function(k){
+['rain','snow','blits','wolken','wind'].forEach(function(k){
 m.classList.toggle('no-'+k,!on[k]);
 var b=box.querySelector('.pwr-pc[data-l="'+k+'"]');b.classList.toggle('on',on[k]);b.setAttribute('aria-pressed',on[k]);
 });
@@ -145,6 +161,7 @@ var open=!$('pwr-body').hidden;
 if(on.wolken&&open){if(!wolkenLagen.length)wolkenBouw();else wolkenToon(idx)}else wolkenWeg();
 if(on.blits&&open){map.addLayer(boltLayer);wsWant=true;if(!ws)wsStart(0);bolts(idx)}
 else{map.removeLayer(boltLayer);wsStop()}
+if(window.pwWind)pwWind.set(open&&on.wind,open?meet():'');
 }
 function satTijd(i){return new Date(Math.floor((frames[i].time-SAT_LAG*60)/600)*600000).toISOString()}
 function wolkenWeg(){wolkenLagen.forEach(function(l){map.removeLayer(l)});wolkenLagen=[]}
@@ -189,7 +206,7 @@ if(opened)wsRetry=setTimeout(function(){wsStart(k)},15000);else wsStart(k+1);
 function wsStop(){wsWant=false;clearTimeout(wsRetry);wsOpen=false;if(ws){var s=ws;ws=null;try{s.close()}catch(e){}}blLabel()}
 function wsFail(){
 on.blits=false;blitsGone=true;wsWant=false;
-var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow&&!on.wolken){on.rain=on.snow=on.wolken=true}
+var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow&&!on.wolken&&!on.wind){on.rain=on.snow=on.wolken=on.wind=true}
 toggles();
 }
 function strike(lat,lon){
@@ -224,7 +241,11 @@ var css=document.createElement('link');css.rel='stylesheet';
 css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';document.head.appendChild(css);
 var js=document.createElement('script');
 js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
-js.onload=init;js.onerror=function(){$('pwr-t').textContent='Kaart laadt niet'};
+js.onload=function(){
+/* wind.js erbij laden; lukt dat niet dan werkt de radar gewoon zonder wind */
+var w=document.createElement('script');w.src='wind.js';w.onload=init;w.onerror=init;document.head.appendChild(w);
+};
+js.onerror=function(){$('pwr-t').textContent='Kaart laadt niet'};
 document.head.appendChild(js);
 }
 function init(){
@@ -234,10 +255,28 @@ base=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,cl
 L.control.attribution({prefix:false}).addAttribution('© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, Contains modified EUMETSAT Meteosat data '+new Date().getFullYear()).addTo(map);
 mk=L.circleMarker([pl.lat,pl.lon],{radius:7,color:'#FCF5EE',weight:2,fillColor:'#B32C43',fillOpacity:1}).addTo(map);
 boltLayer=L.layerGroup();
+if(window.pwWind)pwWind.init(map);
 loadFrames();setInterval(loadFrames,300000);
 setInterval(function(){if(frames.length&&idx===frames.length-1)bolts(idx)},30000);
 setTimeout(function(){map.invalidateSize()},300);
 toggles();
+}
+/* alle beelden eerst volledig laden, pas daarna afspelen: dat geeft een vloeiend beeld */
+function voorlaad(){
+var n=layers.length,k=0,id=++lid;readyOk=false;pause();
+function klaar(){
+if(id!==lid||readyOk)return;
+readyOk=true;show(idx);
+if(wantPlay&&canPlay())play();
+}
+layers.forEach(function(l){l.once('load',function(){
+if(id!==lid||readyOk)return;
+k++;$('pwr-t').textContent='Laden '+k+'/'+n;
+if(k>=n)klaar();
+})});
+$('pwr-t').textContent='Laden 0/'+n;
+setTimeout(klaar,8000);
+setTimeout(function(){if(id===lid&&!readyOk&&!k)klaar()},1500);
 }
 function loadFrames(){
 fetch(API).then(function(r){return r.json()}).then(function(d){
@@ -246,11 +285,11 @@ if(f[f.length-1].time===lastKey)return;lastKey=f[f.length-1].time;
 layers.forEach(function(l){map.removeLayer(l)});
 host=d.host;frames=f;
 layers=f.map(function(fr){
-return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10,updateWhenZooming:false,keepBuffer:1});
+return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10,updateWhenZooming:false,keepBuffer:1,className:'pwr-rl'});
 });layers.slice().reverse().forEach(function(l){l.addTo(map)});
 wolkenBouw();
 $('pwr-s').max=f.length-1;show(f.length-1);
-if(eerste){eerste=false;if(wantPlay)play()}
+voorlaad();
 }).catch(function(){$('pwr-t').textContent='Radar niet beschikbaar'});
 }
 function tijd(i){return new Date(frames[i].time*1000).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}
@@ -259,15 +298,16 @@ idx=i;
 layers.forEach(function(l,j){l.setOpacity(j===i?.85:0)});
 wolkenToon(i);
 $('pwr-s').value=i;
+if(!readyOk)return bolts(i);
 var min=Math.round((Date.now()-frames[i].time*1000)/60000),hhmm=tijd(i);
 $('pwr-t').textContent=i===frames.length-1?hhmm+' · nu':hhmm+' · '+min+' min geleden';
 bolts(i);
 }
 function play(){
-if(!frames.length)return;
+if(!frames.length||timer)return;
 $('pwr-p').textContent='❚❚';$('pwr-p').setAttribute('aria-label','Pauze');
 (function stap(){
-timer=setTimeout(function(){show(idx+1>=frames.length?0:idx+1);stap()},idx===frames.length-1?1500:450);
+timer=setTimeout(function(){show(idx+1>=frames.length?0:idx+1);stap()},idx===frames.length-1?STAP_LAATST:STAP);
 })();
 }
 function pause(){
