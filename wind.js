@@ -5,11 +5,11 @@ var KL=['#5C77AD','#6F4257','#B32C43','#3E1A2C'],GR=[12,25,40];
 var GX=8,GY=6;        /* meetpunten over de kaart (8 x 6 = 48) */
 var CEL=8;            /* grootte van een veldcel in pixels */
 var SNEL=.05;         /* snelheid van de deeltjes */
-var PAD=.08,LEEF=70,LIJN=1.9;
+var PAD=.08,LEEF=60,LIJN=1.6;
 var map,cv,ctx,mv,W=0,H=0,dpr=1,gd=null,gb=null,fu,fv,cw=0,ch=0,P=[],raf=0,act=false,md='',tm=0,lastT=0,busy=0,paused=false,iv=0;
 function div(c){var e=document.createElement('div');e.className=c;return e}
 function size(){
-  W=map.getSize().x;H=map.getSize().y;dpr=Math.min(2,window.devicePixelRatio||1);
+  W=map.getSize().x;H=map.getSize().y;dpr=1; /* deeltjes hoeven niet scherp: scheelt veel rekenwerk */
   cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
 }
 function stop(){cancelAnimationFrame(raf);raf=0}
@@ -32,14 +32,14 @@ function load(){
   }
   var id=++busy;
   fetch('https://api.open-meteo.com/v1/forecast?latitude='+la.join(',')+'&longitude='+lo.join(',')+
-    '&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation,cloud_cover&wind_speed_unit=kmh&timezone=auto')
+    '&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=kmh&timezone=auto')
   .then(function(r){return r.json()}).then(function(d){
     if(id!==busy)return;
     if(!Array.isArray(d))d=[d];
     if(d.length<GX*GY||!d[0].current)return;
     gd=d.map(function(x){return x.current});gb={n:n,s:s,w:w,e:e};
     build();apply();
-  }).catch(function(){});
+  }).catch(function(){if(id===busy&&md==='wind')chips()});
 }
 /* vectorveld op schermcellen (bilineair tussen de meetpunten) */
 function build(){
@@ -61,7 +61,7 @@ function spawn(p){p.x=Math.random()*W;p.y=Math.random()*H;p.a=Math.random()*LEEF
 function loop(t){
   raf=requestAnimationFrame(loop);
   if(t-lastT<30)return;lastT=t;
-  ctx.globalCompositeOperation='destination-out';ctx.fillStyle='rgba(0,0,0,.1)';ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='destination-out';ctx.fillStyle='rgba(0,0,0,.16)';ctx.fillRect(0,0,W,H);
   ctx.globalCompositeOperation='source-over';ctx.lineWidth=LIJN;ctx.lineCap='round';
   var paths=KL.map(function(){return new Path2D()});
   for(var k=0;k<P.length;k++){
@@ -75,28 +75,51 @@ function loop(t){
 }
 function start(){
   if(raf||paused||!act||!gd||!fu)return;
-  var n=Math.min(1400,Math.round(W*H/150));P=[];
+  var n=Math.min(800,Math.round(W*H/420));P=[];
   for(var i=0;i<n;i++){var p={};spawn(p);P.push(p)}
   ctx.clearRect(0,0,W,H);raf=requestAnimationFrame(loop);
 }
-/* meetchips: wind (alleen wind aan) of regen + bewolking (regen en wolken aan) */
+/* meetchips: windkracht en windstoten op een aantal grote plaatsen die in beeld zijn */
+var STAD=[['Amsterdam',52.37,4.90],['Rotterdam',51.92,4.48],['Utrecht',52.09,5.12],['Den Haag',52.08,4.30],['Groningen',53.22,6.57],['Eindhoven',51.44,5.48],['Zwolle',52.51,6.09],['Maastricht',50.85,5.69],['Arnhem',51.98,5.91],['Leeuwarden',53.20,5.80],['Middelburg',51.50,3.61],['Den Helder',52.96,4.76],['Enschede',52.22,6.89],['Breda',51.59,4.78],['Antwerpen',51.22,4.40],['Brussel',50.85,4.35],['Gent',51.05,3.72],['Luik',50.63,5.57],['Keulen',50.94,6.96],['Düsseldorf',51.23,6.78],['Hamburg',53.55,9.99],['Bremen',53.08,8.80],['Hannover',52.37,9.74],['Londen',51.51,-.13],['Parijs',48.86,2.35],['Lille',50.63,3.06],['Dortmund',51.51,7.47],['Norwich',52.63,1.30],['Amersfoort',52.16,5.39],['Almere',52.35,5.26],['Apeldoorn',52.21,5.97],['Emmen',52.78,6.90],['Venlo',51.37,6.17],['Tilburg',51.56,5.09],['Haarlem',52.38,4.64],['Alkmaar',52.63,4.75],['Vlissingen',51.44,3.57]];
+var BFT=[1,6,12,20,29,39,50,62,75,89,103,118],sc={},sbusy=false;
+function bft(v){var k=0;while(k<12&&v>=BFT[k])k++;return k}
+function kies(){
+  W=map.getSize().x;H=map.getSize().y;
+  var q=[];
+  for(var k=0;k<STAD.length&&q.length<6;k++){
+    var p=map.latLngToContainerPoint([STAD[k][1],STAD[k][2]]);
+    if(p.x<60||p.x>W-60||p.y<40||p.y>H-70)continue;
+    if(p.y<80&&p.x>W-150)continue;
+    if(q.some(function(o){return Math.abs(o.x-p.x)<110&&Math.abs(o.y-p.y)<70}))continue;
+    q.push({n:STAD[k][0],la:STAD[k][1],lo:STAD[k][2],x:p.x,y:p.y});
+  }
+  return q;
+}
+function vers(c){return c&&Date.now()-c.t<600000}
 function chips(){
   mv.innerHTML='';mv.style.visibility='visible';
-  if(!md||!gd||!gb)return;
-  for(var j=0;j<GY;j++)for(var i=0;i<GX;i++){
-    if((i+j)%2)continue;
-    var c=gd[j*GX+i],lat=gb.n-(gb.n-gb.s)*j/(GY-1),lon=gb.w+(gb.e-gb.w)*i/(GX-1),p=map.latLngToContainerPoint([lat,lon]);
-    if(p.x<30||p.x>W-30||p.y<22||p.y>H-62)continue;
-    var e=document.createElement('div');e.style.left=p.x+'px';e.style.top=p.y+'px';
-    if(md==='wind'){
-      e.innerHTML='<svg viewBox="0 0 24 24" style="transform:rotate('+Math.round(c.wind_direction_10m+180)+'deg)"><path d="M12 2l7 19-7-4-7 4z" fill="#FCF5EE"/></svg><span>'+Math.round(c.wind_speed_10m)+'</span><small>km/u</small>';
-    }else{
-      var mm=c.precipitation||0;
-      e.className='c'+(mm>0?' r':'');
-      e.innerHTML='<span>'+mm.toFixed(1).replace('.',',')+' mm</span><small>\u2601 '+Math.round(c.cloud_cover)+'%</small>';
-    }
-    mv.appendChild(e);
+  if(md!=='wind'||!map)return;
+  var q=kies(),need=q.filter(function(o){return !vers(sc[o.n])});
+  if(need.length&&!sbusy){
+    sbusy=true;
+    fetch('https://api.open-meteo.com/v1/forecast?latitude='+need.map(function(o){return o.la}).join(',')+'&longitude='+need.map(function(o){return o.lo}).join(',')+'&current=wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kmh&timezone=auto')
+    .then(function(r){return r.json()}).then(function(d){
+      sbusy=false;
+      if(!Array.isArray(d))d=[d];
+      need.forEach(function(o,i){
+        var c=d[i]&&d[i].current;
+        sc[o.n]=c?{t:Date.now(),s:c.wind_speed_10m,g:c.wind_gusts_10m,d:c.wind_direction_10m}:{t:Date.now()};
+      });
+      if(md==='wind')chips();
+    }).catch(function(){sbusy=false});
   }
+  q.forEach(function(o){
+    var c=sc[o.n];if(!c||c.s==null)return;
+    var e=document.createElement('div');e.style.left=o.x+'px';e.style.top=o.y+'px';
+    e.className='c'+(c.g>=50?' r':'');
+    e.innerHTML='<small>'+o.n+'</small><b><svg viewBox="0 0 24 24" style="transform:rotate('+Math.round(c.d+180)+'deg)"><path d="M12 2l7 19-7-4-7 4z" fill="#FCF5EE"/></svg><span>'+Math.round(c.s)+'</span><small>km/u</small></b><small>kracht '+bft(c.s)+' · stoten '+Math.round(c.g)+'</small>';
+    mv.appendChild(e);
+  });
 }
 function apply(){
   if(!map)return;
