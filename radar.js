@@ -98,7 +98,7 @@ setTimeout(function(){map.invalidateSize()},300);
 toggles();
 zetWeergave(huidigeWeergave);
 
-// ===== MASKER: laad de Benelux-grenzen =====
+// ===== MASKER: laad de Benelux-grenzen uit de 3 bestanden =====
 var grensBestanden = ['nederland.geojson', 'belgie.geojson', 'luxemburg.geojson'];
 var maskerLaag = null;
 
@@ -106,8 +106,6 @@ Promise.all(grensBestanden.map(function(f) {
     return fetch(f).then(function(r) { return r.json(); });
 })).then(function(bestanden) {
     if (maskerLaag) { map.removeLayer(maskerLaag); maskerLaag = null; }
-    
-    // Bouw een groot vlak over de hele wereld, met een gat voor de Benelux
     var wereld = [[-90, -180], [90, -180], [90, 180], [-90, 180], [-90, -180]];
     var gaten = [];
     
@@ -127,7 +125,7 @@ Promise.all(grensBestanden.map(function(f) {
     
     var ringen = [wereld];
     gaten.forEach(function(gat) {
-        ringen.push(gat.slice().reverse()); // Omgekeerd = gat
+        ringen.push(gat.slice().reverse());
     });
     
     maskerLaag = L.polygon(ringen, {
