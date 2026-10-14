@@ -55,6 +55,7 @@
   color:#FCF5EE
 }
 .pwr-map{
+  --pwr-rad:6px; /* hoekafronding van de knoppen op de kaart */
   position:relative;
   height:360px;
   border-radius:10px;
@@ -101,7 +102,7 @@
   font-size:19px
 }
 
-/* wind: deeltjes + meetchips */
+/* wind: deeltjes */
 .pwr-wc{
   position:absolute;
   left:0;
@@ -112,6 +113,9 @@
   pointer-events:none;
   opacity:.7
 }
+.pwr-map.no-wind .pwr-wc{display:none}
+
+/* windmetingen: rode knopjes per plaats, zelfde kleur als de knoppen boven de radar */
 .pwr-wm{
   position:absolute;
   inset:0;
@@ -121,43 +125,43 @@
 }
 .pwr-wm div{
   position:absolute;
-  transform:translate(-50%,-50%);
+  transform:translate(-50%,calc(-100% - 5px));
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:1px;
-  padding:3px 6px 2px;
-  border-radius:7px;
-  background:#6F4257;
+  padding:2px 8px 3px;
+  border-radius:var(--pwr-rad,6px);
+  background:#B32C43;
   color:#FCF5EE;
-  border:1px solid #FCF5EE;
-  font:15px/1 "Bebas Neue",sans-serif;
   white-space:nowrap;
   box-shadow:0 1px 4px #0005
 }
-.pwr-wm b{
+.pwr-wm div::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:-4px;
+  margin-left:-4px;
+  border:4px solid transparent;
+  border-bottom:0;
+  border-top-color:#B32C43
+}
+.pwr-wm .pn{
+  font:400 19px/1.1 "Great Vibes",cursive;
+  -webkit-text-stroke:.3px #FCF5EE
+}
+.pwr-wm .pk{
   display:flex;
   align-items:center;
   gap:3px;
-  font-weight:400
+  font:11px/1.2 Oswald,Arial,sans-serif;
+  letter-spacing:.2px
 }
 .pwr-wm svg{
-  width:12px;
-  height:12px;
+  width:10px;
+  height:10px;
   flex-shrink:0
 }
-.pwr-wm small{font:10px/1.1 Oswald,Arial,sans-serif}
-.pwr-wm.m div{
-  padding:2px 4px 1px;
-  border-radius:6px;
-  font-size:13px
-}
-.pwr-wm.m svg{
-  width:10px;
-  height:10px
-}
-.pwr-wm.m small{font-size:8.5px}
-.pwr-map.no-wind .pwr-wc{display:none}
 
 /* legenda: onderaan, per laag een titel in Great Vibes */
 .pwr-leg{
@@ -204,26 +208,42 @@
 .pwr-map.no-wind .pwr-lwd{display:none}
 .pwr-map.no-rain.no-snow.no-wolken.no-wind .pwr-leg{display:none}
 
-/* bliksemblok: standaard ingeklapt, tik op de titel */
-.pwr-bl{
+/* rechtsboven: bliksemknop met daaronder de windmetingen-knop */
+.pwr-rt{
   position:absolute;
   right:8px;
   top:8px;
   z-index:1200;
   display:flex;
   flex-direction:column;
-  gap:1px;
-  padding:5px 5px 4px;
-  border-radius:8px;
-  background:#6F4257eb;
+  align-items:stretch;
+  gap:6px
+}
+/* oude opbouw zonder .pwr-rt blijft ook werken */
+.pwr-map>.pwr-bl{
+  position:absolute;
+  right:8px;
+  top:8px;
+  z-index:1200
+}
+.pwr-bl{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  padding:4px 6px;
+  border-radius:var(--pwr-rad,6px);
+  background:#6F4257;
   color:#FCF5EE;
-  font:12px/1.2 Oswald,Arial,sans-serif
+  font:17px/1.1 "Bebas Neue",sans-serif;
+  letter-spacing:.3px;
+  box-shadow:0 2px 6px #0004
 }
 .pwr-map.no-blits .pwr-bl{display:none}
 .pwr-bl .pwr-bt{
-  padding:2px 3px 3px;
-  font-size:12px;
+  padding:3px 4px;
+  font-size:17px;
   white-space:nowrap;
+  text-align:center;
   cursor:pointer
 }
 .pw .pwr-bl .pwr-br{
@@ -232,15 +252,14 @@
   gap:6px;
   width:100%;
   margin:0;
-  padding:3px;
+  padding:3px 4px;
   border:0;
-  border-radius:5px;
+  border-radius:4px;
   background:none;
   box-shadow:none;
   color:#FCF5EE;
-  font:12px/1.2 Oswald,Arial,sans-serif;
-  letter-spacing:0;
-  text-transform:none;
+  font:16px/1.1 "Bebas Neue",sans-serif;
+  letter-spacing:.3px;
   text-align:left
 }
 .pw .pwr-bl.dicht .pwr-br{display:none}
@@ -261,6 +280,19 @@
   text-align:right;
   opacity:.8
 }
+.pw .pwr-wb{
+  padding:7px 10px;
+  border:0;
+  border-radius:var(--pwr-rad,6px);
+  background:#6F4257;
+  color:#FCF5EE;
+  font:17px/1.1 "Bebas Neue",sans-serif;
+  letter-spacing:.3px;
+  white-space:nowrap;
+  box-shadow:0 2px 6px #0004
+}
+.pw .pwr-wb.off{opacity:.6}
+.pwr-map.no-wind .pwr-wb{display:none}
 
 /* tijdlijn */
 .pwr-bar{
