@@ -1,4 +1,3 @@
-
 (function(){
 var wp=document.getElementById('pw');if(!wp||window.pwRadarLoaded)return;window.pwRadarLoaded=1;
 var API='https://api.rainviewer.com/public/weather-maps.json';
