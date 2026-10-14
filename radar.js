@@ -98,4 +98,15 @@ setTimeout(function(){map.invalidateSize()},300);
 toggles();
 zetWeergave(huidigeWeergave);
 }
-function voorlaad(){var all=layers.concat(on.wolken?wolkenLagen:[]),n=all.length,k=0,id=++lid;readyOk=false;pause();function klaar(){if(id!==lid||readyOk)return;readyOk=true;show(idx);if(wantPlay&&canPlay())play();}all.forEach(function(l){l.once('load',function(){if(id!==lid||
+function voorlaad(){var all=layers.concat(on.wolken?wolkenLagen:[]),n=all.length,k=0,id=++lid;readyOk=false;pause();function klaar(){if(id!==lid||readyOk)return;readyOk=true;show(idx);if(wantPlay&&canPlay())play();}all.forEach(function(l){l.once('load',function(){if(id!==lid||readyOk)return;k++;$('pwr-t').textContent='Laden '+k+'/'+n;if(k>=n)klaar();})});$('pwr-t').textContent='Laden 0/'+n;setTimeout(klaar,8000);setTimeout(function(){if(id===lid&&!readyOk&&!k)klaar()},1500);}
+function loadFrames(){fetch(API).then(function(r){return r.json()}).then(function(d){var f=((d.radar&&d.radar.past)||[]).slice(-AANTAL);if(!f.length)throw 0;if(f[f.length-1].time===lastKey)return;lastKey=f[f.length-1].time;layers.forEach(function(l){map.removeLayer(l)});host=d.host;frames=f;layers=f.map(function(fr){return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10,updateWhenZooming:false,keepBuffer:1,className:'pwr-rl'});});layers.slice().reverse().forEach(function(l){l.addTo(map)});wolkenBouw();$('pwr-s').max=f.length-1;show(f.length-1);voorlaad();}).catch(function(){$('pwr-t').textContent='Radar niet beschikbaar'});}
+function tijd(i){return new Date(frames[i].time*1000).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}
+function show(i){idx=i;layers.forEach(function(l,j){l.setOpacity(j===i?.85:0)});wolkenToon(i);$('pwr-s').value=i;if(!readyOk)return bolts(i);var min=Math.round((Date.now()-frames[i].time*1000)/60000),hhmm=tijd(i);$('pwr-t').textContent=i===frames.length-1?hhmm+' · nu':hhmm+' · '+min+' min geleden';bolts(i);}
+function play(){if(!frames.length||timer)return;$('pwr-p').textContent='❚❚';$('pwr-p').setAttribute('aria-label','Pauze');(function stap(){timer=setTimeout(function(){show(idx+1>=frames.length?0:idx+1);stap()},idx===frames.length-1?STAP_LAATST:STAP);})();}
+function pause(){clearTimeout(timer);timer=null;var p=$('pwr-p');if(p){p.textContent='▶';p.setAttribute('aria-label','Afspelen')}}
+window.pwRadar={s:function(){return{map:map,base:base,layers:layers,wolken:wolkenLagen,satCors:SAT_CORS,satOp:satOp(),frames:frames,on:on,pl:pl,mapEl:mapEl,zichtbaar:zichtbaar,tijd:tijd,HEX:HEX,SNOWHEX:SNOWHEX,BCOL:BCOL,BLAB:BLAB,bon:bon,pause:pause,idx:idx,gb:$('pwr-g')}}};
+function gifKlik(f){if(window.pwRadarGif)return window.pwRadarGif(f);var gb=$(f?'pwr-f':'pwr-g'),T=f?'Foto':'GIF',s=document.createElement('script');gb.textContent='…';s.src='radar-gif.js';s.onload=function(){gb.textContent=T;window.pwRadarGif&&window.pwRadarGif(f)};s.onerror=function(){gb.textContent='Mislukt';setTimeout(function(){gb.textContent=T},3000)};document.head.appendChild(s);}
+function place(p){pl=p;if(!box)build();if(map){map.setView([pl.lat,pl.lon],map.getZoom());mk.setLatLng([pl.lat,pl.lon])}if(huidigeWeergave==='nl'){map.setView([pl.lat,pl.lon],8)}}
+document.addEventListener('pw-place',function(e){place(e.detail)});
+if(pl)place(pl);
+})();
