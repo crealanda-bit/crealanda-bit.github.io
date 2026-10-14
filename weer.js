@@ -1,5 +1,80 @@
-/* Weer Crea Landa - Open-Meteo.com */
-(function(){var h=document.getElementById("pw-host");if(!h)return;var st=document.createElement("style");st.textContent=".pw{--red:#B32C43;--cream:#FCF5EE;--card:#ffffff26;--mut:#FCF5EEd0;font-family:\"Bebas Neue\",sans-serif;letter-spacing:.3px;font-size:19px;color:var(--cream);margin:0 0 18px;text-align:left}.pw *{box-sizing:border-box}.pw-search{display:flex;gap:8px}.pw-search input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--red);border-radius:7px;background:var(--card);color:var(--cream);caret-color:var(--cream);font-size:19px}.pw-search input::placeholder{color:var(--cream);opacity:.8}.pw-search input:focus{outline:2px solid var(--cream);outline-offset:2px}.pw button{border:0;border-radius:8px;padding:10px 18px;background:var(--red);color:var(--cream);font-size:21px;line-height:1}.pw button.alt{padding:10px 12px;font-size:20px}.pw-list{list-style:none;margin:8px 0 0;padding:0;background:var(--cream);color:#6F4257;border-radius:10px;overflow:hidden;font:17px Oswald,Arial,sans-serif}.pw-list li{padding:11px 14px;cursor:pointer;border-bottom:1px solid #6F425722}.pw-list li:hover{background:#9EB3D850}.pw-msg{margin:16px 0;text-align:center;font:16px Oswald,Arial,sans-serif;color:var(--mut)}.pw-hero{margin-top:14px;padding:16px 18px;border-radius:10px;background:var(--red);display:flex;align-items:center;justify-content:space-between;gap:12px}.pw-hero h2{margin:0;font:400 clamp(30px,8vw,40px)/1.05 \"Great Vibes\",cursive;-webkit-text-stroke:.4px var(--cream)}.pw-hero .sub{margin:4px 0 0;font:15px/1.35 Oswald,Arial,sans-serif;color:var(--mut)}.pw-now{text-align:right;flex-shrink:0}.pw-ico{font-size:44px;line-height:1}.pw-temp{font-size:58px;line-height:1}.pw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}.pw-card{background:var(--card);border-radius:10px;padding:9px 12px}.pw-card small{display:block;font:14px Oswald,Arial,sans-serif;color:var(--mut)}.pw-card b{font-weight:400;font-size:22px}.pw h3{margin:20px 0 8px;text-align:center;font:400 clamp(26px,7vw,32px) \"Great Vibes\",cursive;-webkit-text-stroke:.4px var(--cream)}.pw-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}.pw-h{flex:0 0 auto;min-width:64px;text-align:center;background:var(--card);border-radius:10px;padding:8px 4px}.pw-h span{display:block;font:15px Oswald,Arial,sans-serif}.pw-h b{font-weight:400;font-size:22px}.pw-d{display:grid;grid-template-columns:5.8rem 2rem 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #FCF5EE70}.pw-d .r{font:15px Oswald,Arial,sans-serif;color:var(--mut)}.pw-d b{font-weight:400;font-size:22px}.pw-foot{margin:16px 0 0;text-align:center;font:13px Oswald,Arial,sans-serif;color:var(--mut)}.pw-foot a{color:inherit}";document.head.appendChild(st);h.innerHTML="<div class=\"pw\" id=\"pw\">\n  <div class=\"pw-search\">\n    <input id=\"pw-in\" type=\"text\" placeholder=\"Typ je plaats, bijv. Zwolle\" autocomplete=\"off\" aria-label=\"Plaatsnaam\">\n    <button id=\"pw-go\">Zoek</button>\n    <button id=\"pw-me\" class=\"alt\" title=\"Gebruik mijn locatie\" aria-label=\"Gebruik mijn locatie\">\ud83d\udccd</button>\n  </div>\n  <ul class=\"pw-list\" id=\"pw-list\" hidden></ul>\n  <div id=\"pw-out\"><p class=\"pw-msg\">Vul een plaats in om het weer te zien \ud83c\udf24\ufe0f</p></div>\n  <p class=\"pw-foot\">Weergegevens van <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo.com</a> \u00b7 wordt elke 10 minuten automatisch bijgewerkt</p>\n</div>";})();
+/* Weer Crea Landa - Open-Meteo.com & Benelux Swipe Pagina */
+(function(){
+var h=document.getElementById("pw-host");if(!h)return;
+var st=document.createElement("style");
+st.textContent=`
+/* Plop animatie voor het blauwe vak */
+@keyframes popOpen {
+    0% { opacity: 0; transform: scale(0.88); }
+    75% { opacity: 1; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Het blauwe vak met afgeronde hoeken en plop-animatie */
+#weerPage .k9 {
+    background-color: #2c4a6f;
+    border-radius: 16px;
+    padding: clamp(18px, 4vw, 32px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    animation: popOpen 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Knoppen boven de radar in kleur #b32c43, subtiel afgerond en niet te groot */
+.pw .pwr-top button,
+.pwr-ch button,
+.pw button {
+    background-color: #B32C43 !important;
+    color: #FCF5EE !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.pw .pwr-top button:hover,
+.pwr-ch button:hover,
+.pw button:hover {
+    background-color: #9c2438 !important;
+}
+
+.pw{--red:#B32C43;--cream:#FCF5EE;--card:#ffffff26;--mut:#FCF5EEd0;font-family:"Bebas Neue",sans-serif;letter-spacing:.3px;font-size:19px;color:var(--cream);margin:0 0 18px;text-align:left}
+.pw *{box-sizing:border-box}
+.pw-search{display:flex;gap:8px}
+.pw-search input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--red);border-radius:7px;background:var(--card);color:var(--cream);caret-color:var(--cream);font-size:19px}
+.pw-search input::placeholder{color:var(--cream);opacity:.8}
+.pw-search input:focus{outline:2px solid var(--cream);outline-offset:2px}
+.pw-list{list-style:none;margin:8px 0 0;padding:0;background:var(--cream);color:#6F4257;border-radius:10px;overflow:hidden;font:17px Oswald,Arial,sans-serif}
+.pw-list li{padding:11px 14px;cursor:pointer;border-bottom:1px solid #6F425722}
+.pw-list li:hover{background:#9EB3D850}
+.pw-msg{margin:16px 0;text-align:center;font:16px Oswald,Arial,sans-serif;color:var(--mut)}
+.pw-hero{margin-top:14px;padding:16px 18px;border-radius:10px;background:var(--red);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pw-hero h2{margin:0;font:400 clamp(30px,8vw,40px)/1.05 "Great Vibes",cursive;-webkit-text-stroke:.4px var(--cream)}
+.pw-hero .sub{margin:4px 0 0;font:15px/1.35 Oswald,Arial,sans-serif;color:var(--mut)}
+.pw-now{text-align:right;flex-shrink:0}
+.pw-ico{font-size:44px;line-height:1}
+.pw-temp{font-size:58px;line-height:1}
+.pw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.pw-card{background:var(--card);border-radius:10px;padding:9px 12px}
+.pw-card small{display:block;font:14px Oswald,Arial,sans-serif;color:var(--mut)}
+.pw-card b{font-weight:400;font-size:22px}
+.pw h3{margin:20px 0 8px;text-align:center;font:400 clamp(26px,7vw,32px) "Great Vibes",cursive;-webkit-text-stroke:.4px var(--cream)}
+.pw-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.pw-h{flex:0 0 auto;min-width:64px;text-align:center;background:var(--card);border-radius:10px;padding:8px 4px}
+.pw-h span{display:block;font:15px Oswald,Arial,sans-serif}
+.pw-h b{font-weight:400;font-size:22px}
+.pw-d{display:grid;grid-template-columns:5.8rem 2rem 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #FCF5EE70}
+.pw-d .r{font:15px Oswald,Arial,sans-serif;color:var(--mut)}
+.pw-d b{font-weight:400;font-size:22px}
+.pw-foot{margin:16px 0 0;text-align:center;font:13px Oswald,Arial,sans-serif;color:var(--mut)}
+.pw-foot a{color:inherit}
+`;
+document.head.appendChild(st);
+h.innerHTML="<div class=\"pw\" id=\"pw\">\n  <div class=\"pw-search\">\n    <input id=\"pw-in\" type=\"text\" placeholder=\"Typ je plaats, bijv. Zwolle\" autocomplete=\"off\" aria-label=\"Plaatsnaam\">\n    <button id=\"pw-go\">Zoek</button>\n    <button id=\"pw-me\" class=\"alt\" title=\"Gebruik mijn locatie\" aria-label=\"Gebruik mijn locatie\">\ud83d\udccd</button>\n  </div>\n  <ul class=\"pw-list\" id=\"pw-list\" hidden></ul>\n  <div id=\"pw-out\"><p class=\"pw-msg\">Vul een plaats in om het weer te zien \ud83c\udf24\ufe0f</p></div>\n  <p class=\"pw-foot\">Weergegevens van <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo.com</a> \u00b7 wordt elke 10 minuten automatisch bijgewerkt</p>\n</div>";
+})();
+
 (function(){
 var $=function(i){return document.getElementById(i)};
 var moreOpen=false,out=$('pw-out'),list=$('pw-list'),input=$('pw-in'),place=null,timer=null;
@@ -91,12 +166,11 @@ if(p){place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat
 }
 var s=load();if(s){place=s;input.value=s.name;get()}else startPlace();
 })();
-/* ===== Compacte weerberichten: pas de twee getallen hieronder aan als je wilt ===== */
+
+/* Compacte weerberichten */
 (function(){
-var DAGEN=4;      /* aantal dagen dat meteen zichtbaar is (2 naast elkaar) */
-var FOTOS_PC=8;   /* aantal foto's per dag meteen zichtbaar op computer */
-var FOTOS_TEL=6;  /* aantal foto's per dag meteen zichtbaar op telefoon */
-var wl=document.getElementById('weerLijst');if(!wl)return;
+var DAGEN=4,FOTOS_PC=8,FOTOS_TEL=6;
+var wl=document.getElementById('weerList');if(!wl)return;
 function knop(t){var b=document.createElement('button');b.type='button';b.textContent=t;
 b.style.cssText='display:block;margin:10px auto 0;padding:8px 14px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:19px "Bebas Neue",sans-serif;white-space:nowrap;cursor:pointer;grid-column:1/-1';return b}
 function apply(){
@@ -127,48 +201,14 @@ wl.appendChild(b);
 new MutationObserver(apply).observe(wl,{childList:true});
 apply();
 })();
-(function(){
-var wl=document.getElementById('weerLijst');if(!wl)return;
-var st=document.createElement('style');
-st.textContent='#weerLijst{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start}#weerLijst>p{grid-column:1/-1}#weerLijst .wdag{min-width:0}#weerLijst .wt{white-space:normal;line-height:1.1;font-size:clamp(20px,5.4vw,30px)}#weerLijst .wg a{cursor:zoom-in}@media(max-width:650px){#weerLijst{column-gap:10px}#weerLijst .wg{grid-template-columns:repeat(2,1fr)}#weerLijst .wi{font-size:15px}}.pwl{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:56px 20px 24px;background:#00000066;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:pwlIn .25s ease both}.pwl.out{animation:pwlOut .2s ease both}.pwl-box{position:relative;line-height:0;animation:pwlPlop .65s ease both}.pwl.out .pwl-box{transform:scale(.94);opacity:0;transition:transform .2s,opacity .2s}.pwl-img{display:block;width:auto;height:auto;max-width:min(calc(100vw - 40px),900px);max-height:calc(100vh - 130px);max-height:calc(100dvh - 130px);border-radius:14px;box-shadow:0 10px 40px #0006}.pwl-x{position:absolute;right:-4px;bottom:100%;margin-bottom:2px;width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:0}.pwl-x svg{width:26px;height:26px;fill:none;stroke:#FCF5EE;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 3px #000a)}@keyframes pwlIn{from{opacity:0}}@keyframes pwlOut{to{opacity:0}}@keyframes pwlPlop{0%{opacity:0;transform:scale(.88)}75%{opacity:1;transform:scale(1.02)}}';
-document.head.appendChild(st);
-function open(url){
-var img=new Image();
-img.onload=function(){
-var ov=document.createElement('div'),box=document.createElement('div'),x=document.createElement('button');
-ov.className='pwl';box.className='pwl-box';x.className='pwl-x';x.type='button';
-x.setAttribute('aria-label','Sluiten');
-x.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>';
-img.className='pwl-img';img.alt='';
-box.appendChild(x);box.appendChild(img);ov.appendChild(box);document.body.appendChild(ov);
-document.body.style.overflow='hidden';
-function key(e){if(e.key==='Escape')close()}
-function close(){
-if(ov.classList.contains('out'))return;
-ov.classList.add('out');document.body.style.overflow='';
-document.removeEventListener('keydown',key);
-setTimeout(function(){ov.remove()},200);
-}
-x.onclick=close;
-ov.onclick=function(e){if(e.target===ov)close()};
-document.addEventListener('keydown',key);
-};
-img.onerror=function(){window.open(url,'_blank')};
-img.src=url;
-}
-wl.addEventListener('click',function(e){
-var a=e.target.closest&&e.target.closest('.wg a');
-if(!a||!a.querySelector('img'))return;
-e.preventDefault();open(a.href);
-});
-})();
-/* Titel + swipe */
+
+/* Titel + swipe functionaliteit + swipe-indicator bolletjes bovenaan */
 (function(){
 var wp=document.getElementById('weerPage'),k9=wp&&wp.querySelector('.k9'),host=document.getElementById('pw-host'),wl=document.getElementById('weerLijst');
 if(!k9||!host||!wl)return;
 var GAP=12,cur=0,W=0,X0=0,Y0=0,T0=0,dx=0,ok=0,drag=0,h1=k9.querySelector('h1');
 var st=document.createElement('style');
-st.textContent='.pwd{display:flex;justify-content:center;align-items:center;height:28px;margin:-33px 0 5px}.pwd button{height:28px;padding:0 5px;border:0;background:none;display:flex;align-items:center}.pwd button::after{content:"";width:12px;height:12px;border-radius:6px;border:2px solid #FCF5EE;opacity:.6;transition:.3s}.pwd button.on::after{width:32px;background:#FCF5EE;opacity:1}#weerPage>h1{margin:0 0 14px;text-align:center;white-space:nowrap;font:400 clamp(26px,8.4vw,48px) "Great Vibes",cursive;-webkit-text-stroke:.4px #FCF5EE}.pwv{overflow:hidden;overflow:clip;overflow-clip-margin:6px;transition:height .35s ease}.pwt{display:flex;align-items:flex-start;gap:'+GAP+'px;will-change:transform;transition:transform .4s cubic-bezier(.22,.85,.3,1)}.pwt.drag,.pwt.drag .pwp{transition:none}.pwp{flex:0 0 100%;min-width:0;opacity:.35;transform:scale(.96);transform-origin:50% 0;transition:opacity .4s,transform .4s}.pwp.on{opacity:1;transform:none}';
+st.textContent='.pwd{display:flex;justify-content:center;align-items:center;height:28px;margin:-33px 0 5px}.pwd button{height:28px;padding:0 5px;border:0;background:none;display:flex;align-items:center;cursor:pointer}.pwd button::after{content:"";width:12px;height:12px;border-radius:6px;border:2px solid #FCF5EE;opacity:.6;transition:.3s}.pwd button.on::after{width:32px;background:#FCF5EE;opacity:1}#weerPage>h1{margin:0 0 14px;text-align:center;white-space:nowrap;font:400 clamp(26px,8.4vw,48px) "Great Vibes",cursive;-webkit-text-stroke:.4px #FCF5EE}.pwv{overflow:hidden;overflow:clip;overflow-clip-margin:6px;transition:height .35s ease}.pwt{display:flex;align-items:flex-start;gap:'+GAP+'px;will-change:transform;transition:transform .4s cubic-bezier(.22,.85,.3,1)}.pwt.drag,.pwt.drag .pwp{transition:none}.pwp{flex:0 0 100%;min-width:0;opacity:.35;transform:scale(.96);transform-origin:50% 0;transition:opacity .4s,transform .4s}.pwp.on{opacity:1;transform:none}';
 document.head.appendChild(st);
 var pwv=document.createElement('div'),pwt=document.createElement('div'),pn=[document.createElement('div'),document.createElement('div')],d=document.createElement('div');
 pwv.className='pwv';pwt.className='pwt';pn[0].className='pwp on';pn[1].className='pwp';
@@ -221,9 +261,10 @@ pwv.addEventListener('touchcancel',end,{passive:true});
 function check(){if(pwt.clientWidth+GAP!==W)snap();sync()}
 if(window.ResizeObserver){var ro=new ResizeObserver(check);ro.observe(pn[0]);ro.observe(pn[1])}
 addEventListener('resize',check);
-var idle=window.requestIdleCallback?function(f){requestIdleCallback(f)}:function(f){setTimeout(f,300)};
+var idle=window.requestIdleCallback?function(f){requestIdleCallback(f)}:function(f);
 function warm(){var im=wl.querySelectorAll('img');for(var i=0;i<im.length&&i<18;i++){im[i].loading='eager';im[i].decoding='async'}}
 new MutationObserver(function(){idle(warm)}).observe(wl,{childList:true});
 })();
-/* ===== Radar laden (radar.js moet naast dit bestand staan) ===== */
+
+/* Radar laden */
 (function(){var s=document.createElement('script');s.src='radar.js';document.body.appendChild(s)})();
