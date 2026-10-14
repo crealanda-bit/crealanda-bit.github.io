@@ -1,329 +1,229 @@
+/* Weer Crea Landa - Open-Meteo.com */
+(function(){var h=document.getElementById("pw-host");if(!h)return;var st=document.createElement("style");st.textContent=".pw{--red:#B32C43;--cream:#FCF5EE;--card:#ffffff26;--mut:#FCF5EEd0;font-family:\"Bebas Neue\",sans-serif;letter-spacing:.3px;font-size:19px;color:var(--cream);margin:0 0 18px;text-align:left}.pw *{box-sizing:border-box}.pw-search{display:flex;gap:8px}.pw-search input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--red);border-radius:7px;background:var(--card);color:var(--cream);caret-color:var(--cream);font-size:19px}.pw-search input::placeholder{color:var(--cream);opacity:.8}.pw-search input:focus{outline:2px solid var(--cream);outline-offset:2px}.pw button{border:0;border-radius:8px;padding:10px 18px;background:var(--red);color:var(--cream);font-size:21px;line-height:1}.pw button.alt{padding:10px 12px;font-size:20px}.pw-list{list-style:none;margin:8px 0 0;padding:0;background:var(--cream);color:#6F4257;border-radius:10px;overflow:hidden;font:17px Oswald,Arial,sans-serif}.pw-list li{padding:11px 14px;cursor:pointer;border-bottom:1px solid #6F425722}.pw-list li:hover{background:#9EB3D850}.pw-msg{margin:16px 0;text-align:center;font:16px Oswald,Arial,sans-serif;color:var(--mut)}.pw-hero{margin-top:14px;padding:16px 18px;border-radius:10px;background:var(--red);display:flex;align-items:center;justify-content:space-between;gap:12px}.pw-hero h2{margin:0;font:400 clamp(30px,8vw,40px)/1.05 \"Great Vibes\",cursive;-webkit-text-stroke:.4px var(--cream)}.pw-hero .sub{margin:4px 0 0;font:15px/1.35 Oswald,Arial,sans-serif;color:var(--mut)}.pw-now{text-align:right;flex-shrink:0}.pw-ico{font-size:44px;line-height:1}.pw-temp{font-size:58px;line-height:1}.pw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}.pw-card{background:var(--card);border-radius:10px;padding:9px 12px}.pw-card small{display:block;font:14px Oswald,Arial,sans-serif;color:var(--mut)}.pw-card b{font-weight:400;font-size:22px}.pw h3{margin:20px 0 8px;text-align:center;font:400 clamp(26px,7vw,32px) \"Great Vibes\",cursive;-webkit-text-stroke:.4px var(--cream)}.pw-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}.pw-h{flex:0 0 auto;min-width:64px;text-align:center;background:var(--card);border-radius:10px;padding:8px 4px}.pw-h span{display:block;font:15px Oswald,Arial,sans-serif}.pw-h b{font-weight:400;font-size:22px}.pw-d{display:grid;grid-template-columns:5.8rem 2rem 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #FCF5EE70}.pw-d .r{font:15px Oswald,Arial,sans-serif;color:var(--mut)}.pw-d b{font-weight:400;font-size:22px}.pw-foot{margin:16px 0 0;text-align:center;font:13px Oswald,Arial,sans-serif;color:var(--mut)}.pw-foot a{color:inherit}";document.head.appendChild(st);h.innerHTML="<div class=\"pw\" id=\"pw\">\n  <div class=\"pw-search\">\n    <input id=\"pw-in\" type=\"text\" placeholder=\"Typ je plaats, bijv. Zwolle\" autocomplete=\"off\" aria-label=\"Plaatsnaam\">\n    <button id=\"pw-go\">Zoek</button>\n    <button id=\"pw-me\" class=\"alt\" title=\"Gebruik mijn locatie\" aria-label=\"Gebruik mijn locatie\">\ud83d\udccd</button>\n  </div>\n  <ul class=\"pw-list\" id=\"pw-list\" hidden></ul>\n  <div id=\"pw-out\"><p class=\"pw-msg\">Vul een plaats in om het weer te zien \ud83c\udf24\ufe0f</p></div>\n  <p class=\"pw-foot\">Weergegevens van <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo.com</a> \u00b7 wordt elke 10 minuten automatisch bijgewerkt</p>\n</div>";})();
 (function(){
-var wp=document.getElementById('pw');if(!wp||window.pwRadarLoaded)return;window.pwRadarLoaded=1;
-var API='https://api.rainviewer.com/public/weather-maps.json';
-var START_OPEN=true;
-var SAT_URL='https://view.eumetsat.int/geoserver/wms';
-var SAT_LAAG='mtg_fd:ir105_hrfi';
-var SAT_OPACITY=.45;   /* wolken samen met regen */
-var SAT_SOLO=.75;      /* alleen wolken aan: duidelijker */
-var SAT_LAG=0;
-var SAT_CORS=true;
-var AANTAL=8;
-var STAP=550,STAP_LAATST=2000; /* ms per beeld / pauze op het laatste beeld */
-/* kaartkleuren: DONKER = lijnen/letters/water, LICHT = land */
-var KAART_DONKER='#5C77AD',KAART_LICHT='#EAF0F8';
-var HEX=['#9EB3D8','#627EB5','#D9667A','#B32C43','#7E1D30','#3E1A2C'];
-var SNOWHEX=['#D6BFD9','#AE86B4','#7E4F8C'];
-var WINDHEX=['#5C77AD','#6F4257','#B32C43','#3E1A2C']; /* zelfde kleuren als KL in wind.js */
-var BMAX=[5,15,30,60,120];
-var BLAB=['0-5 min','5-15 min','15-30 min','30-60 min','1-2 uur'];
-var BCOL=['#B32C43','#D9667A','#FCF5EE','#9EB3D8','#627EB5'];
-function rgb(h){return[parseInt(h.substr(1,2),16),parseInt(h.substr(3,2),16),parseInt(h.substr(5,2),16)]}
-var KLEUREN=HEX.map(rgb),SKLEUREN=SNOWHEX.map(rgb);
-var WS=['wss://ws1.blitzortung.org/','wss://ws7.blitzortung.org/','wss://ws8.blitzortung.org/','wss://ws1.blitzortung.org:3000/'];
-var BWIN=BMAX[BMAX.length-1]*60000;
-var BOLTP='<path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="#6F4257" stroke-width="1.3" stroke-linejoin="round"/>';
-function bsvg(c){return '<svg viewBox="0 0 24 24" fill="currentColor"'+(c?' style="color:'+c+'"':'')+'>'+BOLTP+'</svg>'}
-var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],wolkenLagen=[],idx=0,timer=null,host='',lastKey=0,started=false;
-var wantPlay=true,blitsGone=false,meetOn=true,on={rain:true,snow:true,blits:true,wolken:true,wind:true},bon=[1,1,1,1,1],strikes=[],boltLayer=null;
-var vis=true,readyOk=false,lid=0;
-/* stijl staat in radar.css */
-var cl=document.createElement('link');cl.rel='stylesheet';cl.href='radar.css';document.head.appendChild(cl);var gv=document.createElement('link');gv.rel='stylesheet';gv.href='https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap';document.head.appendChild(gv);
-var kd=rgb(KAART_DONKER),kl=rgb(KAART_LICHT);window.pwKaart={d:kd,l:kl};
-function tb(i){return (kd[i]/255).toFixed(3)+' '+(kl[i]/255).toFixed(3)}
-var sv=document.createElement('div');sv.style.cssText='position:absolute;width:0;height:0;overflow:hidden';
-sv.innerHTML='<svg width="0" height="0"><filter id="pwr-duo" color-interpolation-filters="sRGB"><feColorMatrix values=".299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues="'+tb(0)+'"/><feFuncG type="table" tableValues="'+tb(1)+'"/><feFuncB type="table" tableValues="'+tb(2)+'"/></feComponentTransfer></filter></svg>';
-document.body.appendChild(sv);
-function $(i){return document.getElementById(i)}
-function satOp(){return(on.rain||on.snow)?SAT_OPACITY:SAT_SOLO}
-function allOn(){return on.rain&&on.snow&&on.wolken&&on.wind&&(on.blits||blitsGone)}
-/* metingen: knoppen met windkracht per plaats, zodra wind aan staat en de metingen-knop aan staat */
-function meet(){return on.wind&&meetOn?'wind':''}
-function canPlay(){return readyOk&&frames.length&&!timer&&vis&&$('pwr-body')&&!$('pwr-body').hidden}
-function rgb2hsl(r,g,b){
-r/=255;g/=255;b/=255;
-var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,h=0,s=0,d=mx-mn;
-if(d){
-s=l>.5?d/(2-mx-mn):d/(mx+mn);
-h=mx===r?(g-b)/d+(g<b?6:0):mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;
+var $=function(i){return document.getElementById(i)};
+var moreOpen=false,out=$('pw-out'),list=$('pw-list'),input=$('pw-in'),place=null,timer=null;
+var WC={0:['Helder','☀️'],1:['Overwegend helder','🌤️'],2:['Half bewolkt','⛅'],3:['Bewolkt','☁️'],45:['Mist','🌫️'],48:['Rijpmist','🌫️'],
+51:['Lichte motregen','🌦️'],53:['Motregen','🌦️'],55:['Zware motregen','🌧️'],56:['Ijzel','🌧️'],57:['Ijzel','🌧️'],
+61:['Lichte regen','🌦️'],63:['Regen','🌧️'],65:['Zware regen','🌧️'],66:['Ijzelregen','🌧️'],67:['Ijzelregen','🌧️'],
+71:['Lichte sneeuw','🌨️'],73:['Sneeuw','🌨️'],75:['Zware sneeuw','❄️'],77:['Sneeuwkorrels','🌨️'],
+80:['Lichte buien','🌦️'],81:['Buien','🌧️'],82:['Zware buien','⛈️'],85:['Sneeuwbuien','🌨️'],86:['Zware sneeuwbuien','❄️'],
+95:['Onweer','⛈️'],96:['Onweer met hagel','⛈️'],99:['Zwaar onweer met hagel','⛈️']};
+function wc(c){return WC[c]||['Onbekend','🌡️']}
+function bft(k){var t=[1,6,12,20,29,39,50,62,75,89,103,118],n=0;while(n<t.length&&k>=t[n])n++;return n}
+function dir(d){return ['noord','noordoost','oost','zuidoost','zuid','zuidwest','west','noordwest'][Math.round(d/45)%8]}
+function arrow(d){return '<span style="display:inline-block;transform:rotate('+((d+180)%360)+'deg)">↑</span>'}
+function r(n){return Math.round(n)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function save(p){try{localStorage.setItem('pw-place',JSON.stringify(p))}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem('pw-place'))}catch(e){return null}}
+function search(){
+var q=input.value.trim(); if(!q)return;
+out.innerHTML='<p class="pw-msg">Zoeken…</p>';list.hidden=true;
+fetch('https://geocoding-api.open-meteo.com/v1/search?count=6&language=nl&format=json&name='+encodeURIComponent(q))
+.then(function(r){return r.json()}).then(function(d){
+var res=d.results||[];
+if(!res.length){out.innerHTML='<p class="pw-msg">Geen plaats gevonden. Probeer een andere schrijfwijze.</p>';return}
+if(res.length===1){pick(res[0]);return}
+out.innerHTML='<p class="pw-msg">Welke bedoel je?</p>';
+list.innerHTML=res.map(function(p,i){return '<li data-i="'+i+'">'+esc(p.name)+(p.admin1?', '+esc(p.admin1):'')+(p.country?' ('+esc(p.country)+')':'')+'</li>'}).join('');
+list.hidden=false;
+list.onclick=function(e){var li=e.target.closest('li');if(li){list.hidden=true;pick(res[li.dataset.i])}};
+}).catch(function(){out.innerHTML='<p class="pw-msg">Zoeken lukt nu niet. Probeer het zo nog eens.</p>'});
 }
-return [h,s,l];
+function pick(p){
+place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat:p.latitude,lon:p.longitude};
+input.value=p.name;save(place);get();
 }
-function niveau(r,g,b){
-var c=rgb2hsl(r,g,b),h=c[0],s=c[1],l=c[2];
-if(s<.35||l>.85)return -1;
-if((h<75||h>330)&&l>.6)return 0;
-if(h>=75&&h<170)return 2;
-if(h>=170&&h<=265)return l>.62?0:(l>.42?1:2);
-if(h>=48&&h<75)return 3;
-if(h>=18&&h<48)return 4;
-return 5;
+function get(){
+if(!place)return;
+window.pwPlace=place;setTimeout(function(){document.dispatchEvent(new CustomEvent('pw-place',{detail:place}))},0);
+clearInterval(timer);
+var u='https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+
+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset,uv_index_max&timezone=auto&forecast_days=7';
+fetch(u).then(function(r){return r.json()}).then(show).catch(function(){out.innerHTML='<p class="pw-msg">Weergegevens ophalen lukt nu niet.</p>'});
+timer=setInterval(get,600000);
 }
-function laadImg(u,cb){var im=new Image();im.crossOrigin='anonymous';im.onload=function(){cb(im)};im.onerror=function(){cb(null)};im.src=u}
-function pixels(im,w,h){var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.drawImage(im,0,0);return x.getImageData(0,0,w,h)}
-var Kleurlaag=null;
-function maakLaag(){
-Kleurlaag=L.TileLayer.extend({
-createTile:function(c,done){
-var tile=document.createElement('div'),sz=this.getTileSize(),w=sz.x,h=sz.y;
-var u1=this.getTileUrl(c),u0=u1.replace(/\/1_1\.png$/,'/1_0.png'),a=null,b=null,n=0;
-function klaar(){
-if(++n<2)return;
-var rc=document.createElement('canvas');rc.width=w;rc.height=h;rc.className='pwr-cr';tile.appendChild(rc);
-var src=a||b;
-if(src){
-try{
-var d1=pixels(src,w,h),p=d1.data,p2=(a&&b)?pixels(b,w,h).data:null,sd=null,sp=null,sc=null;
-for(var i=0;i<p.length;i+=4){
-var a1=p[i+3];
-if(p2&&p2[i+3]&&a1&&Math.abs(p[i]-p2[i])+Math.abs(p[i+1]-p2[i+1])+Math.abs(p[i+2]-p2[i+2])>40){
-if(!sd){sc=document.createElement('canvas');sc.width=w;sc.height=h;sc.className='pwr-cs';sd=sc.getContext('2d').createImageData(w,h);sp=sd.data}
-var m=niveau(p[i],p[i+1],p[i+2]),k=m<=1?0:(m<=3?1:2);
-sp[i]=SKLEUREN[k][0];sp[i+1]=SKLEUREN[k][1];sp[i+2]=SKLEUREN[k][2];sp[i+3]=p2[i+3];
-p[i+3]=0;
-}else if(a1){
-var q=niveau(p[i],p[i+1],p[i+2]);
-if(q>=0){p[i]=KLEUREN[q][0];p[i+1]=KLEUREN[q][1];p[i+2]=KLEUREN[q][2]}
+function show(d){
+var c=d.current,w=wc(c.weather_code),dl=d.daily,h=d.hourly;
+window.pwCold=c.temperature_2m<8;
+var now=c.time.slice(0,13),i0=h.time.findIndex(function(t){return t.slice(0,13)>=now});if(i0<0)i0=0;
+var hrs=h.time.slice(i0,i0+24).map(function(t,k){var j=i0+k;
+return '<div class="pw-h"><span>'+t.slice(11,16)+'</span><span style="font-size:26px">'+wc(h.weather_code[j])[1]+'</span><b>'+r(h.temperature_2m[j])+'°</b><span class="r" >💧'+(h.precipitation_probability[j]||0)+'%</span></div>'}).join('');
+var days=dl.time.map(function(t,i){
+var nm=i===0?'Vandaag':new Date(t+'T12:00').toLocaleDateString('nl-NL',{weekday:'long'});
+return '<div class="pw-d"><span style="text-transform:capitalize;font:17px Oswald,Arial,sans-serif">'+nm+'</span><span>'+wc(dl.weather_code[i])[1]+'</span><span class="r">'+(dl.precipitation_sum[i]>0?'💧 '+dl.precipitation_sum[i].toFixed(1)+' mm':'droog')+'</span><b>'+r(dl.temperature_2m_max[i])+'° <span class="r">/ '+r(dl.temperature_2m_min[i])+'°</span></b></div>'}).join('');
+var wk=r(c.wind_speed_10m);
+out.innerHTML=
+'<div class="pw-hero"><div><h2>'+esc(place.name)+'</h2><p class="sub">'+esc(place.sub)+'<br>'+w[0]+' · bijgewerkt '+c.time.slice(11,16)+'</p></div><div class="pw-now"><div class="pw-ico">'+w[1]+'</div><div class="pw-temp">'+r(c.temperature_2m)+'°</div></div></div><div class="pw-grid">'+
+card('Voelt als',r(c.apparent_temperature)+'°')+
+card('Wind',wk+' km/u '+arrow(c.wind_direction_10m)+'<br><span style="font:15px Oswald,Arial,sans-serif">uit het '+dir(c.wind_direction_10m)+' · kracht '+bft(wk)+'</span>')+
+card('Windstoten',r(c.wind_gusts_10m)+' km/u')+
+card('Neerslag nu',c.precipitation+' mm')+
+'</div><div id="pw-more"'+(moreOpen?'':' hidden')+'><div class="pw-grid">'+
+card('Luchtvochtigheid',c.relative_humidity_2m+'%')+
+card('Bewolking',c.cloud_cover+'%')+
+card('Luchtdruk',r(c.pressure_msl)+' hPa')+
+card('UV vandaag',r(dl.uv_index_max[0]))+
+card('Zon op / onder',dl.sunrise[0].slice(11,16)+' / '+dl.sunset[0].slice(11,16))+
+'</div><h3>Komende 24 uur</h3><div class="pw-scroll">'+hrs+'</div><h3>Komende 7 dagen</h3>'+days+'</div><p style="text-align:center;margin:14px 0 0"><button id="pw-tog" type="button">'+(moreOpen?'Minder weergegevens ▴':'Meer weergegevens ▾')+'</button></p>';
 }
-}
-rc.getContext('2d').putImageData(d1,0,0);
-if(sd){sc.getContext('2d').putImageData(sd,0,0);tile.appendChild(sc)}
-}catch(e){rc.getContext('2d').drawImage(src,0,0)}
-}
-done(null,tile);
-}
-if(window.pwCold===false)klaar();else laadImg(u0,function(i){a=i;klaar()});
-laadImg(u1,function(i){b=i;klaar()});
-return tile;
-}
+function card(a,b){return '<div class="pw-card"><small>'+a+'</small><b>'+b+'</b></div>'}
+$('pw-go').onclick=search;
+out.addEventListener('click',function(e){
+if(e.target.id!=='pw-tog')return;
+moreOpen=!moreOpen;$('pw-more').hidden=!moreOpen;
+e.target.textContent=moreOpen?'Minder weergegevens ▴':'Meer weergegevens ▾';
 });
-}
-function build(){
-box=document.createElement('div');box.id='pw-radar';
-box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'▴':'▾')+'</button></p><div id="pwr-body"'+(START_OPEN?'':' hidden')+'><div class="pwr-top"><span class="pwr-ch"><button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button><button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button><button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button><button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button><button type="button" class="pwr-pc on" data-l="wind" aria-pressed="true">Wind</button></span></div><div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div><div class="pwr-rt"><div class="pwr-bl dicht"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div><button type="button" class="pwr-wb" id="pwr-wb" aria-pressed="true">Windmetingen aan</button></div><div class="pwr-leg"><div class="pwr-lr"><div class="pwr-lt">Regen</div><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div><div class="pwr-ls"><div class="pwr-lt">Sneeuw</div><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span></div></div><div class="pwr-lw"><div class="pwr-lt">Wolken</div><i style="background:linear-gradient(90deg,#2c2c38,#8d8d9c,#fff)"></i><div class="pwr-lb"><span>Laag</span><span>Hoog</span></div></div><div class="pwr-lwd"><div class="pwr-lt">Wind</div><i style="background:linear-gradient(90deg,'+WINDHEX.join(',')+')"></i><div class="pwr-lb"><span>Zacht</span><span>Hard</span></div></div></div></div><div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button><input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div><div class="pwr-acts"><button id="pwr-f" type="button" class="alt">Foto</button><button id="pwr-g" type="button" class="alt">GIF</button></div><p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
-var foot=wp.querySelector('.pw-foot');wp.insertBefore(box,foot);
-foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> · bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a> · wolken van <a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a> · wind van <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>');
-mapEl=$('pwr-m');
-box.style.setProperty('--kl',KAART_LICHT);
-var m=box.querySelector('.pwr-map'),body=$('pwr-body'),hb=$('pwr-h');
-function lock(v){m.classList.toggle('locked',v);$('pwr-l').textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
-box.querySelector('.pwr-lock').onclick=function(){lock(false)};
-$('pwr-l').onclick=function(){lock(!m.classList.contains('locked'))};
-$('pwr-p').onclick=function(){if(timer){wantPlay=false;pause()}else{wantPlay=true;if(canPlay())play()}};
-$('pwr-s').oninput=function(){wantPlay=false;pause();show(+this.value)};
-$('pwr-g').onclick=function(){gifKlik()};$('pwr-f').onclick=function(){gifKlik(1)};
-$('pwr-wb').onclick=function(){meetOn=!meetOn;this.classList.toggle('off',!meetOn);this.setAttribute('aria-pressed',meetOn);this.textContent='Windmetingen '+(meetOn?'aan':'uit');toggles()};
-box.querySelector('.pwr-bl').onclick=function(e){
-if(e.target.closest&&e.target.closest('.pwr-bt')){this.classList.toggle('dicht');blLabel();return}
-var b=e.target.closest&&e.target.closest('.pwr-br');if(!b)return;
-var k=+b.getAttribute('data-b');bon[k]=bon[k]?0:1;
-b.classList.toggle('off',!bon[k]);b.setAttribute('aria-pressed',!!bon[k]);bolts(idx);
+input.onkeydown=function(e){if(e.key==='Enter')search()};
+$('pw-me').onclick=function(){
+if(!navigator.geolocation){out.innerHTML='<p class="pw-msg">Locatie wordt niet ondersteund.</p>';return}
+navigator.geolocation.getCurrentPosition(function(p){
+place={name:'Mijn locatie',sub:'',lat:p.coords.latitude,lon:p.coords.longitude};input.value='';get();
+},function(){out.innerHTML='<p class="pw-msg">Locatie niet toegestaan. Typ gewoon je plaats in.</p>'});
 };
-[].forEach.call(box.querySelectorAll('.pwr-pc'),function(b){
-b.onclick=function(){
-var k=b.getAttribute('data-l');
-if(allOn()){on.rain=on.snow=on.blits=on.wolken=on.wind=false;on[k]=true}
-else{on[k]=!on[k];if(!on.rain&&!on.snow&&!on.blits&&!on.wolken&&!on.wind){on.rain=on.snow=on.wolken=on.wind=true;on.blits=!blitsGone}}
-toggles();
-};
-});
-hb.onclick=function(){
-var open=body.hidden;body.hidden=!open;
-hb.textContent='Radar '+(open?'▴':'▾');hb.setAttribute('aria-expanded',open);
-if(open){
-if(!started){started=true;loadLeaflet()}
-else if(map)setTimeout(function(){map.invalidateSize()},50);
-toggles();
-if(wantPlay&&canPlay())play();
-}else{pause();wsStop();if(window.pwWind)pwWind.set(false,'')}
-};
-new IntersectionObserver(function(es){
-vis=es[0].isIntersecting;
-if(vis){
-if(!started&&!body.hidden){started=true;loadLeaflet()}
-else if(wantPlay&&canPlay())play();
-if(window.pwWind)pwWind.resume();
-}else{pause();if(window.pwWind)pwWind.pause()}
-},{threshold:.1}).observe(box);
+function startPlace(){
+fetch('https://geocoding-api.open-meteo.com/v1/search?count=5&language=nl&format=json&name=Espel')
+.then(function(r){return r.json()}).then(function(d){
+var l=d.results||[],p=l.filter(function(x){return x.admin1==='Flevoland'})[0]||l[0];
+if(p){place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat:p.latitude,lon:p.longitude};input.value=p.name;get()}
+}).catch(function(){});
 }
-function toggles(){
-if(!box)return;
-var m=box.querySelector('.pwr-map');
-['rain','snow','blits','wolken','wind'].forEach(function(k){
-m.classList.toggle('no-'+k,!on[k]);
-var b=box.querySelector('.pwr-pc[data-l="'+k+'"]');b.classList.toggle('on',on[k]);b.setAttribute('aria-pressed',on[k]);
-});
-if(!map)return;
-var open=!$('pwr-body').hidden;
-if(on.wolken&&open){if(!wolkenLagen.length)wolkenBouw();else wolkenToon(idx)}else wolkenWeg();
-if(on.blits&&open){map.addLayer(boltLayer);wsWant=true;if(!ws)wsStart(0);bolts(idx)}
-else{map.removeLayer(boltLayer);wsStop()}
-if(window.pwWind)pwWind.set(open&&on.wind,open?meet():'');
-}
-function satTijd(i){return new Date(Math.floor((frames[i].time-SAT_LAG*60)/600)*600000).toISOString()}
-function wolkenWeg(){wolkenLagen.forEach(function(l){map.removeLayer(l)});wolkenLagen=[]}
-function wolkenBouw(){
-wolkenWeg();
-if(!map||!frames.length||!on.wolken||$('pwr-body').hidden)return;
-wolkenLagen=frames.map(function(fr,j){
-return L.tileLayer.wms(SAT_URL,{
-layers:SAT_LAAG,format:'image/png',transparent:true,version:'1.3.0',time:satTijd(j),exceptions:'application/vnd.ogc.se_blank',
-opacity:0,zIndex:5,maxZoom:10,crossOrigin:SAT_CORS,updateWhenZooming:false,keepBuffer:1,className:'pwr-sat'
-});
-});wolkenLagen.slice().reverse().forEach(function(l){l.addTo(map)});
-wolkenToon(idx);
-}
-function wolkenToon(i){var o=satOp();wolkenLagen.forEach(function(l,j){l.setOpacity(j===i?o:0)})}
-var ws=null,wsWant=false,wsRetry=null,wsOpen=false;
-function blLabel(){
-var t=box&&box.querySelector('.pwr-bt');if(!t)return;
-var c=[0,0,0,0,0],tot=0;
-if(frames.length)zichtbaar(idx,1).forEach(function(v){c[v.b]++;tot++});
-t.textContent='⚡ '+(!wsOpen?'Verbinden…':(tot?'Bliksem · '+tot:'Geen bliksem'))+(box.querySelector('.pwr-bl').classList.contains('dicht')?' ▾':' ▴');
-[].forEach.call(box.querySelectorAll('.pwr-bn'),function(e,j){e.textContent=c[j]});
-}
-function lzw(b){var a,e={},d=b.split(''),c=d[0],f=c,g=[c],h=256,o=h;for(var i=1;i<d.length;i++){a=d[i].charCodeAt(0);a=h>a?d[i]:e[a]?e[a]:f+c;g.push(a);c=a.charAt(0);e[o]=f+c;o++;f=a}return g.join('')}
-function wsStart(k){
-if(!wsWant)return;
-if(k>=WS.length){wsFail();return}
-var opened=false,s;
-try{s=new WebSocket(WS[k])}catch(e){wsStart(k+1);return}
-ws=s;
-s.onopen=function(){opened=true;wsOpen=true;blLabel();try{s.send('{"a":111}')}catch(e){}};
-s.onmessage=function(e){
-try{var d=JSON.parse(lzw(e.data));if(typeof d.lat==='number'&&typeof d.lon==='number')strike(d.lat,d.lon)}catch(x){}
-};
-s.onerror=function(){};
-s.onclose=function(){
-if(ws!==s)return;ws=null;wsOpen=false;blLabel();
-if(!wsWant)return;
-if(opened)wsRetry=setTimeout(function(){wsStart(k)},15000);else wsStart(k+1);
-};
-}
-function wsStop(){wsWant=false;clearTimeout(wsRetry);wsOpen=false;if(ws){var s=ws;ws=null;try{s.close()}catch(e){}}blLabel()}
-function wsFail(){
-on.blits=false;blitsGone=true;wsWant=false;
-var b=box&&box.querySelector('.pwr-pc[data-l="blits"]');if(b)b.hidden=true;if(!on.rain&&!on.snow&&!on.wolken&&!on.wind){on.rain=on.snow=on.wolken=on.wind=true}
-toggles();
-}
-function strike(lat,lon){
-if(!pl||!map||Math.abs(lat-pl.lat)>10||Math.abs(lon-pl.lon)>16)return;
-var mkr=L.marker([lat,lon],{icon:L.divIcon({html:bsvg(''),className:'pwr-bolt',iconSize:[20,20]}),interactive:false,keyboard:false,opacity:0}).addTo(boltLayer);
-strikes.push({t:Date.now(),lat:lat,lon:lon,m:mkr,b:-1});
-var lim=Date.now()-BWIN-60000;
-while(strikes.length>600||(strikes.length&&strikes[0].t<lim)){boltLayer.removeLayer(strikes.shift().m)}
-if(idx===frames.length-1)bolts(idx);
-}
-function zichtbaar(i,all){
-var last=i===frames.length-1,ft=last?Date.now():frames[i].time*1000,r=[];
-strikes.forEach(function(s){
-var a=(ft-s.t)/60000;if(a<0||a>BMAX[BMAX.length-1])return;
-var b=0;while(a>BMAX[b])b++;
-if(all||bon[b])r.push({s:s,b:b});
-});
-return r;
-}
-function bolts(i){
-if(!frames.length||!boltLayer)return;
-strikes.forEach(function(s){s.b=-1});
-zichtbaar(i).forEach(function(v){v.s.b=v.b});
-strikes.forEach(function(s){
-s.m.setOpacity(s.b<0?0:1);
-var e=s.m.getElement&&s.m.getElement();if(e&&s.b>=0)e.style.color=BCOL[s.b];
-});
-blLabel();
-}
-function loadLeaflet(){
-var css=document.createElement('link');css.rel='stylesheet';
-css.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';document.head.appendChild(css);
-var js=document.createElement('script');
-js.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
-js.onload=function(){
-/* wind.js erbij laden; lukt dat niet dan werkt de radar gewoon zonder wind */
-var w=document.createElement('script');w.src='wind.js';w.onload=init;w.onerror=init;document.head.appendChild(w);
-};
-js.onerror=function(){$('pwr-t').textContent='Kaart laadt niet'};
-document.head.appendChild(js);
-}
-function init(){
-maakLaag();
-map=L.map(mapEl,{attributionControl:false,minZoom:5,maxZoom:10}).setView([pl.lat,pl.lon],7);
-base=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,className:'pwr-base',crossOrigin:true}).addTo(map);
-L.control.attribution({prefix:false}).addAttribution('© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, Contains modified EUMETSAT Meteosat data '+new Date().getFullYear()).addTo(map);
-mk=L.circleMarker([pl.lat,pl.lon],{radius:7,color:'#FCF5EE',weight:2,fillColor:'#B32C43',fillOpacity:1}).addTo(map);
-boltLayer=L.layerGroup();
-if(window.pwWind)pwWind.init(map);
-loadFrames();setInterval(loadFrames,300000);
-setInterval(function(){if(frames.length&&idx===frames.length-1)bolts(idx)},30000);
-setTimeout(function(){map.invalidateSize()},300);
-toggles();
-}
-/* alle beelden eerst volledig laden, pas daarna afspelen: dat geeft een vloeiend beeld */
-function voorlaad(){
-var all=layers.concat(on.wolken?wolkenLagen:[]),n=all.length,k=0,id=++lid;readyOk=false;pause();
-function klaar(){
-if(id!==lid||readyOk)return;
-readyOk=true;show(idx);
-if(wantPlay&&canPlay())play();
-}
-all.forEach(function(l){l.once('load',function(){
-if(id!==lid||readyOk)return;
-k++;$('pwr-t').textContent='Laden '+k+'/'+n;
-if(k>=n)klaar();
-})});
-$('pwr-t').textContent='Laden 0/'+n;
-setTimeout(klaar,8000);
-setTimeout(function(){if(id===lid&&!readyOk&&!k)klaar()},1500);
-}
-function loadFrames(){
-fetch(API).then(function(r){return r.json()}).then(function(d){
-var f=((d.radar&&d.radar.past)||[]).slice(-AANTAL);if(!f.length)throw 0;
-if(f[f.length-1].time===lastKey)return;lastKey=f[f.length-1].time;
-layers.forEach(function(l){map.removeLayer(l)});
-host=d.host;frames=f;
-layers=f.map(function(fr){
-return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10,updateWhenZooming:false,keepBuffer:1,className:'pwr-rl'});
-});layers.slice().reverse().forEach(function(l){l.addTo(map)});
-wolkenBouw();
-$('pwr-s').max=f.length-1;show(f.length-1);
-voorlaad();
-}).catch(function(){$('pwr-t').textContent='Radar niet beschikbaar'});
-}
-function tijd(i){return new Date(frames[i].time*1000).toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'})}
-function show(i){
-idx=i;
-layers.forEach(function(l,j){l.setOpacity(j===i?.85:0)});
-wolkenToon(i);
-$('pwr-s').value=i;
-if(!readyOk)return bolts(i);
-var min=Math.round((Date.now()-frames[i].time*1000)/60000),hhmm=tijd(i);
-$('pwr-t').textContent=i===frames.length-1?hhmm+' · nu':hhmm+' · '+min+' min geleden';
-bolts(i);
-}
-function play(){
-if(!frames.length||timer)return;
-$('pwr-p').textContent='❚❚';$('pwr-p').setAttribute('aria-label','Pauze');
-(function stap(){
-timer=setTimeout(function(){show(idx+1>=frames.length?0:idx+1);stap()},idx===frames.length-1?STAP_LAATST:STAP);
+var s=load();if(s){place=s;input.value=s.name;get()}else startPlace();
 })();
+/* ===== Compacte weerberichten: pas de twee getallen hieronder aan als je wilt ===== */
+(function(){
+var DAGEN=4;      /* aantal dagen dat meteen zichtbaar is (2 naast elkaar) */
+var FOTOS_PC=8;   /* aantal foto's per dag meteen zichtbaar op computer */
+var FOTOS_TEL=6;  /* aantal foto's per dag meteen zichtbaar op telefoon */
+var wl=document.getElementById('weerLijst');if(!wl)return;
+function knop(t){var b=document.createElement('button');b.type='button';b.textContent=t;
+b.style.cssText='display:block;margin:10px auto 0;padding:8px 14px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:19px "Bebas Neue",sans-serif;white-space:nowrap;cursor:pointer;grid-column:1/-1';return b}
+function apply(){
+var secs=[].slice.call(wl.querySelectorAll('.wdag'));
+if(!secs.length)return;
+var FOTOS=innerWidth<650?FOTOS_TEL:FOTOS_PC;
+secs.forEach(function(s){
+if(s.dataset.pw)return;s.dataset.pw='1';
+var g=s.querySelector('.wg');if(!g)return;
+var it=[].slice.call(g.children);if(it.length<=FOTOS)return;
+var extra=it.slice(FOTOS),open=false,n=extra.length,b=knop('+'+n+' foto\u2019s');
+extra.forEach(function(e){e.style.display='none'});
+b.onclick=function(){open=!open;
+extra.forEach(function(e){e.style.display=open?'':'none'});
+b.textContent=open?'Minder foto\u2019s':'+'+n+' foto\u2019s'};
+g.after(b);
+});
+if(secs.length>DAGEN&&!wl.dataset.pwDagen){
+wl.dataset.pwDagen='1';
+var oud=secs.slice(DAGEN),open=false,b=knop('Oudere dagen tonen ('+oud.length+')');
+oud.forEach(function(s){s.style.display='none'});
+b.onclick=function(){open=!open;
+oud.forEach(function(s){s.style.display=open?'':'none'});
+b.textContent=open?'Oudere dagen verbergen':'Oudere dagen tonen ('+oud.length+')'};
+wl.appendChild(b);
 }
-function pause(){
-clearTimeout(timer);timer=null;
-var p=$('pwr-p');if(p){p.textContent='▶';p.setAttribute('aria-label','Afspelen')}
 }
-window.pwRadar={s:function(){return{map:map,base:base,layers:layers,wolken:wolkenLagen,satCors:SAT_CORS,satOp:satOp(),frames:frames,on:on,pl:pl,mapEl:mapEl,zichtbaar:zichtbaar,tijd:tijd,HEX:HEX,SNOWHEX:SNOWHEX,BCOL:BCOL,BLAB:BLAB,bon:bon,pause:pause,idx:idx,gb:$('pwr-g')}}};
-function gifKlik(f){
-if(window.pwRadarGif)return window.pwRadarGif(f);
-var gb=$(f?'pwr-f':'pwr-g'),T=f?'Foto':'GIF',s=document.createElement('script');gb.textContent='…';
-s.src='radar-gif.js';s.onload=function(){gb.textContent=T;window.pwRadarGif&&window.pwRadarGif(f)};
-s.onerror=function(){gb.textContent='Mislukt';setTimeout(function(){gb.textContent=T},3000)};
-document.head.appendChild(s);
-}
-function place(p){
-pl=p;
-if(!box)build();
-if(map){map.setView([pl.lat,pl.lon],map.getZoom());mk.setLatLng([pl.lat,pl.lon])}
-}
-document.addEventListener('pw-place',function(e){place(e.detail)});
-if(pl)place(pl);
+new MutationObserver(apply).observe(wl,{childList:true});
+apply();
 })();
+(function(){
+var wl=document.getElementById('weerLijst');if(!wl)return;
+var st=document.createElement('style');
+st.textContent='#weerLijst{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start}#weerLijst>p{grid-column:1/-1}#weerLijst .wdag{min-width:0}#weerLijst .wt{white-space:normal;line-height:1.1;font-size:clamp(20px,5.4vw,30px)}#weerLijst .wg a{cursor:zoom-in}@media(max-width:650px){#weerLijst{column-gap:10px}#weerLijst .wg{grid-template-columns:repeat(2,1fr)}#weerLijst .wi{font-size:15px}}.pwl{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:56px 20px 24px;background:#00000066;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);animation:pwlIn .25s ease both}.pwl.out{animation:pwlOut .2s ease both}.pwl-box{position:relative;line-height:0;animation:pwlPlop .65s ease both}.pwl.out .pwl-box{transform:scale(.94);opacity:0;transition:transform .2s,opacity .2s}.pwl-img{display:block;width:auto;height:auto;max-width:min(calc(100vw - 40px),900px);max-height:calc(100vh - 130px);max-height:calc(100dvh - 130px);border-radius:14px;box-shadow:0 10px 40px #0006}.pwl-x{position:absolute;right:-4px;bottom:100%;margin-bottom:2px;width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:0}.pwl-x svg{width:26px;height:26px;fill:none;stroke:#FCF5EE;stroke-width:2.6;stroke-linecap:round;filter:drop-shadow(0 0 3px #000a)}@keyframes pwlIn{from{opacity:0}}@keyframes pwlOut{to{opacity:0}}@keyframes pwlPlop{0%{opacity:0;transform:scale(.88)}75%{opacity:1;transform:scale(1.02)}}';
+document.head.appendChild(st);
+function open(url){
+var img=new Image();
+img.onload=function(){
+var ov=document.createElement('div'),box=document.createElement('div'),x=document.createElement('button');
+ov.className='pwl';box.className='pwl-box';x.className='pwl-x';x.type='button';
+x.setAttribute('aria-label','Sluiten');
+x.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+img.className='pwl-img';img.alt='';
+box.appendChild(x);box.appendChild(img);ov.appendChild(box);document.body.appendChild(ov);
+document.body.style.overflow='hidden';
+function key(e){if(e.key==='Escape')close()}
+function close(){
+if(ov.classList.contains('out'))return;
+ov.classList.add('out');document.body.style.overflow='';
+document.removeEventListener('keydown',key);
+setTimeout(function(){ov.remove()},200);
+}
+x.onclick=close;
+ov.onclick=function(e){if(e.target===ov)close()};
+document.addEventListener('keydown',key);
+};
+img.onerror=function(){window.open(url,'_blank')};
+img.src=url;
+}
+wl.addEventListener('click',function(e){
+var a=e.target.closest&&e.target.closest('.wg a');
+if(!a||!a.querySelector('img'))return;
+e.preventDefault();open(a.href);
+});
+})();
+/* Titel + swipe */
+(function(){
+var wp=document.getElementById('weerPage'),k9=wp&&wp.querySelector('.k9'),host=document.getElementById('pw-host'),wl=document.getElementById('weerLijst');
+if(!k9||!host||!wl)return;
+var GAP=12,cur=0,W=0,X0=0,Y0=0,T0=0,dx=0,ok=0,drag=0,h1=k9.querySelector('h1');
+var st=document.createElement('style');
+st.textContent='.pwd{display:flex;justify-content:center;align-items:center;height:28px;margin:-33px 0 5px}.pwd button{height:28px;padding:0 5px;border:0;background:none;display:flex;align-items:center}.pwd button::after{content:"";width:12px;height:12px;border-radius:6px;border:2px solid #FCF5EE;opacity:.6;transition:.3s}.pwd button.on::after{width:32px;background:#FCF5EE;opacity:1}#weerPage>h1{margin:0 0 14px;text-align:center;white-space:nowrap;font:400 clamp(26px,8.4vw,48px) "Great Vibes",cursive;-webkit-text-stroke:.4px #FCF5EE}.pwv{overflow:hidden;overflow:clip;overflow-clip-margin:6px;transition:height .35s ease}.pwt{display:flex;align-items:flex-start;gap:'+GAP+'px;will-change:transform;transition:transform .4s cubic-bezier(.22,.85,.3,1)}.pwt.drag,.pwt.drag .pwp{transition:none}.pwp{flex:0 0 100%;min-width:0;opacity:.35;transform:scale(.96);transform-origin:50% 0;transition:opacity .4s,transform .4s}.pwp.on{opacity:1;transform:none}';
+document.head.appendChild(st);
+var pwv=document.createElement('div'),pwt=document.createElement('div'),pn=[document.createElement('div'),document.createElement('div')],d=document.createElement('div');
+pwv.className='pwv';pwt.className='pwt';pn[0].className='pwp on';pn[1].className='pwp';
+k9.insertBefore(pwv,host);pwv.appendChild(pwt);pwt.appendChild(pn[0]);pwt.appendChild(pn[1]);pn[0].appendChild(host);pn[1].appendChild(wl);
+d.className='pwd';d.innerHTML='<button type="button" class="on" aria-label="Pagina 1: weer en radar"></button><button type="button" aria-label="Pagina 2: weerfoto\u2019s"></button>';
+wp.insertBefore(d,wp.firstChild);if(h1)wp.insertBefore(h1,k9);
+var b=d.children;
+function meas(){W=pwt.clientWidth+GAP}
+function setX(x){pwt.style.transform='translate3d('+x+'px,0,0)'}
+function sync(){if(drag)return;var v=pn[cur].offsetHeight;if(v)pwv.style.height=v+'px'}
+function snap(){pwt.classList.add('drag');meas();setX(-cur*W);void pwt.offsetWidth;pwt.classList.remove('drag')}
+function go(n){
+var old=cur;cur=n;meas();setX(-n*W);pwv.style.transition='';
+for(var i=0;i<2;i++){pn[i].style.opacity=pn[i].style.transform='';pn[i].classList.toggle('on',i===n);b[i].classList.toggle('on',i===n)}
+sync();
+if(n!==old&&window.scrollY>0)window.scrollTo({top:0,behavior:'smooth'});
+}
+b[0].onclick=function(){go(0)};b[1].onclick=function(){go(1)};
+pwv.addEventListener('touchstart',function(e){
+ok=drag=0;
+if(e.touches.length!==1||e.target.closest('.leaflet-container,.pw-scroll,input,textarea,select,video'))return;
+X0=e.touches[0].clientX;Y0=e.touches[0].clientY;T0=Date.now();dx=0;ok=1;
+},{passive:true});
+pwv.addEventListener('touchmove',function(e){
+if(!ok)return;
+var t=e.touches[0],mx=t.clientX-X0,my=t.clientY-Y0;
+if(!drag){
+if(Math.abs(my)>10&&Math.abs(my)>Math.abs(mx)){ok=0;return}
+if(Math.abs(mx)<8||Math.abs(mx)<Math.abs(my)*1.3)return;
+drag=1;meas();pwt.classList.add('drag');pwv.style.transition='none';
+}
+if(e.cancelable)e.preventDefault();
+dx=mx;
+var m=(cur===0&&mx>0)||(cur===1&&mx<0)?mx*.3:mx,p=Math.max(0,Math.min(1,cur-m/W)),a=pn[0].offsetHeight,c=pn[1].offsetHeight;
+setX(-cur*W+m);
+pn[0].style.opacity=1-.65*p;pn[0].style.transform='scale('+(1-.04*p)+')';
+pn[1].style.opacity=.35+.65*p;pn[1].style.transform='scale('+(.96+.04*p)+')';
+pwv.style.height=(a+(c-a)*p)+'px';
+},{passive:false});
+function end(){
+if(!ok)return;ok=0;
+if(!drag)return;drag=0;
+pwt.classList.remove('drag');
+var v=dx/(Date.now()-T0||1),n=cur;
+if(cur===0&&(dx<-W*.2||v<-.45))n=1;else if(cur===1&&(dx>W*.2||v>.45))n=0;
+go(n);
+}
+pwv.addEventListener('touchend',end,{passive:true});
+pwv.addEventListener('touchcancel',end,{passive:true});
+function check(){if(pwt.clientWidth+GAP!==W)snap();sync()}
+if(window.ResizeObserver){var ro=new ResizeObserver(check);ro.observe(pn[0]);ro.observe(pn[1])}
+addEventListener('resize',check);
+var idle=window.requestIdleCallback?function(f){requestIdleCallback(f)}:function(f){setTimeout(f,300)};
+function warm(){var im=wl.querySelectorAll('img');for(var i=0;i<im.length&&i<18;i++){im[i].loading='eager';im[i].decoding='async'}}
+new MutationObserver(function(){idle(warm)}).observe(wl,{childList:true});
+})();
+/* ===== Radar laden (radar.js moet naast dit bestand staan) ===== */
+(function(){var s=document.createElement('script');s.src='radar.js';document.body.appendChild(s)})();
