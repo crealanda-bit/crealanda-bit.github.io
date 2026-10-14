@@ -1,7 +1,7 @@
 /* Regenradar Crea Landa - GIF-maker (wordt door radar.js geladen) */
 (function(){
   var gifUrl='',gifBusy=false;
-  var st=document.createElement('style');st.textContent='.pwr-gv{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:#000000b3;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}.pwr-gv img{max-width:100%;max-height:68vh;border-radius:12px;box-shadow:0 10px 40px #0006}.pwr-gv .pwr-rij{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.pwr-gv .pwr-gb{display:inline-block;border:0;border-radius:999px;padding:10px 20px;background:#B32C43;color:#FCF5EE;font:21px/1 "Bebas Neue",sans-serif;text-decoration:none;cursor:pointer}';document.head.appendChild(st);
+  var st=document.createElement('style');st.textContent='.pwr-gv{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;background:#000000b3;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}.pwr-gv img{max-width:100%;max-height:68vh;border-radius:12px;box-shadow:0 10px 40px #0006}.pwr-gv .pwr-rij{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.pwr-gv .pwr-gb{display:inline-block;border:0;border-radius:8px;padding:10px 18px;background:#B32C43;color:#FCF5EE;font:21px/1 "Bebas Neue",sans-serif;text-decoration:none;cursor:pointer}';document.head.appendChild(st);
   var BP=window.Path2D?new Path2D('M13 2 4 14h6l-1 8 9-12h-6z'):null;
   var workerUrl='';
   function laadGif(cb,err){
