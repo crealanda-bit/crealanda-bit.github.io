@@ -11,7 +11,6 @@ var SAT_CORS=true;
 var AANTAL=8;
 /* kaartkleuren: DONKER = lijnen/letters/water, LICHT = land */
 var KAART_DONKER='#5C77AD',KAART_LICHT='#EAF0F8';
-var NACHT_DONKER='#8FA6D4',NACHT_LICHT='#33202D';
 var HEX=['#9EB3D8','#627EB5','#D9667A','#B32C43','#7E1D30','#3E1A2C'];
 var SNOWHEX=['#D6BFD9','#AE86B4','#7E4F8C'];
 var BMAX=[5,15,30,60,120];
@@ -25,7 +24,6 @@ var BOLTP='<path d="M13 2 4 14h6l-1 8 9-12h-6z" stroke="#6F4257" stroke-width="1
 function bsvg(c){return '<svg viewBox="0 0 24 24" fill="currentColor"'+(c?' style="color:'+c+'"':'')+'>'+BOLTP+'</svg>'}
 var pl=window.pwPlace||null,box,mapEl,map,mk,base,frames=[],layers=[],wolkenLagen=[],idx=0,timer=null,host='',lastKey=0,started=false;
 var wantPlay=true,eerste=true,blitsGone=false,on={rain:true,snow:true,blits:true,wolken:true},bon=[1,1,1,1,1],strikes=[],boltLayer=null;
-var donker=false,full=false,lockFn=function(){};
 /* stijl staat in radar.css */
 var cl=document.createElement('link');cl.rel='stylesheet';cl.href='radar.css';document.head.appendChild(cl);
 var kd=rgb(KAART_DONKER),kl=rgb(KAART_LICHT);window.pwKaart={d:kd,l:kl};
@@ -34,12 +32,6 @@ var sv=document.createElement('div');sv.style.cssText='position:absolute;width:0
 sv.innerHTML='<svg width="0" height="0"><filter id="pwr-duo" color-interpolation-filters="sRGB"><feColorMatrix values=".299 .587 .114 0 0 .299 .587 .114 0 0 .299 .587 .114 0 0 0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues="'+tb(0)+'"/><feFuncG type="table" tableValues="'+tb(1)+'"/><feFuncB type="table" tableValues="'+tb(2)+'"/></feComponentTransfer></filter></svg>';
 document.body.appendChild(sv);
 function $(i){return document.getElementById(i)}
-function setKaart(dk){
-donker=dk;
-kd=rgb(dk?NACHT_DONKER:KAART_DONKER);kl=rgb(dk?NACHT_LICHT:KAART_LICHT);window.pwKaart={d:kd,l:kl};
-['R','G','B'].forEach(function(c,i){var f=document.querySelector('#pwr-duo feFunc'+c);if(f)f.setAttribute('tableValues',tb(i))});
-if(box){box.style.setProperty('--kl',dk?NACHT_LICHT:KAART_LICHT);var b=box.querySelector('.pwr-dk');b.classList.toggle('on',dk);b.setAttribute('aria-pressed',dk)}
-}
 function satOp(){return(on.rain||on.snow)?SAT_OPACITY:SAT_SOLO}
 function rgb2hsl(r,g,b){
 r/=255;g/=255;b/=255;
@@ -99,29 +91,17 @@ return tile;
 }
 });
 }
-function fs(){
-full=!full;
-box.classList.toggle('pwr-full',full);box.classList.toggle('pw',full);
-var b=box.querySelector('.pwr-fs');b.textContent=full?'✕':'⛶';b.setAttribute('aria-label',full?'Sluit beeldschermvullend':'Beeldschermvullend');
-if(full){document.body.appendChild(box);document.body.style.overflow='hidden';lockFn(false)}
-else{wp.insertBefore(box,wp.querySelector('.pw-foot'));document.body.style.overflow='';lockFn(true)}
-if(map)setTimeout(function(){map.invalidateSize()},120);
-}
 function build(){
 box=document.createElement('div');box.id='pw-radar';
-box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'▴':'▾')+'</button></p><div id="pwr-body"'+(START_OPEN?'':' hidden')+'><div class="pwr-top"><span class="pwr-ch"><button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button><button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button><button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button><button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button><button type="button" class="pwr-ic pwr-dk" aria-label="Donkere kaart" aria-pressed="false">☾</button><button type="button" class="pwr-ic pwr-fs" aria-label="Beeldschermvullend">⛶</button></span></div><div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div><div class="pwr-bl dicht"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div><div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div><div class="pwr-ls"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Sneeuw</span></div></div><div class="pwr-lw"><i style="background:linear-gradient(90deg,#2c2c38,#8d8d9c,#fff)"></i><div class="pwr-lb"><span>Laag</span><span>Hoog</span></div></div></div></div><div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button><input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div><div class="pwr-acts"><button id="pwr-f" type="button" class="alt">Foto</button><button id="pwr-g" type="button" class="alt">GIF</button></div><p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
+box.innerHTML='<p style="text-align:center;margin:20px 0 8px"><button id="pwr-h" type="button" aria-expanded="'+START_OPEN+'">Radar '+(START_OPEN?'▴':'▾')+'</button></p><div id="pwr-body"'+(START_OPEN?'':' hidden')+'><div class="pwr-top"><span class="pwr-ch"><button type="button" class="pwr-pc on" data-l="rain" aria-pressed="true">Regen</button><button type="button" class="pwr-pc on" data-l="snow" aria-pressed="true">Sneeuw</button><button type="button" class="pwr-pc on" data-l="blits" aria-pressed="true">Bliksem</button><button type="button" class="pwr-pc on" data-l="wolken" aria-pressed="true">Wolken</button></span></div><div class="pwr-map locked"><div id="pwr-m"></div><div class="pwr-lock"><span>Tik om de kaart te bedienen</span></div><div class="pwr-bl dicht"><div class="pwr-bt">⚡ Verbinden…</div>'+BLAB.map(function(t,j){return '<button type="button" class="pwr-br" data-b="'+j+'" aria-pressed="true">'+bsvg(BCOL[j])+'<span>'+t+'</span><b class="pwr-bn">0</b></button>'}).join('')+'</div><div class="pwr-leg"><div class="pwr-lr"><i style="background:linear-gradient(90deg,'+HEX.join(',')+')"></i><div class="pwr-lb"><span>Licht</span><span>Zwaar</span><span>Extreem</span></div></div><div class="pwr-ls"><i style="background:linear-gradient(90deg,'+SNOWHEX.join(',')+')"></i><div class="pwr-lb"><span>Sneeuw</span></div></div><div class="pwr-lw"><i style="background:linear-gradient(90deg,#2c2c38,#8d8d9c,#fff)"></i><div class="pwr-lb"><span>Laag</span><span>Hoog</span></div></div></div></div><div class="pwr-bar"><button id="pwr-p" type="button" aria-label="Afspelen">▶</button><input id="pwr-s" type="range" min="0" max="0" value="0" aria-label="Tijd"><span id="pwr-t">Laden…</span></div><div class="pwr-acts"><button id="pwr-f" type="button" class="alt">Foto</button><button id="pwr-g" type="button" class="alt">GIF</button></div><p style="text-align:center;margin:10px 0 0"><button id="pwr-l" type="button" class="alt">Kaart bedienen</button></p></div>';
 var foot=wp.querySelector('.pw-foot');wp.insertBefore(box,foot);
 foot.insertAdjacentHTML('beforeend','<br>Radar van <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer.com</a> · bliksem van <a href="https://www.blitzortung.org/" target="_blank" rel="noopener">Blitzortung.org</a> · wolken van <a href="https://view.eumetsat.int/" target="_blank" rel="noopener">EUMETSAT</a>');
 mapEl=$('pwr-m');
 box.style.setProperty('--kl',KAART_LICHT);
 var m=box.querySelector('.pwr-map'),body=$('pwr-body'),hb=$('pwr-h');
 function lock(v){m.classList.toggle('locked',v);$('pwr-l').textContent=v?'Kaart bedienen':'Kaart vergrendelen'}
-lockFn=lock;
 box.querySelector('.pwr-lock').onclick=function(){lock(false)};
 $('pwr-l').onclick=function(){lock(!m.classList.contains('locked'))};
-box.querySelector('.pwr-fs').onclick=fs;
-box.querySelector('.pwr-dk').onclick=function(){setKaart(!donker);try{localStorage.setItem('pw-donker',donker?1:0)}catch(e){}};
-try{if(+localStorage.getItem('pw-donker'))setKaart(true)}catch(e){}
 $('pwr-p').onclick=function(){if(timer){wantPlay=false;pause()}else{wantPlay=true;play()}};
 $('pwr-s').oninput=function(){wantPlay=false;pause();show(+this.value)};
 $('pwr-g').onclick=function(){gifKlik()};$('pwr-f').onclick=function(){gifKlik(1)};
