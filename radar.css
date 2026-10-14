@@ -1,352 +1,105 @@
-/* Radar Crea Landa - stijl (wordt door radar.js geladen) */
-.pwr-base{filter:url(#pwr-duo)}
-.pwr-sat{
-  filter:contrast(1.4) brightness(1.1)
+/* Radar Crea Landa - Strakke donkere stijl (Weerfocus look) */
+.pwr-base { filter: brightness(0.4) contrast(1.3) grayscale(0.1); }
+.pwr-sat { filter: contrast(1.6) brightness(1.1) drop-shadow(0 0 4px #fff2); }
+.pwr-rl { transition: opacity 0.2s ease; }
+
+.pwr-map {
+  position: relative;
+  height: 440px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0d1117;
+  box-shadow: inset 0 0 40px #000c, 0 4px 12px #0006;
+  --pwr-rad: 6px;
 }
-.pwr-rl{transition:opacity .15s linear}
-#pwr-m .leaflet-control-attribution{
-  font-size:10px;
-  line-height:1.3;
-  padding:0 5px;
-  background:#FCF5EEdd;
-  color:#6F4257
+#pwr-m { position: absolute; inset: 0; font: 12px "Oswald", Arial, sans-serif; background: transparent; }
+
+#pwr-m .leaflet-control-attribution {
+  font-size: 10px; line-height: 1.3; padding: 0 5px;
+  background: #1a1a1aee; color: #aaa;
 }
-#pwr-m .leaflet-bar{
-  border:0;
-  border-radius:8px;
-  overflow:hidden;
-  box-shadow:0 2px 8px #6F425755
-}
-#pwr-m .leaflet-bar a{
-  width:32px;
-  height:32px;
-  background:#B32C43;
-  color:#FCF5EE;
-  border:0;
-  border-radius:0;
-  font:bold 22px/32px Arial,sans-serif
-}
-.pwr-ch{
-  display:flex;
-  gap:5px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-bottom:8px
-}
-.pw .pwr-top button{
-  padding:7px 11px;
-  font-size:18px;
-  border-radius:8px
-}
-.pwr-acts{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-top:10px
-}
-.pw .pwr-acts button{min-width:100px}
-.pw .pwr-top .pwr-pc{
-  background:#ffffff26;
-  color:#FCF5EE;
-  box-shadow:inset 0 0 0 2px #B32C43
-}
-.pw .pwr-top .pwr-pc.on{
-  background:#B32C43;
-  color:#FCF5EE
-}
-.pwr-map{
-  --pwr-rad:6px; /* hoekafronding van de knoppen op de kaart */
-  position:relative;
-  height:360px;
-  border-radius:10px;
-  overflow:hidden;
-  background:var(--kl,#EAF0F8)
-}
-.pwr-cr,.pwr-cs{
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%
-}
-.pwr-map.no-rain .pwr-cr,
-.pwr-map.no-snow .pwr-cs{display:none}
-.pwr-bolt{color:#B32C43}
-.pwr-bolt svg{
-  display:block;
-  width:20px;
-  height:20px
-}
-#pwr-m{
-  position:absolute;
-  inset:0;
-  font:12px Oswald,Arial,sans-serif;
-  background:var(--kl,#EAF0F8)
-}
-.pwr-map.locked #pwr-m{pointer-events:none}
-.pwr-lock{
-  display:none;
-  position:absolute;
-  inset:0;
-  z-index:1100;
-  align-items:flex-end;
-  justify-content:center;
-  padding:12px 12px 70px
-}
-.pwr-map.locked .pwr-lock{display:flex}
-.pwr-lock span{
-  background:#B32C43;
-  color:#FCF5EE;
-  padding:7px 14px;
-  border-radius:8px;
-  font-size:19px
+#pwr-m .leaflet-bar { border: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px #0008; }
+#pwr-m .leaflet-bar a {
+  width: 32px; height: 32px; background: #222; color: #ccc; border: 0; font: bold 22px/32px Arial, sans-serif;
 }
 
-/* wind: deeltjes */
-.pwr-wc{
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  z-index:450;
-  pointer-events:none;
-  opacity:.7
-}
-.pwr-map.no-wind .pwr-wc{display:none}
+.pwr-top { display: flex; flex-direction: column; gap: 6px; align-items: center; margin-bottom: 10px; }
+.pwr-ch { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
 
-/* windmetingen: rode knopjes per plaats, zelfde kleur als de knoppen boven de radar */
-.pwr-wm{
-  position:absolute;
-  inset:0;
-  z-index:460;
-  pointer-events:none;
-  overflow:hidden
+.pw .pwr-top button {
+  padding: 8px 14px; font-size: 18px; border-radius: 8px; border: 1px solid #333;
+  background: #1c1c1e; color: #eee; cursor: pointer; transition: all 0.2s ease;
+  font-family: "Oswald", sans-serif;
 }
-.pwr-wm div{
-  position:absolute;
-  transform:translate(-50%,calc(-100% - 5px));
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:2px 8px 3px;
-  border-radius:var(--pwr-rad,6px);
-  background:#B32C43;
-  color:#FCF5EE;
-  white-space:nowrap;
-  box-shadow:0 1px 4px #0005
-}
-.pwr-wm div::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  bottom:-4px;
-  margin-left:-4px;
-  border:4px solid transparent;
-  border-bottom:0;
-  border-top-color:#B32C43
-}
-.pwr-wm .pn{
-  font:400 19px/1.1 "Great Vibes",cursive;
-  -webkit-text-stroke:.3px #FCF5EE
-}
-.pwr-wm .pk{
-  display:flex;
-  align-items:center;
-  gap:3px;
-  font:11px/1.2 Oswald,Arial,sans-serif;
-  letter-spacing:.2px
-}
-.pwr-wm svg{
-  width:10px;
-  height:10px;
-  flex-shrink:0
+.pw .pwr-top button:hover { background: #2a2a2c; }
+
+/* Actieve laag-knoppen (Crea Landa rood) */
+.pw .pwr-top button.on {
+  background: #B32C43; color: #fff; border-color: #B32C43;
+  box-shadow: 0 0 12px #b32c4380;
 }
 
-/* legenda: onderaan, per laag een titel in Great Vibes */
-.pwr-leg{
-  position:absolute;
-  left:50%;
-  bottom:26px;
-  transform:translateX(-50%);
-  width:max-content;
-  max-width:96%;
-  z-index:1000;
-  display:flex;
-  align-items:flex-end;
-  gap:8px;
-  padding:5px 8px 4px;
-  border-radius:8px;
-  background:#6F4257f2;
-  pointer-events:none;
-  font:11px/1.2 Oswald,Arial,sans-serif;
-  color:#FCF5EE
+/* Weergave-knoppen (NL, Benelux, Europa) */
+.pwr-weer {
+  background: #1c1c1e !important;
+  color: #eee !important;
+  border: 1px solid #444 !important;
+  padding: 6px 12px !important;
+  font-size: 16px !important;
+  font-weight: 500;
 }
-.pwr-leg .pwr-lt{
-  font:700 15px/1 "Great Vibes",cursive;
-  text-align:center;
-  white-space:nowrap;
-  margin-bottom:3px
-}
-.pwr-leg i{
-  display:block;
-  height:8px;
-  border-radius:4px
-}
-.pwr-leg .pwr-lb{
-  display:flex;
-  justify-content:space-between;
-  margin-top:3px
-}
-.pwr-leg .pwr-lr{width:96px}
-.pwr-leg .pwr-ls{width:52px}
-.pwr-leg .pwr-lw{width:48px}
-.pwr-leg .pwr-lwd{width:48px}
-.pwr-map.no-rain .pwr-lr,
-.pwr-map.no-snow .pwr-ls,
-.pwr-map.no-wolken .pwr-lw,
-.pwr-map.no-wind .pwr-lwd{display:none}
-.pwr-map.no-rain.no-snow.no-wolken.no-wind .pwr-leg{display:none}
-
-/* rechtsboven: bliksemknop met daaronder de windmetingen-knop */
-.pwr-rt{
-  position:absolute;
-  right:8px;
-  top:8px;
-  z-index:1200;
-  display:flex;
-  flex-direction:column;
-  align-items:stretch;
-  gap:6px
-}
-/* oude opbouw zonder .pwr-rt blijft ook werken */
-.pwr-map>.pwr-bl{
-  position:absolute;
-  right:8px;
-  top:8px;
-  z-index:1200
-}
-.pwr-bl{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  padding:4px 6px;
-  border-radius:var(--pwr-rad,6px);
-  background:#6F4257;
-  color:#FCF5EE;
-  font:17px/1.1 "Bebas Neue",sans-serif;
-  letter-spacing:.3px;
-  box-shadow:0 2px 6px #0004
-}
-.pwr-map.no-blits .pwr-bl{display:none}
-.pwr-bl .pwr-bt{
-  padding:3px 4px;
-  font-size:17px;
-  white-space:nowrap;
-  text-align:center;
-  cursor:pointer
-}
-.pw .pwr-bl .pwr-br{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  width:100%;
-  margin:0;
-  padding:3px 4px;
-  border:0;
-  border-radius:4px;
-  background:none;
-  box-shadow:none;
-  color:#FCF5EE;
-  font:16px/1.1 "Bebas Neue",sans-serif;
-  letter-spacing:.3px;
-  text-align:left
-}
-.pw .pwr-bl.dicht .pwr-br{display:none}
-.pw .pwr-bl .pwr-br.off{opacity:.4}
-.pw .pwr-bl .pwr-br:active{background:#ffffff26}
-.pwr-br svg{
-  width:16px;
-  height:16px;
-  flex-shrink:0
-}
-.pwr-br span{
-  flex:1;
-  white-space:nowrap
-}
-.pwr-br b{
-  font-weight:400;
-  min-width:14px;
-  text-align:right;
-  opacity:.8
-}
-.pw .pwr-wb{
-  padding:7px 10px;
-  border:0;
-  border-radius:var(--pwr-rad,6px);
-  background:#6F4257;
-  color:#FCF5EE;
-  font:17px/1.1 "Bebas Neue",sans-serif;
-  letter-spacing:.3px;
-  white-space:nowrap;
-  box-shadow:0 2px 6px #0004
-}
-.pw .pwr-wb.off{opacity:.6}
-.pwr-map.no-wind .pwr-wb{display:none}
-
-/* tijdlijn */
-.pwr-bar{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-top:10px
-}
-.pw .pwr-bar button{
-  width:46px;
-  height:42px;
-  padding:0;
-  font-size:20px
-}
-.pwr-bar input{
-  -webkit-appearance:none;
-  appearance:none;
-  flex:1;
-  min-width:0;
-  height:24px;
-  background:none
-}
-.pwr-bar input::-webkit-slider-runnable-track{
-  height:8px;
-  border-radius:4px;
-  background:#FCF5EE
-}
-.pwr-bar input::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:24px;
-  height:24px;
-  margin-top:-8px;
-  border-radius:50%;
-  background:#B32C43;
-  border:0
-}
-.pwr-bar input::-moz-range-track{
-  height:8px;
-  border-radius:4px;
-  background:#FCF5EE
-}
-.pwr-bar input::-moz-range-thumb{
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background:#B32C43;
-  border:0
-}
-#pwr-t{
-  min-width:112px;
-  text-align:right;
-  font:16px Oswald,Arial,sans-serif
+.pwr-weer.on {
+  background: #4CAF50 !important;
+  color: #fff !important;
+  border-color: #4CAF50 !important;
+  box-shadow: 0 0 12px #4caf5080;
 }
 
-@media(min-width:700px){
-  .pwr-map{height:440px}
+.pwr-leg {
+  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
+  width: max-content; max-width: 96%; z-index: 1000;
+  display: flex; align-items: flex-end; gap: 10px; padding: 8px 12px;
+  border-radius: 10px; background: #151515ee; backdrop-filter: blur(5px);
+  border: 1px solid #333; pointer-events: none;
+  font: 11px/1.2 "Oswald", Arial, sans-serif; color: #eee;
 }
+.pwr-leg .pwr-lt { font: 700 15px/1 "Great Vibes", cursive; text-align: center; white-space: nowrap; margin-bottom: 4px; color: #fff; }
+.pwr-leg i { display: block; height: 8px; border-radius: 4px; }
+.pwr-leg .pwr-lb { display: flex; justify-content: space-between; margin-top: 4px; color: #aaa; }
+.pwr-leg .pwr-lr { width: 100px; } .pwr-leg .pwr-ls { width: 60px; } .pwr-leg .pwr-lw { width: 50px; } .pwr-leg .pwr-lwd { width: 50px; }
+.pwr-map.no-rain .pwr-lr, .pwr-map.no-snow .pwr-ls, .pwr-map.no-wolken .pwr-lw, .pwr-map.no-wind .pwr-lwd { display: none; }
+.pwr-map.no-rain.no-snow.no-wolken.no-wind .pwr-leg { display: none; }
+
+.pwr-rt { position: absolute; right: 8px; top: 8px; z-index: 1200; display: flex; flex-direction: column; gap: 6px; }
+.pwr-bl {
+  display: flex; flex-direction: column; gap: 2px; padding: 4px 6px;
+  border-radius: 8px; background: #1c1c1ecc; backdrop-filter: blur(4px);
+  color: #eee; font: 16px/1.1 "Bebas Neue", sans-serif; box-shadow: 0 2px 8px #0006; border: 1px solid #333;
+}
+.pwr-bl .pwr-bt { padding: 4px 6px; font-size: 17px; white-space: nowrap; text-align: center; cursor: pointer; }
+.pw .pwr-bl .pwr-br { display: flex; align-items: center; gap: 6px; width: 100%; padding: 3px 4px; border: 0; background: none; color: #eee; font: 15px/1.1 "Bebas Neue", sans-serif; text-align: left; }
+.pw .pwr-bl .pwr-br.off { opacity: 0.4; }
+.pwr-br svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pwr-br b { font-weight: 400; min-width: 14px; text-align: right; opacity: 0.8; }
+
+.pwr-wm { position: absolute; inset: 0; z-index: 460; pointer-events: none; overflow: hidden; }
+.pwr-wm div {
+  position: absolute; transform: translate(-50%, calc(-100% - 5px));
+  display: flex; flex-direction: column; align-items: center; padding: 3px 8px;
+  border-radius: 6px; background: #B32C43ee; color: #fff; white-space: nowrap;
+  box-shadow: 0 2px 6px #0008; border: 1px solid #fff3;
+}
+.pwr-wm div::after { content: ""; position: absolute; left: 50%; bottom: -4px; margin-left: -4px; border: 4px solid transparent; border-bottom: 0; border-top-color: #B32C43ee; }
+.pwr-wm .pn { font: 400 18px/1.1 "Great Vibes", cursive; -webkit-text-stroke: 0.3px #fff; }
+.pwr-wm .pk { display: flex; align-items: center; gap: 4px; font: 11px/1.2 "Oswald", Arial, sans-serif; }
+
+.pwr-bar { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.pw .pwr-bar button { width: 46px; height: 42px; padding: 0; font-size: 20px; background: #1c1c1e; color: #eee; border: 1px solid #333; border-radius: 8px; }
+.pwr-bar input { -webkit-appearance: none; appearance: none; flex: 1; height: 24px; background: none; }
+.pwr-bar input::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: #333; }
+.pwr-bar input::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -8px; border-radius: 50%; background: #B32C43; box-shadow: 0 0 8px #b32c43aa; }
+#pwr-t { min-width: 112px; text-align: right; font: 16px "Oswald", sans-serif; color: #aaa; }
+
+.pwr-acts { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+.pw .pwr-acts button { min-width: 100px; background: #1c1c1e; color: #eee; border: 1px solid #333; padding: 10px 18px; border-radius: 8px; font-size: 18px; }
+.pw .pwr-acts button:hover { background: #2a2a2c; }
