@@ -1,3 +1,4 @@
+
 (function(){
 var wp=document.getElementById('pw');if(!wp||window.pwRadarLoaded)return;window.pwRadarLoaded=1;
 var API='https://api.rainviewer.com/public/weather-maps.json';
@@ -98,43 +99,32 @@ setTimeout(function(){map.invalidateSize()},300);
 toggles();
 zetWeergave(huidigeWeergave);
 
-// ===== NIEUW: Masker voor de Benelux =====
-// Laad de wereldkaart GeoJSON en filter de Benelux eruit
-fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
-.then(function(r){return r.json()})
-.then(function(data){
-    // De Benelux heeft deze ID's in de Natural Earth dataset: 
-    // NL = 528, BE = 056, LU = 442
-    var benelux = data.objects.countries.geometries.filter(function(g){
-        return ['528','056','442'].indexOf(g.id) !== -1;
-    });
-    
-    // Bouw een groot vlak over de hele wereld, met een gat voor de Benelux
+// ===== MASKER VOOR DE BENELUX =====
+// De grenzen van Nederland, Belgie en Luxemburg zitten direct in de code.
+var BENELUX_GATEN = [
+    // Nederland (grofweg, 40 punten)
+    [[53.5,4.9],[53.4,6.9],[53.0,7.2],[52.4,7.1],[52.0,7.0],[51.8,6.7],[51.5,6.2],[51.3,6.0],[51.2,5.9],[51.0,5.8],[50.8,5.7],[50.7,5.6],[50.7,5.5],[50.8,5.4],[50.9,5.3],[51.0,5.2],[51.1,5.0],[51.3,4.8],[51.3,4.5],[51.4,4.3],[51.5,4.2],[51.6,4.1],[51.7,4.0],[51.9,4.0],[52.0,4.1],[52.1,4.2],[52.2,4.3],[52.3,4.4],[52.4,4.6],[52.5,4.7],[52.6,4.8],[52.7,4.9],[52.8,4.9],[52.9,4.8],[53.0,4.7],[53.1,4.8],[53.2,4.8],[53.3,4.8],[53.4,4.8],[53.5,4.9]],
+    // Belgie (grofweg, 40 punten)
+    [[51.5,4.2],[51.4,4.0],[51.3,3.8],[51.3,3.5],[51.2,3.4],[51.2,3.2],[51.1,3.0],[50.9,2.9],[50.8,2.9],[50.7,2.9],[50.6,3.0],[50.5,3.1],[50.4,3.2],[50.3,3.3],[50.2,3.5],[50.1,3.6],[50.0,3.7],[49.9,3.9],[49.8,4.1],[49.7,4.3],[49.6,4.5],[49.6,4.8],[49.6,5.0],[49.6,5.2],[49.6,5.4],[49.6,5.6],[49.7,5.7],[49.8,5.8],[49.9,5.9],[50.0,6.0],[50.1,6.1],[50.2,6.2],[50.3,6.3],[50.4,6.4],[50.5,6.4],[50.6,6.4],[50.7,6.3],[50.8,6.2],[50.9,6.1],[51.0,6.0],[51.1,5.9],[51.2,5.9],[51.3,6.0],[51.3,6.1],[51.4,6.2],[51.4,6.0],[51.5,5.9],[51.5,5.8],[51.5,5.6],[51.5,5.4],[51.5,5.2],[51.5,5.0],[51.5,4.8],[51.5,4.6],[51.5,4.4],[51.5,4.2]],
+    // Luxemburg (grofweg, 20 punten)
+    [[50.2,6.0],[50.1,6.1],[50.0,6.1],[49.9,6.1],[49.8,6.0],[49.7,5.9],[49.6,5.8],[49.6,5.6],[49.6,5.4],[49.7,5.3],[49.8,5.2],[49.9,5.2],[50.0,5.2],[50.1,5.3],[50.2,5.4],[50.3,5.5],[50.3,5.7],[50.3,5.8],[50.2,6.0]]
+];
+function bouwMasker(){
     var wereld = [[-90,-180],[90,-180],[90,180],[-90,180],[-90,-180]];
-    var gaten = [];
-    
-    benelux.forEach(function(f){
-        // Converteer de coördinaten naar Leaflet-formaat [lat, lng]
-        // We pakken de eerste ring (de buitenkant) van elk land
-        var coords = f.geometry.coordinates[0];
-        var ring = [];
-        coords.forEach(function(c){ ring.push([c[1], c[0]]); });
-        gaten.push(ring);
+    var ringen = [wereld];
+    BENELUX_GATEN.forEach(function(gat){
+        var omgekeerd = gat.slice().reverse();
+        ringen.push(omgekeerd);
     });
-    
-    // Teken het masker: alles buiten de Benelux wordt donker
-    // De kleur #6F4257 is jouw website-achtergrondkleur
-    L.polygon([wereld].concat(gaten), {
+    L.polygon(ringen, {
         color: 'transparent',
-        fillColor: '#6F4257',  // Pas deze kleur aan naar wens
-        fillOpacity: 0.95,      // 95% dekkend
+        fillColor: '#6F4257',
+        fillOpacity: 0.95,
         interactive: false,
-        zIndex: 1000           // Zorgt dat het masker BOVEN de weerdata ligt
+        zIndex: 1000
     }).addTo(map);
-})
-.catch(function(e){
-    console.warn('Masker kon niet geladen worden:', e);
-});
+}
+bouwMasker();
 // ===== EINDE MASKER =====
 
 }
