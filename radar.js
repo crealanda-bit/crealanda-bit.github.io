@@ -98,29 +98,25 @@ setTimeout(function(){map.invalidateSize()},300);
 toggles();
 zetWeergave(huidigeWeergave);
 
-// ===== MASKER: laad de Benelux-grenzen uit de 3 bestanden =====
-var grensBestanden = ['nederland.geojson', 'belgie.geojson', 'luxemburg.geojson'];
-var maskerLaag = null;
-
-Promise.all(grensBestanden.map(function(f) {
-    return fetch(f).then(function(r) { return r.json(); });
-})).then(function(bestanden) {
-    if (maskerLaag) { map.removeLayer(maskerLaag); maskerLaag = null; }
+// ===== MASKER: haal de grenzen van alle landen direct op =====
+// We gebruiken de gratis Natural Earth data via een CDN
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+.then(function(r) { return r.json(); })
+.then(function(data) {
+    // Filter de Benelux eruit (NL = 528, BE = 056, LU = 442)
+    var benelux = data.objects.countries.geometries.filter(function(g) {
+        return ['528', '056', '442'].indexOf(g.id) !== -1;
+    });
+    
+    // Bouw een groot vlak over de hele wereld, met een gat voor de Benelux
     var wereld = [[-90, -180], [90, -180], [90, 180], [-90, 180], [-90, -180]];
     var gaten = [];
     
-    bestanden.forEach(function(data) {
-        if (data.type === 'FeatureCollection') {
-            data.features.forEach(function(f) {
-                if (f.geometry.type === 'Polygon') {
-                    gaten.push(f.geometry.coordinates[0].map(function(c) { return [c[1], c[0]]; }));
-                } else if (f.geometry.type === 'MultiPolygon') {
-                    f.geometry.coordinates.forEach(function(poly) {
-                        gaten.push(poly[0].map(function(c) { return [c[1], c[0]]; }));
-                    });
-                }
-            });
-        }
+    benelux.forEach(function(f) {
+        var coords = f.geometry.coordinates[0];
+        var ring = [];
+        coords.forEach(function(c) { ring.push([c[1], c[0]]); });
+        gaten.push(ring);
     });
     
     var ringen = [wereld];
@@ -128,14 +124,15 @@ Promise.all(grensBestanden.map(function(f) {
         ringen.push(gat.slice().reverse());
     });
     
-    maskerLaag = L.polygon(ringen, {
+    L.polygon(ringen, {
         color: 'transparent',
         fillColor: '#6F4257',
         fillOpacity: 0.95,
         interactive: false,
         zIndex: 1000
     }).addTo(map);
-}).catch(function(e) {
+})
+.catch(function(e) {
     console.warn('Masker kon niet geladen worden:', e);
 });
 // ===== EINDE MASKER =====
