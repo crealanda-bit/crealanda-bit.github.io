@@ -37,11 +37,8 @@ document.body.appendChild(sv);
 function $(i){return document.getElementById(i)}
 function satOp(){return(on.rain||on.snow)?SAT_OPACITY:SAT_SOLO}
 function allOn(){return on.rain&&on.snow&&on.wolken&&on.wind&&(on.blits||blitsGone)}
-/* metingen: alleen windmetingen, nooit met wolken erbij en niet als alles aan staat */
-function meet(){
-if(on.wind&&!on.wolken&&!allOn())return 'wind';
-return '';
-}
+/* metingen: windkracht en windstoten per plaats, zodra wind aan staat */
+function meet(){return on.wind?'wind':''}
 function canPlay(){return readyOk&&frames.length&&!timer&&vis&&$('pwr-body')&&!$('pwr-body').hidden}
 function rgb2hsl(r,g,b){
 r/=255;g/=255;b/=255;
@@ -262,13 +259,13 @@ toggles();
 }
 /* alle beelden eerst volledig laden, pas daarna afspelen: dat geeft een vloeiend beeld */
 function voorlaad(){
-var n=layers.length,k=0,id=++lid;readyOk=false;pause();
+var all=layers.concat(on.wolken?wolkenLagen:[]),n=all.length,k=0,id=++lid;readyOk=false;pause();
 function klaar(){
 if(id!==lid||readyOk)return;
 readyOk=true;show(idx);
 if(wantPlay&&canPlay())play();
 }
-layers.forEach(function(l){l.once('load',function(){
+all.forEach(function(l){l.once('load',function(){
 if(id!==lid||readyOk)return;
 k++;$('pwr-t').textContent='Laden '+k+'/'+n;
 if(k>=n)klaar();
