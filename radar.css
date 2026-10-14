@@ -8,8 +8,8 @@
 .pw .pwr-top button{padding:7px 11px;font-size:18px;border-radius:8px}
 .pwr-acts{display:flex;justify-content:center;gap:10px;margin-top:10px}
 .pw .pwr-acts button{min-width:100px}
-.pw .pwr-top .pwr-pc,.pw .pwr-top .pwr-ic{background:#ffffff26;color:#FCF5EE;box-shadow:inset 0 0 0 2px #B32C43}
-.pw .pwr-top .pwr-pc.on,.pw .pwr-top .pwr-ic.on{background:#B32C43;color:#FCF5EE}
+.pw .pwr-top .pwr-pc{background:#ffffff26;color:#FCF5EE;box-shadow:inset 0 0 0 2px #B32C43}
+.pw .pwr-top .pwr-pc.on{background:#B32C43;color:#FCF5EE}
 .pwr-map{position:relative;height:360px;border-radius:10px;overflow:hidden;background:var(--kl,#EAF0F8)}
 .pwr-cr,.pwr-cs{position:absolute;left:0;top:0;width:100%;height:100%}
 .pwr-map.no-rain .pwr-cr,.pwr-map.no-snow .pwr-cs{display:none}
@@ -36,8 +36,8 @@
 .pwr-bl{position:absolute;right:8px;top:8px;z-index:1200;display:flex;flex-direction:column;gap:1px;padding:5px 5px 4px;border-radius:8px;background:#6F4257eb;color:#FCF5EE;font:12px/1.2 Oswald,Arial,sans-serif}
 .pwr-map.no-blits .pwr-bl{display:none}
 .pwr-bl .pwr-bt{padding:2px 3px 3px;font-size:12px;white-space:nowrap;cursor:pointer}
-.pwr-bl.dicht .pwr-br{display:none}
 .pw .pwr-bl .pwr-br{display:flex;align-items:center;gap:6px;width:100%;margin:0;padding:3px;border:0;border-radius:5px;background:none;box-shadow:none;color:#FCF5EE;font:12px/1.2 Oswald,Arial,sans-serif;letter-spacing:0;text-transform:none;text-align:left}
+.pw .pwr-bl.dicht .pwr-br{display:none}
 .pw .pwr-bl .pwr-br.off{opacity:.4}
 .pw .pwr-bl .pwr-br:active{background:#ffffff26}
 .pwr-br svg{width:16px;height:16px;flex-shrink:0}
@@ -53,12 +53,5 @@
 .pwr-bar input::-moz-range-track{height:8px;border-radius:4px;background:#FCF5EE}
 .pwr-bar input::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#B32C43;border:0}
 #pwr-t{min-width:112px;text-align:right;font:16px Oswald,Arial,sans-serif}
-
-/* beeldschermvullend (Windy-stijl) */
-.pwr-full{position:fixed;inset:0;z-index:3500;display:flex;flex-direction:column;background:#6F4257;color:#FCF5EE;padding:calc(env(safe-area-inset-top,0px) + 10px) 10px calc(env(safe-area-inset-bottom,0px) + 10px)}
-.pwr-full>p{display:none}
-.pwr-full #pwr-body{display:flex;flex-direction:column;flex:1;min-height:0}
-.pwr-full .pwr-map{flex:1;height:auto;min-height:200px;border-radius:12px}
-.pwr-full .pwr-acts{margin-top:8px}
 
 @media(min-width:700px){.pwr-map{height:440px}}
