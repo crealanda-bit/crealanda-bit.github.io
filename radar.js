@@ -97,6 +97,46 @@ setInterval(function(){if(frames.length&&idx===frames.length-1)bolts(idx)},30000
 setTimeout(function(){map.invalidateSize()},300);
 toggles();
 zetWeergave(huidigeWeergave);
+
+// ===== NIEUW: Masker voor de Benelux =====
+// Laad de wereldkaart GeoJSON en filter de Benelux eruit
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json')
+.then(function(r){return r.json()})
+.then(function(data){
+    // De Benelux heeft deze ID's in de Natural Earth dataset: 
+    // NL = 528, BE = 056, LU = 442
+    var benelux = data.objects.countries.geometries.filter(function(g){
+        return ['528','056','442'].indexOf(g.id) !== -1;
+    });
+    
+    // Bouw een groot vlak over de hele wereld, met een gat voor de Benelux
+    var wereld = [[-90,-180],[90,-180],[90,180],[-90,180],[-90,-180]];
+    var gaten = [];
+    
+    benelux.forEach(function(f){
+        // Converteer de coördinaten naar Leaflet-formaat [lat, lng]
+        // We pakken de eerste ring (de buitenkant) van elk land
+        var coords = f.geometry.coordinates[0];
+        var ring = [];
+        coords.forEach(function(c){ ring.push([c[1], c[0]]); });
+        gaten.push(ring);
+    });
+    
+    // Teken het masker: alles buiten de Benelux wordt donker
+    // De kleur #6F4257 is jouw website-achtergrondkleur
+    L.polygon([wereld].concat(gaten), {
+        color: 'transparent',
+        fillColor: '#6F4257',  // Pas deze kleur aan naar wens
+        fillOpacity: 0.95,      // 95% dekkend
+        interactive: false,
+        zIndex: 1000           // Zorgt dat het masker BOVEN de weerdata ligt
+    }).addTo(map);
+})
+.catch(function(e){
+    console.warn('Masker kon niet geladen worden:', e);
+});
+// ===== EINDE MASKER =====
+
 }
 function voorlaad(){var all=layers.concat(on.wolken?wolkenLagen:[]),n=all.length,k=0,id=++lid;readyOk=false;pause();function klaar(){if(id!==lid||readyOk)return;readyOk=true;show(idx);if(wantPlay&&canPlay())play();}all.forEach(function(l){l.once('load',function(){if(id!==lid||readyOk)return;k++;$('pwr-t').textContent='Laden '+k+'/'+n;if(k>=n)klaar();})});$('pwr-t').textContent='Laden 0/'+n;setTimeout(klaar,8000);setTimeout(function(){if(id===lid&&!readyOk&&!k)klaar()},1500);}
 function loadFrames(){fetch(API).then(function(r){return r.json()}).then(function(d){var f=((d.radar&&d.radar.past)||[]).slice(-AANTAL);if(!f.length)throw 0;if(f[f.length-1].time===lastKey)return;lastKey=f[f.length-1].time;layers.forEach(function(l){map.removeLayer(l)});host=d.host;frames=f;layers=f.map(function(fr){return new Kleurlaag(host+fr.path+'/256/{z}/{x}/{y}/2/1_1.png',{opacity:0,maxNativeZoom:7,maxZoom:10,zIndex:10,updateWhenZooming:false,keepBuffer:1,className:'pwr-rl'});});layers.slice().reverse().forEach(function(l){l.addTo(map)});wolkenBouw();$('pwr-s').max=f.length-1;show(f.length-1);voorlaad();}).catch(function(){$('pwr-t').textContent='Radar niet beschikbaar'});}
