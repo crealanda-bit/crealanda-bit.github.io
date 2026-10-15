@@ -4,9 +4,9 @@ var $=function(i){return document.getElementById(i)};
 var moreOpen=false,out=$('pw-out'),list=$('pw-list'),input=$('pw-in'),place=null,timer=null;
 function wc(c){return c<1?'☀️':c<2?'🌤️':c<3?'⛅':c<4?'☁️':c<50?'🌫️':c<61?(c<55?'🌦️':'🌧️'):c<70?(c==61?'🌦️':'🌧️'):c<80?(c==75?'❄️':'🌨️'):c<83?(c==80?'🌦️':c==81?'🌧️':'⛈️'):c<87?(c==86?'❄️':'🌨️'):c>94?'⛈️':'🌡️'}
 function bft(k){var t=[1,6,12,20,29,39,50,62,75,89,103,118],n=0;while(n<t.length&&k>=t[n])n++;return n}
-function ico(c,cc,dy){if(c>3||cc==null)return wc(c);if(dy===0)return cc<25?'🌙':'☁️';return cc<20?'☀️':cc<45?'🌤️':cc<75?'⛅':'☁️'}
+function ico(c,cc,dy){if(c>3||cc==null)return wc(c);if(dy===0)return cc<25?'🌙':'☁️';return cc<25?'☀️':cc<65?'🌤️':cc<90?'⛅':'☁️'}
 function oi(s,dg){s=(s||'').toLowerCase();return/onweer/.test(s)?'⛈️':/sneeuw|hagel/.test(s)?'🌨️':/motregen/.test(s)?'🌦️':/regen|bui/.test(s)?'🌧️':/mist|nevel/.test(s)?'🌫️':/zwaar|^bewolkt|geheel/.test(s)?'☁️':/half|wisselend|opklaring|wolkenveld/.test(s)?'⛅':/licht|gedeeltelijk|deels/.test(s)?(dg?'🌤️':'🌙'):/zon|helder|onbewolkt/.test(s)?(dg?'☀️':'🌙'):null}
-function obs(p){return fetch('https://data.buienradar.nl/2.0/feed/json').then(function(r){return r.json()}).then(function(j){var b=null,m=1e9;((j.actual&&j.actual.stationmeasurements)||[]).forEach(function(x){if(!x.weatherdescription||x.lat==null)return;var a=(x.lat-p.lat)*111,e=(x.lon-p.lon)*111*Math.cos(p.lat*Math.PI/180),q=a*a+e*e;if(q<m){m=q;b=x}});return b&&m<8100?b:null}).catch(function(){return null})}
+function obs(p){return fetch('https://data.buienradar.nl/2.0/feed/json').then(function(r){return r.json()}).then(function(j){var b=null,m=1e9;((j.actual&&j.actual.stationmeasurements)||[]).forEach(function(x){if(!x.weatherdescription||x.lat==null)return;var a=(x.lat-p.lat)*111,e=(x.lon-p.lon)*111*Math.cos(p.lat*Math.PI/180),q=a*a+e*e;if(q<m){m=q;b=x}});return b&&m<400?b:null}).catch(function(){return null})}
 function r(n){return Math.round(n)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
 function save(p){try{localStorage.setItem('pw-place',JSON.stringify(p))}catch(e){}}
