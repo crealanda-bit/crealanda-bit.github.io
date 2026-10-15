@@ -82,7 +82,7 @@ return '<div>'+g.map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>'
 '<div id="pw-more"'+(mo?'':' hidden')+'><h3>Komende 24 uur</h3><div class="pw-scroll">'+hr+'</div><h3>Komende 7 dagen</h3>'+dd+'</div><p style="text-align:center;margin:14px 0 0"><button id="pw-tog" type="button">'+tt()+'</button></p>';
 fit();document.fonts&&document.fonts.ready.then(fit)
 }
-function fit(){var e=out.querySelector('h2'),f=36,t=e&&e.style;if(!e)return;t.whiteSpace='nowrap';t.fontSize='36px';while(f>22&&e.scrollWidth>e.clientWidth)t.fontSize=--f+'px';if(e.scrollWidth>e.clientWidth){t.whiteSpace='normal';while(f>16&&e.scrollWidth>e.clientWidth)t.fontSize=--f+'px'}}
+function fit(){var e=out.querySelector('h2'),f=36,t=e&&e.style;if(!e)return;t.whiteSpace='nowrap';t.fontSize='36px';while(f>12&&e.scrollWidth>e.clientWidth)t.fontSize=--f+'px';if(e.scrollWidth>e.clientWidth)t.whiteSpace='normal'}
 $('pw-go').onclick=se;
 out.addEventListener('click',function(e){if(e.target.id!=='pw-tog')return;mo=!mo;$('pw-more').hidden=!mo;e.target.textContent=tt()});
 input.onkeydown=function(e){if(e.key==='Enter')se()};$('pw-me').onclick=function(){
