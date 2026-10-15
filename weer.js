@@ -10,6 +10,7 @@ var WC={0:['Helder','☀️'],1:['Overwegend helder','🌤️'],2:['Half bewolkt
 95:['Onweer','⛈️'],96:['Onweer met hagel','⛈️'],99:['Zwaar onweer met hagel','⛈️']};
 function wc(c){return WC[c]||['Onbekend','🌡️']}
 function bft(k){var t=[1,6,12,20,29,39,50,62,75,89,103,118],n=0;while(n<t.length&&k>=t[n])n++;return n}
+function ico(c,cc,dy){if(c>3||cc==null)return wc(c)[1];if(dy===0)return cc<25?'🌙':'☁️';return cc<20?'☀️':cc<45?'🌤️':cc<75?'⛅':'☁️'}
 function r(n){return Math.round(n)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function save(p){try{localStorage.setItem('pw-place',JSON.stringify(p))}catch(e){}}
@@ -37,23 +38,26 @@ if(!place)return;
 window.pwPlace=place;setTimeout(function(){document.dispatchEvent(new CustomEvent('pw-place',{detail:place}))},0);
 clearInterval(timer);
 var u='https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+
-'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset&timezone=auto&forecast_days=7';
-fetch(u).then(function(r){return r.json()}).then(show).catch(function(){out.innerHTML='<p class="pw-msg">Weergegevens ophalen lukt nu niet.</p>'});
+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,precipitation_probability,weather_code,cloud_cover,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset&timezone=auto&forecast_days=7';
+fetch(u).then(function(r){return r.json()}).then(function(d){
+return fetch('https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+'&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=knmi_seamless&timezone=auto').then(function(r){return r.json()}).then(function(k){
+var q=k.current||{},c=d.current;for(var x in q)if(q[x]!=null&&x!=='time')c[x]=q[x];return d}).catch(function(){return d})
+}).then(show).catch(function(){out.innerHTML='<p class="pw-msg">Weergegevens ophalen lukt nu niet.</p>'});
 timer=setInterval(get,600000);
 }
 function show(d){
-var c=d.current,w=wc(c.weather_code),dl=d.daily,h=d.hourly;
+var c=d.current,dl=d.daily,h=d.hourly;
 window.pwCold=c.temperature_2m<8;
 var now=c.time.slice(0,13),i0=h.time.findIndex(function(t){return t.slice(0,13)>=now});if(i0<0)i0=0;
 var hrs=h.time.slice(i0,i0+24).map(function(t,k){var j=i0+k;
-return '<div class="pw-h"><span>'+t.slice(11,16)+'</span><span style="font-size:26px">'+wc(h.weather_code[j])[1]+'</span><b>'+r(h.temperature_2m[j])+'°</b><span class="r" >💧'+(h.precipitation_probability[j]||0)+'%</span></div>'}).join('');
+return '<div class="pw-h"><span>'+t.slice(11,16)+'</span><span style="font-size:26px">'+ico(h.weather_code[j],h.cloud_cover[j],h.is_day[j])+'</span><b>'+r(h.temperature_2m[j])+'°</b><span class="r" >💧'+(h.precipitation_probability[j]||0)+'%</span></div>'}).join('');
 var days=dl.time.map(function(t,i){
 var nm=i===0?'Vandaag':new Date(t+'T12:00').toLocaleDateString('nl-NL',{weekday:'long'});
 return '<div class="pw-d"><span style="text-transform:capitalize;font:17px Oswald,Arial,sans-serif">'+nm+'</span><span>'+wc(dl.weather_code[i])[1]+'</span><span class="r">'+(dl.precipitation_sum[i]>0?'💧 '+dl.precipitation_sum[i].toFixed(1)+' mm':'droog')+'</span><b>'+r(dl.temperature_2m_max[i])+'° <span class="r">/ '+r(dl.temperature_2m_min[i])+'°</span></b></div>'}).join('');
 var wk=r(c.wind_speed_10m),ps=dl.precipitation_sum[0]||0;
 var it=[['🌧️ '+ps.toFixed(1)+' mm','💧 '+c.relative_humidity_2m+'%'],['🌬️ '+r(c.wind_gusts_10m)+' km/u','🌀 '+bft(wk)+' Bft'],['🌅 '+dl.sunrise[0].slice(11,16),'🌇 '+dl.sunset[0].slice(11,16)]];
 out.innerHTML=
-'<div class="pw-hero"><div class="pw-top"><div class="pw-pl"><div class="pw-ico">'+w[1]+'</div><h2 style="font-size:'+Math.max(20,Math.min(40,Math.floor(380/place.name.length)))+'px">'+esc(place.name)+'</h2></div><div class="pw-now"><div class="pw-temp">'+r(c.temperature_2m)+'°</div><div class="pw-feel">voelt als '+r(c.apparent_temperature)+'°</div></div></div><div class="pw-det">'+it.map(function(g){return '<div>'+g.map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>'}).join('<i></i>')+'</div></div>'+
+'<div class="pw-hero"><div class="pw-top"><div class="pw-pl"><div class="pw-ico">'+ico(c.weather_code,c.cloud_cover,c.is_day)+'</div><h2 style="font-size:'+Math.max(20,Math.min(40,Math.floor(380/place.name.length)))+'px">'+esc(place.name)+'</h2></div><div class="pw-now"><div class="pw-temp">'+r(c.temperature_2m)+'°</div><div class="pw-feel">voelt als '+r(c.apparent_temperature)+'°</div></div></div><div class="pw-det">'+it.map(function(g){return '<div>'+g.map(function(x){return '<span>'+x+'</span>'}).join('')+'</div>'}).join('<i></i>')+'</div></div>'+
 '<div id="pw-more"'+(moreOpen?'':' hidden')+'><h3>Komende 24 uur</h3><div class="pw-scroll">'+hrs+'</div><h3>Komende 7 dagen</h3>'+days+'</div><p style="text-align:center;margin:14px 0 0"><button id="pw-tog" type="button">'+(moreOpen?'Minder weergegevens ▴':'Meer weergegevens ▾')+'</button></p>';
 }
 $('pw-go').onclick=search;
