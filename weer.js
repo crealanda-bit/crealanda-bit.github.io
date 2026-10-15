@@ -5,12 +5,11 @@ var moreOpen=false,out=$('pw-out'),list=$('pw-list'),input=$('pw-in'),place=null
 function wc(c){return c<1?'☀️':c<2?'🌤️':c<3?'⛅':c<4?'☁️':c<50?'🌫️':c<61?(c<55?'🌦️':'🌧️'):c<70?(c==61?'🌦️':'🌧️'):c<80?(c==75?'❄️':'🌨️'):c<83?(c==80?'🌦️':c==81?'🌧️':'⛈️'):c<87?(c==86?'❄️':'🌨️'):c>94?'⛈️':'🌡️'}
 function bft(k){var t=[1,6,12,20,29,39,50,62,75,89,103,118],n=0;while(n<t.length&&k>=t[n])n++;return n}
 function ico(c,cc,dy){if(c>3||cc==null)return wc(c);if(dy===0)return cc<25?'🌙':'☁️';return cc<25?'☀️':cc<65?'🌤️':cc<95?'⛅':'☁️'}
-function oi(s,dg){s=(s||'').toLowerCase();return/onweer/.test(s)?'⛈️':/sneeuw|hagel/.test(s)?'🌨️':/motregen/.test(s)?'🌦️':/regen|bui/.test(s)?'🌧️':/mist|nevel/.test(s)?'🌫️':/zwaar|^bewolkt|geheel/.test(s)?'☁️':/half|wisselend|opklaring|wolkenveld/.test(s)?'⛅':/licht|gedeeltelijk|deels/.test(s)?(dg?'🌤️':'🌙'):/zon|helder|onbewolkt/.test(s)?(dg?'☀️':'🌙'):null}
+function oi(s){s=(s||'').toLowerCase();return/onweer/.test(s)?'⛈️':/sneeuw|hagel/.test(s)?'🌨️':/motregen/.test(s)?'🌦️':/regen|bui/.test(s)?'🌧️':/mist|nevel/.test(s)?'🌫️':null}
+function ef(l,m,h,t){return l==null||m==null||h==null?t:Math.max(l,m,h*.4)}
 function obs(p){return fetch('https://data.buienradar.nl/2.0/feed/json').then(function(r){return r.json()}).then(function(j){var b=null,m=1e9;((j.actual&&j.actual.stationmeasurements)||[]).forEach(function(x){if(!x.weatherdescription||x.lat==null)return;var a=(x.lat-p.lat)*111,e=(x.lon-p.lon)*111*Math.cos(p.lat*Math.PI/180),q=a*a+e*e;if(q<m){m=q;b=x}});return b&&m<400?b:null}).catch(function(){return null})}
 function r(n){return Math.round(n)}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
-function save(p){try{localStorage.setItem('pw-place',JSON.stringify(p))}catch(e){}}
-function load(){try{return JSON.parse(localStorage.getItem('pw-place'))}catch(e){return null}}
 function search(){
 var q=input.value.trim(); if(!q)return;
 out.innerHTML='<p class="pw-msg">Zoeken…</p>';list.hidden=true;
@@ -27,14 +26,14 @@ list.onclick=function(e){var li=e.target.closest('li');if(li){list.hidden=true;p
 }
 function pick(p){
 place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat:p.latitude,lon:p.longitude};
-input.value=p.name;save(place);get();
+input.value=p.name;get();
 }
 function get(){
 if(!place)return;
 window.pwPlace=place;setTimeout(function(){document.dispatchEvent(new CustomEvent('pw-place',{detail:place}))},0);
 clearInterval(timer);
-var cu='temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m',u='https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+
-'&current='+cu+'&hourly=temperature_2m,precipitation_probability,weather_code,cloud_cover,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset&timezone=auto&forecast_days=7';
+var cu='temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m',u='https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+
+'&current='+cu+'&hourly=temperature_2m,precipitation_probability,weather_code,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,sunrise,sunset&timezone=auto&forecast_days=7';
 fetch(u).then(function(r){return r.json()}).then(function(d){
 return fetch('https://api.open-meteo.com/v1/forecast?latitude='+place.lat+'&longitude='+place.lon+'&current='+cu+'&models=knmi_seamless&timezone=auto').then(function(r){return r.json()}).then(function(k){
 var q=k.current||{},c=d.current;for(var x in q)if(q[x]!=null&&x!=='time')c[x]=q[x];return d}).catch(function(){return d})
@@ -42,11 +41,11 @@ var q=k.current||{},c=d.current;for(var x in q)if(q[x]!=null&&x!=='time')c[x]=q[
 timer=setInterval(get,600000);
 }
 function show(d){
-var c=d.current,dl=d.daily,h=d.hourly,o=d.obs,oc=o&&oi(o.weatherdescription,c.is_day),ic=(oc==='☁️'&&c.is_day&&c.cloud_cover<95?'⛅':oc)||ico(c.weather_code,c.cloud_cover,c.is_day);
+var c=d.current,dl=d.daily,h=d.hourly,o=d.obs,ic=oi(o&&o.weatherdescription)||ico(c.weather_code,ef(c.cloud_cover_low,c.cloud_cover_mid,c.cloud_cover_high,c.cloud_cover),c.is_day);
 window.pwCold=c.temperature_2m<8;
 var now=c.time.slice(0,13),i0=h.time.findIndex(function(t){return t.slice(0,13)>=now});if(i0<0)i0=0;
 var hrs=h.time.slice(i0,i0+24).map(function(t,k){var j=i0+k;
-return '<div class="pw-h"><span>'+t.slice(11,16)+'</span><span style="font-size:26px">'+ico(h.weather_code[j],h.cloud_cover[j],h.is_day[j])+'</span><b>'+r(h.temperature_2m[j])+'°</b><span class="r">💧'+(h.precipitation_probability[j]||0)+'%</span></div>'}).join('');
+return '<div class="pw-h"><span>'+t.slice(11,16)+'</span><span style="font-size:26px">'+ico(h.weather_code[j],ef(h.cloud_cover_low[j],h.cloud_cover_mid[j],h.cloud_cover_high[j],h.cloud_cover[j]),h.is_day[j])+'</span><b>'+r(h.temperature_2m[j])+'°</b><span class="r">💧'+(h.precipitation_probability[j]||0)+'%</span></div>'}).join('');
 var days=dl.time.map(function(t,i){
 var nm=i===0?'Vandaag':new Date(t+'T12:00').toLocaleDateString('nl-NL',{weekday:'long'});
 return '<div class="pw-d"><span style="text-transform:capitalize;font:17px Oswald,Arial,sans-serif">'+nm+'</span><span>'+wc(dl.weather_code[i])+'</span><span class="r">'+(dl.precipitation_sum[i]>0?'💧 '+dl.precipitation_sum[i].toFixed(1)+' mm':'droog')+'</span><b>'+r(dl.temperature_2m_max[i])+'° <span class="r">/ '+r(dl.temperature_2m_min[i])+'°</span></b></div>'}).join('');
@@ -76,7 +75,7 @@ var l=d.results||[],p=l.filter(function(x){return x.admin1==='Flevoland'})[0]||l
 if(p){place={name:p.name,sub:[p.admin1,p.country].filter(Boolean).join(', '),lat:p.latitude,lon:p.longitude};input.value=p.name;get()}
 }).catch(function(){});
 }
-var s=load();if(s){place=s;input.value=s.name;get()}else startPlace();
+startPlace();
 })();
 (function(){
 var DAGEN=4,FOTOS_PC=8,FOTOS_TEL=6;
