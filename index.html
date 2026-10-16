@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Crea Landa</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#9EB3D8">
@@ -741,6 +741,7 @@ main {
 <script src="app.js"></script>
 <script src="reacties.js"></script>
 <script src="weer.js"></script>
+<script src="radar.js"></script>
 <script>
 (function(){
 var btn=document.getElementById('shareBtn'),msg=document.getElementById('shareMsg'),timer;
@@ -751,7 +752,7 @@ else{var i=document.createElement('input');i.value=url;document.body.appendChild
 }
 btn.addEventListener('click',function(){
 var url=location.origin+location.pathname;
-if(navigator.share){navigator.share({title:'Crea Landa',text:'Kijk eens op de website van Crea Landa!',url:url}).catch(function(e){if(e&&e.name!=='AbortError')copy(url)})}
+if(navigator.share){navigator.share({title:'Crea Landa',text:'Kijk eens op de website de website van Crea Landa!',url:url}).catch(function(e){if(e&&e.name!=='AbortError')copy(url)})}
 else copy(url);
 });
 })();
