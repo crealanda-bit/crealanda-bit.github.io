@@ -2,7 +2,7 @@
 var h=document.getElementById("pw-host");if(!h)return;var st=document.createElement("style");
 st.textContent=".pw{--red:#B32C43;--cream:#FCF5EE;--card:#ffffff26;--mut:#FCF5EEd0;--o:Oswald,Arial,sans-serif;font-family:\"Bebas Neue\",sans-serif;letter-spacing:.3px;font-size:19px;color:var(--cream);margin:0 0 18px;text-align:left}.pw *{box-sizing:border-box}.pw-search{display:flex;gap:8px}.pw-search input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--red);border-radius:7px;background:var(--card);color:var(--cream);caret-color:var(--cream);font-size:19px}.pw-search input::placeholder{color:var(--cream);opacity:.8}.pw-search input:focus{outline:2px solid var(--cream);outline-offset:2px}.pw button{border:0;border-radius:8px;padding:10px 18px;background:var(--red);color:var(--cream);font-size:21px;line-height:1}.pw button.alt{padding:10px 12px;font-size:20px}.pw-list{list-style:none;margin:8px 0 0;padding:0;background:var(--cream);color:#6F4257;border-radius:10px;overflow:hidden;font:17px var(--o)}.pw-list li{padding:11px 14px;cursor:pointer;border-bottom:1px solid #6F425722}.pw-msg{margin:16px 0;text-align:center;font:16px var(--o);color:var(--mut)}.pw-hero{margin-top:14px;padding:12px 18px;border-radius:10px;background:var(--red);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}.pw-top{flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;max-width:100%}.pw-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0}.pw-pl{flex:1}.pw-left .pw-temp{font-size:48px}.pw-left .pw-feel{font-size:14px}.pw-vl{align-self:stretch;width:1px;background:#FCF5EE40;flex-shrink:0}.pw-rt{display:flex;flex-direction:column;gap:6px;flex-shrink:0;font:17px/1.3 var(--o)}.pw-rt div{white-space:nowrap;text-align:center}.pw-hl{height:1px;background:#FCF5EE55}.pw-pl,.pw-now{text-align:center;min-width:0;overflow-wrap:anywhere}.pw-hero h2,.pw h3{-webkit-text-stroke:.4px var(--cream)}.pw-hero h2{margin:2px 0 0;font:400 clamp(30px,9vw,40px)/1 \"Great Vibes\",cursive}.pw-ico{font-size:46px;line-height:1;position:relative;left:5px}.pw-temp{font-size:58px;line-height:1}.pw-now{flex-shrink:0}.pw-feel{white-space:nowrap;margin-top:4px;font:16px var(--o);color:var(--mut)}.pw-det{flex-basis:100%;display:grid;grid-template-columns:auto 1px auto 1px auto;justify-content:space-between;align-items:center;gap:0 6px;padding-top:10px;border-top:1px solid #FCF5EE55;font:17px/1.3 var(--o)}.pw-det div{display:flex;flex-direction:column;gap:5px}.pw-det i{align-self:stretch;background:#FCF5EE40}.pw-det span{white-space:nowrap}.pw h3{margin:20px 0 8px;text-align:center;font:400 clamp(26px,7vw,32px) \"Great Vibes\",cursive}.pw-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.pw-h{flex:0 0 auto;min-width:64px;text-align:center;background:var(--card);border-radius:10px;padding:8px 4px}.pw-h span{display:block;font:15px var(--o)}.pw-h b,.pw-d b{font-weight:400;font-size:22px}.pw-d{display:grid;grid-template-columns:5.8rem 2rem 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #FCF5EE70}.pw-d .r{font:15px var(--o);color:var(--mut)}.pw-foot{margin:16px 0 0;text-align:center;font:13px var(--o);color:var(--mut)}.pw-foot a{color:inherit}";
 document.head.appendChild(st);
-h.innerHTML="<div class=\"pw\" id=\"pw\"><div class=\"pw-search\">  <input id=\"pw-in\" type=\"text\" placeholder=\"Typ je plaats, bijv. Zwolle\" autocomplete=\"off\" aria-label=\"Plaatsnaam\">  <button id=\"pw-go\">Zoek</button>  <button id=\"pw-me\" class=\"alt\" aria-label=\"Gebruik mijn locatie\">\ud83d\udccd</button></div><ul class=\"pw-list\" id=\"pw-list\" hidden></ul><div id=\"pw-out\"><p class=\"pw-msg\">Vul een plaats in om het weer te zien \ud83c\udf24\ufe0f</p></div><p class=\"pw-foot\">Weergegevens van <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo.com</a> en Buienradar \u00b7 wordt elke 10 minuten automatisch bijgewerkt</p>\n</div>"
+h.innerHTML="<div class=\"pw\" id=\"pw\"><div class=\"pw-search\"><input id=\"pw-in\" type=\"text\" placeholder=\"Typ je plaats, bijv. Zwolle\" autocomplete=\"off\" aria-label=\"Plaatsnaam\"><button id=\"pw-go\">Zoek</button><button id=\"pw-me\" class=\"alt\" aria-label=\"Gebruik mijn locatie\">\ud83d\udccd</button></div><ul class=\"pw-list\" id=\"pw-list\" hidden></ul><div id=\"pw-out\"><p class=\"pw-msg\">Vul een plaats in om het weer te zien \ud83c\udf24\ufe0f</p></div><p class=\"pw-foot\">Weergegevens van <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo.com</a> en Buienradar \u00b7 wordt elke 10 minuten automatisch bijgewerkt</p>\n</div>"
 })();
 (function(){
 var $=function(i){return document.getElementById(i)};var mo=false,out=$('pw-out'),ls=$('pw-list'),input=$('pw-in'),P=null,tm=null;
@@ -104,18 +104,37 @@ input.value=p.name;get()
 sp()
 })();
 (function(){
-var DG=4,FP=8,FT=6;var wl=document.getElementById('weerLijst');if(!wl)return;function kn(t){
-var b=document.createElement('button');b.type='button';b.textContent=t;
+var DG=4,wl=document.getElementById('weerLijst');if(!wl)return;
+var st=document.createElement('style');
+st.textContent='#weerLijst{--ar:3/4;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start}#weerLijst>p{grid-column:1/-1}#weerLijst .wdag{min-width:0;text-align:center}#weerLijst .wt{white-space:normal;line-height:1.1;font-size:clamp(20px,5.4vw,30px)}#weerLijst .wg{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;aspect-ratio:var(--ar);border-radius:10px;background:#ffffff26}#weerLijst .wg:empty{display:none}#weerLijst .wg::-webkit-scrollbar{display:none}#weerLijst .wg>*{flex:0 0 100%;margin:0;border-radius:0;scroll-snap-align:center;scroll-snap-stop:always}#weerLijst .wg a{display:block;cursor:zoom-in}#weerLijst .wg img,#weerLijst .wg video{display:block;width:100%;height:100%;object-fit:cover;border-radius:0}.wdt{display:flex;flex-wrap:wrap;justify-content:center;margin:0 0 6px}.wdt button{height:20px;padding:0 3px;border:0;background:none;display:flex;align-items:center}.wdt button::after{content:"";width:9px;height:9px;border-radius:5px;border:2px solid #FCF5EE;opacity:.6;transition:.3s}.wdt button.on::after{width:22px;background:#FCF5EE;opacity:1}@media(max-width:650px){#weerLijst{column-gap:10px}#weerLijst .wi{font-size:15px}}';
+document.head.appendChild(st);
+function E(t,c){var e=document.createElement(t);if(c)e.className=c;return e}
+function kn(t){
+var b=E('button');b.type='button';b.textContent=t;
 b.style.cssText='display:block;margin:10px auto 0;padding:8px 14px;border:0;border-radius:8px;background:#B32C43;color:#FCF5EE;font:19px "Bebas Neue",sans-serif;white-space:nowrap;cursor:pointer;grid-column:1/-1';
 return b
 }
+function zm(u,s){
+var ov=E('div','lb'),bx=E('div','sl big'),tr=E('div','sl-t'),dt=E('div','sl-d'),x=E('button','lb-x'),ds=[];
+u.forEach(function(p,n){var i=new Image();i.src=p;i.alt='';i.draggable=false;tr.appendChild(i);var d=E('span',n==s?'on':'');ds.push(d);dt.appendChild(d)});
+bx.appendChild(tr);if(u.length>1)bx.appendChild(dt);
+tr.onscroll=function(){var k=Math.round(tr.scrollLeft/(tr.clientWidth||1));ds.forEach(function(d,n){d.classList.toggle('on',n==k)})};
+x.type='button';x.setAttribute('aria-label','Sluiten');x.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+function k(e){if(e.key==='Escape')c()}
+function c(){if(ov.classList.contains('out'))return;ov.classList.add('out');document.body.style.overflow='';document.removeEventListener('keydown',k);setTimeout(function(){ov.remove()},200)}
+x.onclick=c;ov.onclick=function(e){if(e.target===ov)c()};
+document.body.style.overflow='hidden';document.addEventListener('keydown',k);
+bx.appendChild(x);ov.appendChild(bx);document.body.appendChild(ov);tr.scrollLeft=s*tr.clientWidth
+}
 function ap(){
-var sc=[].slice.call(wl.querySelectorAll('.wdag'));if(!sc.length)return;var FO=innerWidth<650?FT:FP;sc.forEach(function(s){
-if(s.dataset.pw)return;s.dataset.pw='1';var g=s.querySelector('.wg');if(!g)return;var it=[].slice.call(g.children);if(it.length<=FO)return;
-var ex=it.slice(FO),open=false,n=ex.length,b=kn('+'+n+' foto\u2019s');ex.forEach(function(e){e.style.display='none'});b.onclick=function(){
-open=!open;ex.forEach(function(e){e.style.display=open?'':'none'});b.textContent=open?'Minder foto\u2019s':'+'+n+' foto\u2019s'
-};
-g.after(b)
+var sc=[].slice.call(wl.querySelectorAll('.wdag'));if(!sc.length)return;
+sc.forEach(function(s){
+if(s.dataset.pw)return;s.dataset.pw='1';var g=s.querySelector('.wg');if(!g)return;
+var n=g.children.length;if(n<2)return;var d=E('div','wdt'),bs=[];
+for(var i=0;i<n;i++)(function(i){var b=E('button');b.type='button';b.onclick=function(){g.scrollTo({left:i*g.clientWidth,behavior:'smooth'})};bs.push(b);d.appendChild(b)})(i);
+bs[0].className='on';
+g.addEventListener('scroll',function(){var k=Math.round(g.scrollLeft/(g.clientWidth||1));bs.forEach(function(b,i){b.classList.toggle('on',i===k)})},{passive:true});
+g.before(d)
 });
 if(sc.length>DG&&!wl.dataset.pwDagen){
 wl.dataset.pwDagen='1';var od=sc.slice(DG),open=false,b=kn('Oudere dagen tonen ('+od.length+')');
@@ -125,26 +144,10 @@ open=!open;od.forEach(function(s){s.style.display=open?'':'none'});b.textContent
 wl.appendChild(b)
 }
 }
-new MutationObserver(ap).observe(wl,{childList:true});ap()
-})();
-(function(){
-var wl=document.getElementById('weerLijst');if(!wl)return;var st=document.createElement('style');
-st.textContent='#weerLijst{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;align-items:start}#weerLijst>p{grid-column:1/-1}#weerLijst .wdag{min-width:0}#weerLijst .wt{white-space:normal;line-height:1.1;font-size:clamp(20px,5.4vw,30px)}#weerLijst .wg a{cursor:zoom-in}@media(max-width:650px){#weerLijst{column-gap:10px}#weerLijst .wg{grid-template-columns:repeat(2,1fr)}#weerLijst .wi{font-size:15px}}.pwl{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:56px 20px 24px;background:#00000066;backdrop-filter:blur(12px);animation:pwlIn .25s both}.pwl.out{animation:pwlOut .2s both}.pwl-box{position:relative;line-height:0;animation:pwlPlop .65s both}.pwl.out .pwl-box{transform:scale(.94);opacity:0;transition:.2s}.pwl-img{display:block;width:auto;height:auto;max-width:min(calc(100vw - 40px),900px);max-height:calc(100dvh - 130px);border-radius:14px;box-shadow:0 10px 40px #0006}.pwl-x{position:absolute;right:-4px;bottom:100%;margin-bottom:2px;width:44px;height:44px;padding:0;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:0}.pwl-x svg{width:26px;height:26px;fill:none;stroke:#FCF5EE;stroke-width:2.6;stroke-linecap:round}@keyframes pwlIn{from{opacity:0}}@keyframes pwlOut{to{opacity:0}}@keyframes pwlPlop{0%{opacity:0;transform:scale(.88)}75%{opacity:1;transform:scale(1.02)}}';
-document.head.appendChild(st);function open(url){
-var img=new Image();img.onload=function(){
-var ov=document.createElement('div'),box=document.createElement('div'),x=document.createElement('button');
-ov.className='pwl';box.className='pwl-box';x.className='pwl-x';x.type='button';x.setAttribute('aria-label','Sluiten');
-x.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>';img.className='pwl-img';box.appendChild(x);box.appendChild(img);
-ov.appendChild(box);document.body.appendChild(ov);document.body.style.overflow='hidden';function key(e){if(e.key==='Escape')close()}function close(){
-if(ov.classList.contains('out'))return;ov.classList.add('out');document.body.style.overflow='';document.removeEventListener('keydown',key);
-setTimeout(function(){ov.remove()},200)
-}
-x.onclick=close;ov.onclick=function(e){if(e.target===ov)close()};document.addEventListener('keydown',key)
-};
-img.onerror=function(){window.open(url,'_blank')};img.src=url
-}
+new MutationObserver(ap).observe(wl,{childList:true});ap();
 wl.addEventListener('click',function(e){
-var a=e.target.closest&&e.target.closest('.wg a');if(!a||!a.querySelector('img'))return;e.preventDefault();open(a.href)
+var a=e.target.closest&&e.target.closest('.wg a');if(!a||!a.querySelector('img'))return;e.preventDefault();
+var u=[].slice.call(a.parentNode.querySelectorAll('a')).map(function(x){return x.href});zm(u,Math.max(0,u.indexOf(a.href)))
 })
 })();
 (function(){
@@ -169,7 +172,7 @@ sy();if(n!==old&&window.scrollY>0)window.scrollTo({top:0,behavior:'smooth'})
 }
 b[0].onclick=function(){go(0)};b[1].onclick=function(){go(1)};pwv.addEventListener('touchstart',function(e){
 ok=dr=0;
-if(e.touches.length!==1||e.target.closest('.leaflet-container,.pw-scroll,input,textarea,select,video'))return;
+if(e.touches.length!==1||e.target.closest('.leaflet-container,.pw-scroll,.wg,input,textarea,select,video'))return;
 X0=e.touches[0].clientX;Y0=e.touches[0].clientY;T0=Date.now();dx=0;ok=1
 },{passive:true});
 pwv.addEventListener('touchmove',function(e){
